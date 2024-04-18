@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 209, 213, 219;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 209, 213, 219;       /* Purple foreground color */
+    --background-rgb: 209, 213, 219; /* Purple background start color */
+  }
+}
+
+@import '~@fortawesome/fontawesome-free/css/all.min.css';
+
+
+body {
+  @apply bg-gray-800;
+  color: rgb(var(--foreground-rgb));
+}
+
+.outline-container {
+  border: 4px solid ; /* Increase border thickness */
+  padding: 10px; /* Add padding to maintain space between content and the border */
+}
+/* globals.css */
+
+.before-hover-animation {
+  position: relative;
+  overflow: hidden;
+}
+
+.before-hover-animation::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, #3498db); /* Gradient background */
+  z-index: 1;
+  opacity: 0;
+  transition: width 0.5s ease, opacity 0.5s ease; /* Transition properties */
+}
+
+.before-hover-animation:hover::before {
+  width: 100%; /* Make the gradient fill the width on hover */
+  opacity: 1; /* Make the gradient visible on hover */
+}

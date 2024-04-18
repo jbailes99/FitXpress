@@ -1,0 +1,5 @@
+.brand {
+  @apply text-2xl font-bold text-gray-300 font-display mr-10;
+  font-variant: small-caps;
+  letter-spacing: 1px;
+}
