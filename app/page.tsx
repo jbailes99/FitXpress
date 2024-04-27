@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client'
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { Chart as ChartJS, registerables } from 'chart.js'
 import { motion } from 'framer-motion'
@@ -10,34 +10,35 @@ import { getCurrentTokens, getUserDetails } from '@/utils/authService'
 import { useIsLoggedIn, useUserDetails, useIsAdmin } from '@/hooks'
 import { Panel } from '@/components/panel'
 import { Button } from '@/components/button'
+import GaugeChart from 'react-gauge-chart'
 
 ChartJS.register(...registerables)
 
 //ONLY ALLOW BACK SPACE, QUOTES, LEFT AND RIGHT ARROW KEYS
-const VALID_KEYS = [ 8, 9, 37, 39, 222 ]
+const VALID_KEYS = [8, 9, 37, 39, 222]
 
 const BmiCalculator: React.FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isAdmin = useIsAdmin()
   const userDetails = useUserDetails()
-  const [ weight, setWeight ] = useState<number | undefined>(undefined)
-  const [ age, setAge ] = useState<number | undefined>(undefined)
-  const [ neckMeasurement, setNeckMeasurement ] = useState<number | undefined>(undefined)
-  const [ waistMeasurement, setWaistMeasurement ] = useState<number | undefined>(undefined)
-  const [ height, setHeight ] = useState<string | undefined>(undefined)
-  const [ bodyFatCalc, setBodyFatCalc ] = useState<number | null>(null)
-  const [ bodyFatMass, setBodyFatMass ] = useState<number | null>(null)
-  const [ bodyLeanMass, setBodyLeanMass ] = useState<number | null>(null)
-  const [ bodyBMI, setBodyBMI ] = useState<number | null>(null)
-  const [ bodyFatBMI, setBodyFatBMI ] = useState<number | null>(null)
-  const [ showResults, setShowResults ] = useState(false) // set to false
-  const [ bmi, setBmi ] = useState<number | null>(null)
-  const [ fadeInUp, setFadeInUp ] = useState({
+  const [weight, setWeight] = useState<number | undefined>(undefined)
+  const [age, setAge] = useState<number | undefined>(undefined)
+  const [neckMeasurement, setNeckMeasurement] = useState<number | undefined>(undefined)
+  const [waistMeasurement, setWaistMeasurement] = useState<number | undefined>(undefined)
+  const [height, setHeight] = useState<string | undefined>(undefined)
+  const [bodyFatCalc, setBodyFatCalc] = useState<number | null>(null)
+  const [bodyFatMass, setBodyFatMass] = useState<number | null>(null)
+  const [bodyLeanMass, setBodyLeanMass] = useState<number | null>(null)
+  const [bodyBMI, setBodyBMI] = useState<number | null>(null)
+  const [bodyFatBMI, setBodyFatBMI] = useState<number | null>(null)
+  const [showResults, setShowResults] = useState(false) // set to false
+  const [bmi, setBmi] = useState<number | null>(null)
+  const [fadeInUp, setFadeInUp] = useState({
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   })
-  const [ isSignUpOpen, setSignUpOpen ] = useState(false)
-  const [ isModalOpen, setIsModalOpen ] = useState<boolean>(false)
+  const [isSignUpOpen, setSignUpOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const openModal = () => {
     setIsModalOpen(true)
   }
@@ -53,13 +54,6 @@ const BmiCalculator: React.FC = () => {
   const closeSignUpModal = () => {
     setSignUpOpen(false)
   }
-
-  const bmiRanges = [
-    { label: 'Underweight', min: 15, max: 18.5 },
-    { label: 'Normal Weight', min: 18.6, max: 24.9 },
-    { label: 'Overweight', min: 25, max: 29.9 },
-    { label: 'Obese', min: 30, max: 50 },
-  ]
 
   const handleGoBack = () => {
     // Set showResults to false when the "Go Back" button is clicked
@@ -176,8 +170,9 @@ const BmiCalculator: React.FC = () => {
       <div className=' flex flex-col justify-center items-center min-h-screen overflow-x-hidden '>
         <div className='grid grid-cols-3 px-12 space-x-8'>
           <Panel
-            className={`text-center mb-6 p-4 md:p-12 mt-16 rounded-xl shadow-2xl col-span-2 ${showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'
-              }`}
+            className={`text-center mb-6 p-4 md:p-12 mt-16 rounded-xl shadow-2xl col-span-2 ${
+              showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'
+            }`}
           >
             <h1 className='sm:text-3xl text-lg sm:mt-0 mt-2 mb-4 text-center text-gray-400 font-bold sm:mb-12'>
               Gain comprehensive insight into your body composition
@@ -310,8 +305,9 @@ const BmiCalculator: React.FC = () => {
               </div>
 
               <div
-                className={`text-gray-300 font-bold sm:col-span-3 col-span-3 text-2xl ${showResults ? 'visible' : 'hidden'
-                  }`}
+                className={`text-gray-300 font-bold sm:col-span-3 col-span-3 text-2xl ${
+                  showResults ? 'visible' : 'hidden'
+                }`}
               >
                 {showResults && (
                   <>
@@ -322,7 +318,27 @@ const BmiCalculator: React.FC = () => {
                           <h3 className='text-base font-semibold leading-6 text-gray-800'>Body Fat</h3>
                           <div className='mt-2 sm:flex sm:items-start sm:justify-center'>
                             <div className='text-md text-gray-800 text-center'>
-                              {bodyFatCalc !== null ? <p>{bodyFatCalc.toFixed(2)}%</p> : ''}
+                              {bodyFatCalc !== null ? (
+                                <>
+                                  <p className='text-center'>{bodyFatCalc.toFixed(2)}</p>
+
+                                  <div className='flex justify-center items-center text-center'>
+                                    <div className=''>
+                                      <GaugeChart
+                                        id='gauge-chart1'
+                                        percent={parseFloat(bodyFatCalc.toFixed(2)) / 40} // Normalize bodyBMI to fit within the range of 0 to 100
+                                        nrOfLevels={30}
+                                        arcsLength={[0.2, 0.6, 0.2]}
+                                        colors={['#F5CD19', '#5BE12C', '#EA4228']}
+                                        labels={['Low', 'Medium', 'High']}
+                                        hideText
+                                      />
+                                    </div>
+                                  </div>
+                                </>
+                              ) : (
+                                ''
+                              )}
                             </div>
                           </div>
                         </div>
@@ -332,7 +348,26 @@ const BmiCalculator: React.FC = () => {
                           <h3 className='text-base font-semibold leading-6 text-gray-900'> BMI </h3>
                           <div className='mt-2 flex-row items-center justify-center'>
                             <h1 className='text-md text-gray-800'>
-                              {bodyBMI !== null ? <p className='text-center'>{bodyBMI.toFixed(2)}</p> : ''}
+                              {bodyBMI !== null ? (
+                                <>
+                                  <p className='text-center'>{bodyBMI.toFixed(2)}</p>
+                                  <div className='flex justify-center items-center text-center'>
+                                    <div className='w-1/4'>
+                                      <GaugeChart
+                                        id='gauge-chart1'
+                                        percent={parseFloat(bodyBMI.toFixed(2)) / 40} // Normalize bodyBMI to fit within the range of 0 to 100
+                                        nrOfLevels={30}
+                                        arcsLength={[0.2, 0.6, 0.2]}
+                                        colors={['#F5CD19', '#5BE12C', '#EA4228']}
+                                        labels={['Low', 'Medium', 'High']}
+                                        hideText
+                                      />
+                                    </div>
+                                  </div>
+                                </>
+                              ) : (
+                                ''
+                              )}
                             </h1>
                             <div
                               className='flex items-center justify-center mt-4 sm:mt-0 w-full 
@@ -423,19 +458,24 @@ const BmiCalculator: React.FC = () => {
             )}
             {!isLoggedIn && !isAdmin && (
               <Panel className='!bg-medium-purple-500 col-span-2 flex flex-col justify-center items-center text-center md:mb-6 p-4 md:p-8 rounded-2xl shadow-2xl mt-16 w-full h-full'>
-                <div className="leading-tight mb-3">
+                <div className='leading-tight mb-3'>
                   <div className='font-bold text-lg md:text-3xl text-white leading-tight'>Take the first step.</div>
-                  <div className='text-md md:text-base font-medium text-md text-white/80'>Sign up to start your journey!</div>
+                  <div className='text-md md:text-base font-medium text-md text-white/80'>
+                    Sign up to start your journey!
+                  </div>
                 </div>
 
                 <div className='text-md md:text-base text-white font-medium mb-3'>
                   Start easily tracking your progress and access personalized fitness and nutrition advice.
                 </div>
 
-
                 {/* <div className='bg-medium-purple-500  text-center p-2 md:p-4 rounded-lg shadow-2xl mt-6'> */}
-                <Button onClick={openSignUpModal} rounded className=' text-white font-bold bg-secondary-800 hover:bg-secondary-600 shadow-md text-lg px-4'>
-                    Sign up
+                <Button
+                  onClick={openSignUpModal}
+                  rounded
+                  className=' text-white font-bold bg-secondary-800 hover:bg-secondary-600 shadow-md text-lg px-4'
+                >
+                  Sign up
                 </Button>
                 {/* </div> */}
               </Panel>
