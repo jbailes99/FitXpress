@@ -44,7 +44,7 @@ const ExerciseTracker = () => {
     }
 
     fetchExerciseData()
-  }, [])
+  }, [selectedCategory])
 
   const handleExerciseSubmit = () => {
     // Add new exercise entry to the exerciseEntries state
