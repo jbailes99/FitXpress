@@ -63,7 +63,8 @@ const ProfilePage: React.FC = () => {
     try {
       // Ensure that formValues is defined and contains necessary properties
       if (formValues && formValues.email && formValues.nickname && formValues.username) {
-        await updateUserDetails({
+        await updateUserDetails(accessToken, {
+          // Passing accessToken as the first argument
           email: formValues.email,
           nickname: formValues.nickname,
           username: formValues.username,
@@ -84,7 +85,9 @@ const ProfilePage: React.FC = () => {
       email: userData?.email || '',
       nickname: userData?.nickname || '',
       username: userData?.username || '',
+      isAdmin: userData?.isAdmin ? 'true' : 'false',
     })
+
     setEditMode(false)
   }
 

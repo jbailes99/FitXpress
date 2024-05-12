@@ -28,8 +28,7 @@ function classNames(...classes: string[]) {
 
 export default function Results() {
   const [selectedDataset, setSelectedDataset] = useState<string>('bmi')
-  const [results, setResults] = useState<any>([])
-
+  const [results, setResults] = useState<any[]>([])
   interface ResultItem {
     userId: string
     bodyLeanMass: number
@@ -119,9 +118,10 @@ export default function Results() {
   leanMassData.sort((a, b) => a.x - b.x)
   bodyFatPercentageData.sort((a, b) => a.x - b.x)
 
-  const uniqueDates = [...new Set(results.map((item: any) => new Date(item.timestamp).getTime()))]
-    .sort((a, b) => a - b)
-    .map(timestamp => new Date(timestamp).toLocaleDateString())
+  const uniqueDates = Array.from(
+    new Set(results.map((item: any) => new Date(item.timestamp).toLocaleDateString()))
+  ).sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+
   // Extracting unique dates for x-axis labels
 
   const firstEntryChart = {
@@ -156,10 +156,6 @@ export default function Results() {
         tension: 0.1,
       },
     ],
-  }
-
-  const chartOptions = {
-    legend: { display: false },
   }
 
   // Calculate percentage difference
@@ -249,7 +245,7 @@ export default function Results() {
                     Body Fat Percentage
                   </Button>
                 </div>
-                <Line data={firstEntryChart} options={chartOptions} />
+                <Line data={firstEntryChart} />
               </div>
             </div>
             {/* </div> */}
@@ -292,8 +288,7 @@ export default function Results() {
                         <p style={{ fontSize: '16px', margin: '5px 0' }}>entryId: {item.entryId}</p>
 
                         <Button
-                          onClick={e => {
-                            e.preventDefault()
+                          onClick={() => {
                             handleDelete(item.entryId)
                           }}
                           className='bg-red-600 text-gray-200 rounded shadow'
