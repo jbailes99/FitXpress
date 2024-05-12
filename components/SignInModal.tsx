@@ -162,7 +162,15 @@ const SignIn: React.FC<SignInProps> = ({ onClose }) => {
                       Create one
                     </span>
                   </p>
-                  {isSignUpOpen && <SignUp onClose={handleSignUpClose} onSubmit={handleSignUp} />}
+                  {isSignUpOpen && (
+                    <SignUp
+                      onClose={handleSignUpClose}
+                      onSubmit={handleSignUp}
+                      onSignUpClick={function (): void {
+                        throw new Error('Function not implemented.')
+                      }}
+                    />
+                  )}
                 </div>
               </Dialog.Panel>
             </Transition.Child>

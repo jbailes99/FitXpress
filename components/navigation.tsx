@@ -228,7 +228,7 @@ export default function Navigation() {
       {isSignUpOpen && (
         <SignUp
           onClose={() => setSignUpOpen(false)}
-          // onSubmit={() => { }}
+          onSubmit={() => {}} // Provide an empty function if not needed
           onSignUpClick={() => setSignUpOpen(true)}
         />
       )}
