@@ -13,8 +13,13 @@ interface SignInProps {
   onSignUpClick: () => void // Add this prop for handling sign-up click
 }
 
-const SignIn: React.FC<SignInProps> = ({ onClose, onSubmit }) => {
-  const [credentials, setCredentials] = useState<{ username: string; password: string }>({ username: '', password: '' })
+const SignIn: React.FC<SignInProps> = ({ onClose }) => {
+  const [credentials, setCredentials] = useState<{
+    username: string
+    password: string
+    nickname: string
+    email: string
+  }>({ username: '', password: '', nickname: '', email: '' })
   const [open, setOpen] = useState(true)
   const [isSignUpOpen, setIsSignUpOpen] = useState(false)
   const [signInSuccess, setSignInSuccess] = useState(false) // State for successful sign-in
@@ -61,7 +66,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onSubmit }) => {
   const handleSignUp = async () => {
     try {
       // Cwwall signUp function from authService
-      await signUp(credentials.username, credentials.password)
+      await signUp(credentials.username, credentials.email, credentials.nickname, credentials.password)
       console.log('Sign-up successful')
       setSignInSuccess(true) // Set the state to trigger the successful sign-up modal
       setIsSignUpOpen(false) // Close the sign-up modal after sign-up
