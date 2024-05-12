@@ -110,7 +110,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
                       {/* <div className='mb-4'>
                         <label htmlFor='gender' className='block text-sm font-medium text-gray-300'>
                           Gender
-                        </label>
+                        </label>6
                         <input
                           type='text'
                           id='nickname'
@@ -199,7 +199,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
                 <div className='mt-2'>
                   <p className='text-sm text-gray-300'>
                     Already have an account?{' '}
-                    <span className='text-blue-400 cursor-pointer' onClick={handleSignInOpen}>
+                    <span className='text-medium-purple-300 cursor-pointer' onClick={handleSignInOpen}>
                       Sign in
                     </span>
                   </p>

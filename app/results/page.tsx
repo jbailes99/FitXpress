@@ -203,24 +203,51 @@ export default function Results() {
                 </button>
               </div>
             </div>
-            <div className='flex justify-center items-center text-center'>
+            <div className='flex justify-center text-center ml-6 '>
               {/* <div className='flex space-x-24 items-center mt-4'> */}
-              <div className='bg-secondary-300 rounded-2xl w-1/2 mr-4 p-12 mb-4'>
+              <div className='bg-secondary-300 rounded-2xl w-1/2  mr-4 p-12 mb-4 '>
                 <h3 className='font-bold'>Statistics</h3>
-                <div className='font-bold text-2xl text-left mt-2'>
-                  <p>BMI Percentage Difference: {bmiPercentageDifference.toFixed(2)}%</p>
-                  <p>Fat Mass Percentage Difference: {fatMassPercentageDifference.toFixed(2)}%</p>
-                  <p>Lean Mass Percentage Difference: {leanMassPercentageDifference.toFixed(2)}%</p>
-                  <p>Body Fat Percentage Difference: {bodyFatPercentageDifference.toFixed(2)}%</p>
+                <div className='flex h-full'>
+                  <div className='flex flex-col justify-center font-bold text-2xl text-left mt-2 space-y-24'>
+                    <p className={`text-${bmiPercentageDifference < 0 ? 'green' : 'red'}-500`}>
+                      BMI Percentage Difference: {bmiPercentageDifference.toFixed(2)}%
+                    </p>
+                    <p className={`text-${fatMassPercentageDifference < 0 ? 'green' : 'red'}`}>
+                      Fat Mass Percentage Difference: {fatMassPercentageDifference.toFixed(2)}%
+                    </p>
+                    <p className={`text-${leanMassPercentageDifference >= 0 ? 'red' : 'green'}`}>
+                      Lean Mass Percentage Difference: {leanMassPercentageDifference.toFixed(2)}%
+                    </p>
+                    <p className={`text-${bodyFatPercentageDifference < 0 ? 'green' : 'red'}`}>
+                      Body Fat Percentage Difference: {bodyFatPercentageDifference.toFixed(2)}%
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div className='bg-secondary-300 mr-12 rounded-2xl w-full'>
-                <div>
-                  <Button onClick={() => setSelectedDataset('bmi')}>BMI</Button>
-                  <Button onClick={() => setSelectedDataset('fatMass')}>Fat Mass</Button>
-                  <Button onClick={() => setSelectedDataset('leanMass')}>Lean Mass</Button>
-                  <Button onClick={() => setSelectedDataset('bodyFatPercentage')}>Body Fat Percentage</Button>
+              <div className='bg-secondary-300 mr-6 mt-4 mb-4 rounded-2xl w-full'>
+                <div className='mt-4 f '>
+                  <Button className='bg-medium-purple-300 rounded-xl mr-2' onClick={() => setSelectedDataset('bmi')}>
+                    BMI
+                  </Button>
+                  <Button
+                    className='bg-medium-purple-300 rounded-xl mr-2'
+                    onClick={() => setSelectedDataset('fatMass')}
+                  >
+                    Fat Mass
+                  </Button>
+                  <Button
+                    className='bg-medium-purple-300 rounded-xl mr-2'
+                    onClick={() => setSelectedDataset('leanMass')}
+                  >
+                    Lean Mass
+                  </Button>
+                  <Button
+                    className='bg-medium-purple-300 rounded-xl'
+                    onClick={() => setSelectedDataset('bodyFatPercentage')}
+                  >
+                    Body Fat Percentage
+                  </Button>
                 </div>
                 <Line data={firstEntryChart} options={chartOptions} />
               </div>

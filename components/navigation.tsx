@@ -33,11 +33,11 @@ const NAV_ITEMS = [
     href: '/results',
     requireAuth: true,
   },
-  {
-    key: 'info',
-    name: 'More Info',
-    href: '/info',
-  },
+  // {
+  //   key: 'info',
+  //   name: 'More Info',
+  //   href: '/info',
+  // },
   {
     key: 'admin',
     name: 'Admin Panel',

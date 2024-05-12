@@ -101,7 +101,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onSubmit }) => {
               leaveFrom='opacity-100 translate-y-0 sm:scale-100'
               leaveTo='opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'
             >
-              <Dialog.Panel className='relative transform overflow-hidden rounded-lg bg-gray-600 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6'>
+              <Dialog.Panel className='relative transform overflow-hidden rounded-lg bg-secondary-500 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6'>
                 <div>
                   {/* <div className='mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100'>
                     <CheckIcon className='h-6 w-6 text-green-600' aria-hidden='true' />
@@ -144,7 +144,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onSubmit }) => {
                   {error && <div className='text-red-500 text-center mt-2 font-bold text-sm'>{error}</div>}
                   <button
                     type='button'
-                    className='inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
+                    className='inline-flex w-full justify-center rounded-md bg-medium-purple-300 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
                     onClick={handleSubmit}
                   >
                     Sign In
@@ -153,7 +153,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onSubmit }) => {
                 <div className='mt-2 text-center '>
                   <p className='text-sm text-gray-300'>
                     Dont have an account?{' '}
-                    <span className='text-blue-400 cursor-pointer' onClick={handleSignUpClick}>
+                    <span className='text-medium-purple-300 cursor-pointer' onClick={handleSignUpClick}>
                       Create one
                     </span>
                   </p>
