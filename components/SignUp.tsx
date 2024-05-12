@@ -12,8 +12,6 @@ import { Panel } from '@/components/panel'
 
 interface SignUpProps {
   onClose: () => void
-  onSubmit: () => void // Change the return type to void
-  onSignUpClick: () => void
 }
 
 const apiEndpoint = 'https://lz9iflahdk.execute-api.us-east-1.amazonaws.com/default/authService'
