@@ -3,10 +3,15 @@ import React, { useState, useEffect } from 'react'
 import { Panel } from '@/components/panel'
 import { api } from '@/lib/api'
 
+interface Exercise {
+  exerciseType: string
+  exerciseCategory: string
+}
+
 const AdminPanel = () => {
   const [exerciseType, setExerciseType] = useState('')
   const [exerciseCategory, setExerciseCategory] = useState('')
-  const [exerciseList, setExerciseList] = useState([])
+  const [exerciseList, setExerciseList] = useState<Exercise[]>([])
 
   const apiEndpoint = 'https://rh9j7m9y9j.execute-api.us-east-1.amazonaws.com/default/saveExerciseType'
 
@@ -104,7 +109,7 @@ const AdminPanel = () => {
             {exerciseList.map((exercise, index) => (
               <li key={index}>
                 <li key={index}>
-                  {exercise.exerciseType.S} - {exercise.exerciseCategory.S}
+                  {exercise.exerciseType} - {exercise.exerciseCategory}
                 </li>
               </li>
             ))}

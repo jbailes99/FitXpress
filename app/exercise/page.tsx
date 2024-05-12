@@ -11,6 +11,10 @@ type ExerciseEntry = {
   additionalInfo: string
 }
 
+interface ExerciseData {
+  items: { exerciseType: { S: string }; exerciseCategory: { S: string } }[]
+}
+
 const ExerciseTracker = () => {
   const [exerciseEntries, setExerciseEntries] = useState<ExerciseEntry[]>([])
   const [categories, setCategories] = useState<string[]>([])
@@ -31,7 +35,7 @@ const ExerciseTracker = () => {
     // Fetch exercise types for the selected category
     const fetchExerciseData = async () => {
       try {
-        const response = await api.get(fetchUrl) // Adjust the endpoint accordingly
+        const response = await api.get<ExerciseData>(fetchUrl)
         const { items } = response.data
         const extractedCategories = Array.from(new Set(items.map(item => item.exerciseCategory.S)))
         const extractedExerciseTypes = Array.from(new Set(items.map(item => item.exerciseType.S)))
