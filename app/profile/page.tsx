@@ -62,7 +62,7 @@ const ProfilePage: React.FC = () => {
   const handleSaveClick = async () => {
     try {
       // Ensure that formValues is defined and contains necessary properties
-      if (formValues && formValues.email && formValues.nickname && formValues.username) {
+      if (formValues && formValues.email && formValues.nickname && formValues.username && accessToken) {
         await updateUserDetails(accessToken, {
           // Passing accessToken as the first argument
           email: formValues.email,

@@ -62,7 +62,7 @@ export async function getUserDetails(accessToken) {
   }
 }
 
-export async function updateUserDetails(accessToken, updatedUserData) {
+export async function updateUserDetails(accessToken: string, updatedUserData: { [key: string]: string }) {
   try {
     // Use the accessToken and updatedUserData to make a request to your backend or Cognito to update user details
     // Make sure to handle errors appropriately
@@ -82,6 +82,7 @@ export async function updateUserDetails(accessToken, updatedUserData) {
     throw error
   }
 }
+
 const STORAGE_KEY = 'auth:tokens' // You can replace 'myAppTokens' with any string you like
 
 export function storeTokens(tokens) {
