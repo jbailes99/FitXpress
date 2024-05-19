@@ -168,7 +168,7 @@ const BmiCalculator: React.FC = () => {
   return (
     <motion.div initial='hidden' animate='visible' variants={fadeInUp}>
       <div className=' flex flex-col justify-center items-center min-h-screen overflow-x-hidden '>
-        <div className='grid grid-cols-3 px-12 space-x-8'>
+        <div className='lg:grid lg:grid-cols-3 lg:px-12 px-4  space-x-8'>
           <Panel
             className={`text-center mb-6 p-4 md:p-12 mt-16 rounded-xl shadow-2xl col-span-2 ${
               showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'

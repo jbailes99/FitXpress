@@ -114,9 +114,9 @@ export default function Navigation() {
   )
 
   return (
-    <nav className='w-full flex h-16 bg-secondary-800'>
+    <nav className='w-full flex flex-col sm:flex-row h-auto sm:h-16 bg-secondary-800'>
       <div className='flex flex-1 items-center h-full px-6'>
-        <div className={style.brand}>FitXpress</div>
+        <div className={`${style.brand} hidden sm:block`}>FitXpress</div>
         <div className='flex items-center flex-1 h-full *:font-medium'>
           {NAV_ITEMS.map(
             item =>
@@ -157,7 +157,7 @@ export default function Navigation() {
           <Menu as='div' className='justify-end ml-3'>
             <div>
               <Menu.Button className='flex text-medium-purple-300 items-center'>
-                <div className='font-semibold'>{userDetails.username}</div>
+                <div className='font-semibold hidden sm:block'>{userDetails.username}</div>
 
                 <span className='ml-1' />
                 <svg

@@ -33,10 +33,15 @@ const SignIn: React.FC<SignInProps> = ({ onClose }) => {
       // Call signIn function from authService
       const accessToken = await signIn(credentials.username, credentials.password)
 
+      //extracts accessToken from data above (fixes false login error issue)
+      const accessToken1 = accessToken.AuthenticationResult.AccessToken
+
+      console.log(accessToken1)
+
       console.log('Sign-in successful')
       console.log('test', accessToken)
 
-      const userDetails = await getUserDetails(accessToken)
+      const userDetails = await getUserDetails(accessToken1)
       console.log('test details', userDetails)
       onClose() // Close the sign-in modal
     } catch (error) {

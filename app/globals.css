@@ -22,6 +22,39 @@ body {
   color: rgb(var(--foreground-rgb));
 }
 
+.intensity-selector {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.intensity-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  border-radius: 10px;
+}
+
+.intensity-option:hover {
+  transform: scale(1.1);
+  background-color: #f0f0f0;
+}
+
+.intensity-option.selected {
+  transform: scale(1.2);
+  background-color: #ff6b6b;
+  color: white;
+}
+
+.intensity-option .label {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+
 .outline-container {
   border: 4px solid ; /* Increase border thickness */
   padding: 10px; /* Add padding to maintain space between content and the border */
