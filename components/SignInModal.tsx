@@ -34,7 +34,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose }) => {
       const accessToken = await signIn(credentials.username, credentials.password)
 
       //extracts accessToken from data above (fixes false login error issue)
-      const accessToken1 = accessToken.AuthenticationResult.AccessToken
+      const accessToken1 = accessToken.AuthenticationResult?.AccessToken
 
       console.log(accessToken1)
 
