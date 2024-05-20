@@ -27,8 +27,28 @@ function classNames(...classes: string[]) {
 }
 
 export default function Results() {
+  const [selectedCategory, setSelectedCategory] = useState('bodyMetrics')
   const [selectedDataset, setSelectedDataset] = useState<string>('bmi')
   const [results, setResults] = useState<any[]>([])
+  const [exerciseResults, setExerciseResults] = useState<any[]>([])
+  interface ExerciseResultItem {
+    id: number
+    type: string
+    reps?: string
+    sets?: string
+    additionalInfo: string
+    weight?: string
+    distance?: string
+    time?: string
+    intensity?: string
+    timestamp: string
+    exerciseCategory: string
+    exerciseType: string
+  }
+
+  interface ExerciseData {
+    items: { exerciseType: { S: string }; exerciseCategory: { S: string } }[]
+  }
   interface ResultItem {
     userId: string
     bodyLeanMass: number
@@ -90,6 +110,30 @@ export default function Results() {
 
     fetchResults()
   }, [])
+
+  useEffect(() => {
+    const fetchExerciseLogs = async () => {
+      const storedTokens = getCurrentTokens()
+      const userDetails = await getUserDetails(storedTokens.accessToken)
+      const userId = userDetails.username
+
+      try {
+        // Fetch exercise logs
+        const response = await api.post(
+          'https://dqb2sp9hpk.execute-api.us-east-1.amazonaws.com/default/getExerciseLogs',
+          { userId }
+        )
+        const responseData = response.data.items
+        // Update exerciseEntries state with the fetched data
+        setExerciseResults(responseData)
+      } catch (error) {
+        console.error('Error fetching exercise logs:', error)
+      }
+    }
+
+    // Call the fetchExerciseLogs function when the component mounts or when the dependencies change
+    fetchExerciseLogs()
+  }, []) // Empty dependency array means this effect runs only once, similar to componentDidMount
 
   // Extracting required data for charts
   let bmiData = results.map((item: any) => ({
@@ -158,6 +202,80 @@ export default function Results() {
     ],
   }
 
+  const renderExerciseDetails = (item: ExerciseResultItem) => {
+    const calculateCaloriesBurned = (intensity, time) => {
+      const CALORIES_PER_MINUTE = {
+        low: 3.5,
+        medium: 7,
+        high: 10,
+        extreme: 12.5,
+      }
+      const caloriesPerMinute = CALORIES_PER_MINUTE[intensity.toLowerCase()] || 0
+      return caloriesPerMinute * time
+    }
+
+    let caloriesBurned: number | null = null
+    if (item.intensity && item.time) {
+      caloriesBurned = calculateCaloriesBurned(item.intensity, item.time)
+    }
+
+    switch (item.exerciseCategory) {
+      case 'Cardio':
+        return (
+          <>
+            <div className='flex'>
+              <div>
+                <p style={{ fontSize: '16px', margin: '5px 0' }}>
+                  <strong>{item.timestamp}</strong>
+                </p>
+
+                <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
+                {item.intensity && <p style={{ fontSize: '16px', margin: '5px 0' }}>Intensity: {item.intensity}</p>}
+                <p style={{ fontSize: '16px', margin: '5px 0' }}>Time: {item.time}</p>
+                {item.distance && <p style={{ fontSize: '16px', margin: '5px 0' }}>Distance: {item.distance}</p>}
+                {item.additionalInfo && (
+                  <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
+                )}
+              </div>
+              <div className='justify-center items-center flex ml-36 px-4 bg-secondary-300  rounded-full '>
+                <p className='font-bold text-xl text-medium-purple-300' style={{ margin: '5px 0' }}>
+                  {caloriesBurned} calories burned
+                </p>
+              </div>
+            </div>
+          </>
+        )
+      case 'Strength training':
+        return (
+          <>
+            <p style={{ fontSize: '16px', margin: '5px 0' }}>
+              <strong>{item.timestamp}</strong>
+            </p>
+            <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
+
+            {item.weight && <p style={{ fontSize: '16px', margin: '5px 0' }}>Weight: {item.weight}</p>}
+            {item.reps && <p style={{ fontSize: '16px', margin: '5px 0' }}>Reps: {item.reps}</p>}
+            {item.sets && <p style={{ fontSize: '16px', margin: '5px 0' }}>Sets: {item.sets}</p>}
+            {item.additionalInfo && (
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>Comments: {item.additionalInfo}</p>
+            )}
+          </>
+        )
+      default:
+        return (
+          <>
+            <p style={{ fontSize: '16px', margin: '5px 0' }}>
+              <strong>{item.timestamp}</strong>
+            </p>
+            <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.type}</p>
+            {item.additionalInfo && (
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
+            )}
+          </>
+        )
+    }
+  }
+
   // Calculate percentage difference
   const calculatePercentageDifference = (firstValue: number, lastValue: number) => {
     console.log(firstValue)
@@ -191,10 +309,20 @@ export default function Results() {
             {/* Secondary navigation */}
             <div className='flex justify-center rounded-t-none '>
               <div className='flex bg-gray-800 w-1/16 px-4 justify-center space-x-12 pb-2 rounded-b-xl '>
-                <button className='bg-medium-purple-500 hover:bg-medium-purple-700 text-white font-bold py-2 px-4 rounded'>
+                <button
+                  className={`bg-medium-purple-500 hover:bg-medium-purple-700 text-white font-bold py-2 px-4 rounded ${
+                    selectedCategory === 'bodyMetrics' ? 'bg-opacity-100' : 'bg-opacity-50'
+                  }`}
+                  onClick={() => setSelectedCategory('bodyMetrics')}
+                >
                   Body Metrics
                 </button>
-                <button className='bg-medium-purple-500 hover:bg-medium-purple-700 text-white font-bold py-2 px-4 rounded'>
+                <button
+                  className={`bg-medium-purple-500 hover:bg-medium-purple-700 text-white font-bold py-2 px-4 rounded ${
+                    selectedCategory === 'exercises' ? 'bg-opacity-100' : 'bg-opacity-50'
+                  }`}
+                  onClick={() => setSelectedCategory('exercises')}
+                >
                   Exercises
                 </button>
               </div>
@@ -259,44 +387,63 @@ export default function Results() {
                   Recent activity
                 </h2>
                 <div className='results-container'>
-                  {results
-                    .sort(
-                      // @ts-ignore
-                      (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-                    ) // Sort by timestamp
-                    .map((item, index) => (
-                      <div
-                        key={index}
-                        className='bg-secondary-100 text-white'
-                        style={{
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                          padding: '20px',
-                          marginBottom: '20px',
-                        }}
-                      >
-                        <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                          <strong>{item.timestamp}</strong>
-                        </p>
-                        <h2 style={{ fontSize: '18px', marginBottom: '10px' }}>
-                          <strong>{item.userId}</strong>
-                        </h2>
-                        <p style={{ fontSize: '16px', marginBottom: '5px 0' }}>BMI: {item.bodyBMI}</p>
-                        <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Lean Mass: {item.bodyLeanMass}</p>
-                        <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Fat Calculation: {item.bodyFatCalc}</p>
-                        <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Fat Mass: {item.bodyFatMass}</p>
-                        <p style={{ fontSize: '16px', margin: '5px 0' }}>entryId: {item.entryId}</p>
-
-                        <Button
-                          onClick={() => {
-                            handleDelete(item.entryId)
+                  {selectedCategory === 'bodyMetrics' &&
+                    results
+                      .sort(
+                        (a: ResultItem, b: ResultItem) =>
+                          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                      )
+                      .map((item, index) => (
+                        <div
+                          key={index}
+                          className='bg-secondary-100 text-white'
+                          style={{
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                            padding: '20px',
+                            marginBottom: '20px',
                           }}
-                          className='bg-red-600 text-gray-200 rounded shadow'
                         >
-                          Delete
-                        </Button>
-                      </div>
-                    ))}
+                          <p style={{ fontSize: '16px', margin: '5px 0' }}>
+                            <strong>{item.timestamp}</strong>
+                          </p>
+                          <h2 style={{ fontSize: '18px', marginBottom: '10px' }}>
+                            <strong>{item.userId}</strong>
+                          </h2>
+                          <p style={{ fontSize: '16px', marginBottom: '5px 0' }}>BMI: {item.bodyBMI}</p>
+                          <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Lean Mass: {item.bodyLeanMass}</p>
+                          <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Fat Calculation: {item.bodyFatCalc}</p>
+                          <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Fat Mass: {item.bodyFatMass}</p>
+                          <p style={{ fontSize: '16px', margin: '5px 0' }}>entryId: {item.entryId}</p>
+
+                          <Button
+                            onClick={() => {
+                              handleDelete(item.entryId)
+                            }}
+                            className='bg-red-600 text-gray-200 rounded shadow'
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      ))}
+                  {selectedCategory === 'exercises' && (
+                    <div className='results-container'>
+                      {exerciseResults.map(item => (
+                        <div
+                          key={item.id}
+                          className='bg-secondary-100 text-white'
+                          style={{
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                            padding: '20px',
+                            marginBottom: '20px',
+                          }}
+                        >
+                          {renderExerciseDetails(item)}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
