@@ -25,12 +25,16 @@ const BmiCalculator: React.FC = () => {
   const [age, setAge] = useState<number | undefined>(undefined)
   const [neckMeasurement, setNeckMeasurement] = useState<number | undefined>(undefined)
   const [waistMeasurement, setWaistMeasurement] = useState<number | undefined>(undefined)
+  const [hipMeasurement, setHipMeasurement] = useState<number | undefined>(undefined)
+
+  const [gender, setGender] = useState<string | null>(null)
   const [height, setHeight] = useState<string | undefined>(undefined)
   const [bodyFatCalc, setBodyFatCalc] = useState<number | null>(null)
   const [bodyFatMass, setBodyFatMass] = useState<number | null>(null)
   const [bodyLeanMass, setBodyLeanMass] = useState<number | null>(null)
   const [bodyBMI, setBodyBMI] = useState<number | null>(null)
   const [bodyFatBMI, setBodyFatBMI] = useState<number | null>(null)
+  const [bodyBMR, setBodyBMR] = useState<number | null>(null)
   const [showResults, setShowResults] = useState(false) // set to false
   const [bmi, setBmi] = useState<number | null>(null)
   const [fadeInUp, setFadeInUp] = useState({
@@ -81,6 +85,7 @@ const BmiCalculator: React.FC = () => {
         bodyFatMass,
         bodyLeanMass,
         bodyBMI,
+        bodyBMR,
       })
       // Display success message or handle response accordingly
       console.log('Response from Lambda:', response.data)
@@ -97,6 +102,10 @@ const BmiCalculator: React.FC = () => {
     } else {
       setter(Number(value))
     }
+  }
+
+  const handleGenderInputChange = (value: string, setter: React.Dispatch<React.SetStateAction<string | null>>) => {
+    setter(value || null) // Set to null if value is empty
   }
 
   const handleFeetInputChange = (value: string, setter: (value: string | undefined) => void) => {
@@ -122,18 +131,28 @@ const BmiCalculator: React.FC = () => {
 
     e.preventDefault()
 
-    if (weight && height && age && neckMeasurement && waistMeasurement) {
+    if (weight && gender && height && age && neckMeasurement && waistMeasurement) {
       try {
-        console.log('Sending data:', { weight, height, age, neckMeasurement, waistMeasurement })
+        console.log('Sending data:', { weight, height, age, neckMeasurement, waistMeasurement, gender })
 
-        const response = await api.post(apiEndpoint, {
+        const dataToSend: any = {
           weight,
+          gender,
           height,
           age,
           neckMeasurement,
           waistMeasurement,
-        })
+        }
+
+        if (gender === 'female' && hipMeasurement !== undefined) {
+          dataToSend.hipMeasurement = hipMeasurement
+        }
+
+        const response = await api.post(apiEndpoint, dataToSend)
+
         const data = response.data
+
+        setBodyBMR(data.bodyBMR)
         setBodyFatCalc(data.bodyFatPercentage)
         setBodyFatMass(data.bodyFatMass)
         setBodyLeanMass(data.bodyLeanMass)
@@ -149,20 +168,18 @@ const BmiCalculator: React.FC = () => {
           alert('An error occurred')
         }
       }
+      setShowResults(true)
+    } else {
+      alert('Error: Fill in all fields to see calculation')
     }
 
-    setShowResults(true)
-
+    console.log('gender:' + gender)
     //test our values
-    // console.log(weight)
-    // console.log(height)
-    // console.log(age)
-    // console.log(neckMeasurement)
-    // console.log(waistMeasurement)
-  }
-
-  function handleGenderChange(value: string): void {
-    throw new Error('Function not implemented.')
+    console.log(weight)
+    console.log(height)
+    console.log(age)
+    console.log(neckMeasurement)
+    console.log(waistMeasurement)
   }
 
   return (
@@ -190,7 +207,7 @@ const BmiCalculator: React.FC = () => {
                         className='w-3/4 h-3/2 p-2 text-2xl text-center border rounded-md bg-gray-900 text-gray-300 cursor-pointer'
                         id='gender'
                         name='gender'
-                        // onChange={e => handleGenderChange(e.target.value)}
+                        onChange={e => handleGenderInputChange(e.target.value, setGender)}
                       >
                         <option value='' disabled selected hidden></option>
 
@@ -284,6 +301,22 @@ const BmiCalculator: React.FC = () => {
                       />
                     </div>
                   </div>
+                  {gender == 'female' && (
+                    <div className='mb-4 row-start-3 row-end-3 '>
+                      <label className=' block text-gray-400 text-sm font-bold mb-2' htmlFor='weight'>
+                        Hip Measurement (inches)
+                      </label>
+                      <input
+                        className='w-1/2 h-3/2 p-2 text-2xl border rounded-md bg-gray-900 text-center text-gray-300'
+                        type='number'
+                        id='waistMeasurement'
+                        placeholder='Circumference'
+                        value={hipMeasurement}
+                        onChange={(e: any) => handleNumberInputChange(e.target.value, setHipMeasurement)}
+                      />
+                    </div>
+                  )}
+
                   <div>
                     <div className='flex mt-16 h-full justify-center text-center items-center '>
                       <div className='bg-secondary-600 hover-animation grid grid-cols-3 p-2 rounded-2xl text-right shadow-sm mt-2 sm:w-full sm:max-w-4xl'>
@@ -391,6 +424,17 @@ const BmiCalculator: React.FC = () => {
 
                       <div className='flex items-center justify-center'>
                         <div className='bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6'>
+                          <h3 className='text-base font-semibold leading-6 text-gray-800'>BMR</h3>
+                          <div className='mt-2 sm:flex sm:items-start sm:justify-center'>
+                            <div className='justify-center text-md text-gray-800 text-center flex-1'>
+                              {bodyBMR !== null ? <p>{Math.round(bodyBMR)} calories/day</p> : ''}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className='flex items-center justify-center'>
+                        <div className='bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6'>
                           <h3 className='text-base font-semibold leading-6 text-gray-800'>Lean Mass</h3>
                           <div className='mt-2 sm:flex sm:items-start sm:justify-center'>
                             <div className='justify-center text-md text-gray-800 text-center flex-1'>
@@ -400,13 +444,15 @@ const BmiCalculator: React.FC = () => {
                         </div>
                       </div>
                       <div className='flex space-x-4 mt-5 text-sm h-full justify-center items-center'>
-                        <button
-                          type='submit'
-                          onClick={handleSave}
-                          className=' bg-red-600 text-white font-semibold py-2 px-4 rounded hover:bg-red-700'
-                        >
-                          Save Results
-                        </button>
+                        {isLoggedIn && (
+                          <button
+                            type='submit'
+                            onClick={handleSave}
+                            className=' bg-red-600 text-white font-semibold py-2 px-4 rounded hover:bg-red-700'
+                          >
+                            Save Results
+                          </button>
+                        )}
                         <button
                           type='submit'
                           onClick={handleGoBack}
@@ -587,11 +633,10 @@ const BmiCalculator: React.FC = () => {
             <h1>More Calculators</h1>
           </div>
           <div className='flex grid-cols-2 text-white justify-center items-center text-center gap-24'>
-            <div className='bg-secondary-600 col-span-1 text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-md mt-2 sm:max-w-xl sm:w-full '>
+            {/* <div className='bg-secondary-600 col-span-1 text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-md mt-2 sm:max-w-xl sm:w-full '>
               <h1 className='mb-4 text-gray-400 font-bold text-xl md:text-2xl'>BMR calculator</h1>
 
               <div className='bg-medium-purple-500 text-center p-4 md:p-6 rounded-lg shadow-2xl mt-4 md:mt-6'>
-                {/* <h1 className='font-bold mb-2 text-lg md:text-xl'>Take the first step.</h1> */}
                 <p className='text-sm md:text-base text-gray-200'>
                   Your Basal Metabolic Rate (BMR) is the number of calories you burn as your body performs basic (basal)
                   life-sustaining function. Commonly also termed as Resting Metabolic Rate (RMR), which is the calories
@@ -603,7 +648,7 @@ const BmiCalculator: React.FC = () => {
                   </button>
                 </a>
               </div>
-            </div>
+            </div> */}
             <div className='bg-secondary-600 col-span-1 text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-md mt-2  sm:max-w-xl sm:w-1/2  '>
               <h1 className='mb-4 text-gray-400 font-bold text-xl md:text-2xl'>Body Fat & BMI Calculator</h1>
 
