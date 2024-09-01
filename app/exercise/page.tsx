@@ -395,7 +395,8 @@ const ExerciseTracker = () => {
       <div>
         <div className='flex flex-col justify-center items-center'>
           <div className='bg-secondary-400 rounded-xl p-4 font-bold text-center w-3/4 mb-4'>
-            <h1 className='text-3xl'>Weekly Planner</h1>
+            <h1 className='text-6xl font-extrabold text-white  mb-4'>Weekly Planner</h1>
+            <CalendarView selectedDate={selectedDate} onDateChange={handleDateChange} />
             <CalendarView selectedDate={selectedDate} onDateChange={handleDateChange} />
           </div>
         </div>

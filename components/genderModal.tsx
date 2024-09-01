@@ -41,7 +41,7 @@ const GenderExplanationModal: React.FC<GenderExplanationModalProps> = ({ isOpen,
               <div className='px-4 pt-5 pb-4 sm:p-6 sm:pb-4'>
                 <div className='mt-3 text-center sm:mt-2'>
                   <Dialog.Title as='h2' className='text-2xl font-semibold leading-6 text-gray-300'>
-                    Why only two genders?
+                    Why just male and female?
                   </Dialog.Title>
                   <p className='mt-3 text-gray-300 text-left text-lg'>
                     This website is committed to an experience that welcomes people from all walks of life and promotes

@@ -201,7 +201,7 @@ const BmiCalculator: React.FC = () => {
                   <div className='grid grid-cols-2 '>
                     <div className='mb-4'>
                       <label className='block text-gray-400 text-sm font-bold mb-2 cursor-pointer' htmlFor='gender'>
-                        Biological gender
+                        Biological Sex
                       </label>
                       <select
                         className='w-3/4 h-3/2 p-2 text-2xl text-center border rounded-md bg-gray-900 text-gray-300 cursor-pointer'
@@ -217,10 +217,10 @@ const BmiCalculator: React.FC = () => {
                       <div>
                         {/* Gender section with underline */}
                         <span
-                          className='underline cursor-pointer text-gray-400 justify-left flex ml-16'
+                          className='underline cursor-pointer text-gray-400 justify-left flex-center '
                           onClick={openModal}
                         >
-                          Why only two genders?
+                          More info
                         </span>
 
                         {/* Modal component */}
@@ -558,6 +558,11 @@ const BmiCalculator: React.FC = () => {
                 <p>
                   <strong className='text-medium-purple-300'>Fat Mass:</strong> This measurement indicates the weight of
                   your body fat specifically, providing insights into your body fat distribution and overall health.
+                </p>
+                <p>
+                  <strong className='text-medium-purple-300'>BMR (Basal Metabolic Rate):</strong> BMR reflects the
+                  energy required to keep your body functioning at a state of rest and is influenced by factors. BMR can
+                  help you determine your daily caloric needs and create an effective diet or fitness plan.
                 </p>
               </div>
             </Panel>

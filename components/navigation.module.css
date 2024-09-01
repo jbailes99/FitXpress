@@ -1,5 +1,13 @@
+/* navigation.module.css */
 .brand {
-  @apply text-2xl font-bold text-gray-300 font-display mr-10;
-  font-variant: small-caps;
-  letter-spacing: 1px;
+  @apply text-3xl font-extrabold text-gray-200 font-sans mr-12;
+  font-variant: small-caps; /* Retained for small-caps effect */
+  letter-spacing: 1.5px; /* Adjusted for better readability */
+  text-transform: uppercase; /* Ensures small-caps look more consistent */
+  background: linear-gradient(90deg, rgb(152, 35, 115) 0%, rgba(204, 153, 255, 1) 100%); /* Gradient background for visual appeal */
+  -webkit-background-clip: text; /* Text gradient effect */
+  color: transparent; /* Gradient effect */
+  padding: 2px 5px; /* Padding for better spacing */
+  border-radius: 4px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
