@@ -7,8 +7,11 @@ import { getCurrentTokens, getUserDetails } from '@/utils/authService'
 import { FaRunning, FaWalking, FaBiking, FaHeart } from 'react-icons/fa'
 import IntensitySelector from '@/components/intensitySelector' // Import the IntensitySelector component
 import { redirect } from 'next/dist/server/api-utils'
+import { useIsLoggedIn, useUserDetails, useIsAdmin } from '@/hooks'
+import { Button } from '@/components/button'
 
 type ExerciseEntry = {
+  entryId(entryId: any): unknown
   id: number
   type: string
   reps?: string
@@ -28,6 +31,7 @@ interface ExerciseData {
 }
 
 const ExerciseTracker = () => {
+  const userDetails = useUserDetails()
   const [exerciseEntries, setExerciseEntries] = useState<ExerciseEntry[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -51,6 +55,8 @@ const ExerciseTracker = () => {
   }
 
   const categoryUrl = 'https://69f40ajyj9.execute-api.us-east-1.amazonaws.com/default/getExerciseCategory'
+  const exerciseDeleteEndpoint = 'https://d4wil5bz64.execute-api.us-east-1.amazonaws.com/default/deleteExerciseLog'
+
   useEffect(() => {
     // Fetch exercise categories
     const fetchExerciseCategories = async () => {
@@ -90,29 +96,45 @@ const ExerciseTracker = () => {
     fetchExerciseTypes()
   }, [selectedCategory])
 
+  const fetchExerciseLogs = async () => {
+    const storedTokens = getCurrentTokens()
+    const userDetails = await getUserDetails(storedTokens.accessToken)
+    const userId = userDetails.username
+
+    try {
+      // Fetch exercise logs from your API
+      const response = await api.post(
+        'https://dqb2sp9hpk.execute-api.us-east-1.amazonaws.com/default/getExerciseLogs',
+        { userId }
+      )
+      const responseData = response.data.items
+      // Update exerciseEntries state with the fetched data
+      setExerciseEntries(responseData)
+    } catch (error) {
+      console.error('Error fetching exercise logs:', error)
+    }
+  }
+
   useEffect(() => {
-    const fetchExerciseLogs = async () => {
+    // Call the fetchExerciseLogs function when the component mounts or when the dependencies change
+    fetchExerciseLogs()
+  }, []) // Empty dependency array means this effect runs only once, similar to componentDidMount
+
+  const handleDelete = async entryId => {
+    try {
       const storedTokens = getCurrentTokens()
       const userDetails = await getUserDetails(storedTokens.accessToken)
       const userId = userDetails.username
 
-      try {
-        // Fetch exercise logs from your API
-        const response = await api.post(
-          'https://dqb2sp9hpk.execute-api.us-east-1.amazonaws.com/default/getExerciseLogs',
-          { userId }
-        )
-        const responseData = response.data.items
-        // Update exerciseEntries state with the fetched data
-        setExerciseEntries(responseData)
-      } catch (error) {
-        console.error('Error fetching exercise logs:', error)
-      }
+      console.log('Deleting item with entryId:', entryId)
+      const response = await api.post(exerciseDeleteEndpoint, { entryId, userId })
+      console.log('Response from lambda:', response.data)
+      alert('Log entry deleted.')
+      fetchExerciseLogs()
+    } catch (error) {
+      console.error('Error deleting item:', error)
     }
-
-    // Call the fetchExerciseLogs function when the component mounts or when the dependencies change
-    fetchExerciseLogs()
-  }, []) // Empty dependency array means this effect runs only once, similar to componentDidMount
+  }
 
   const handleExerciseSubmit = async () => {
     const storedTokens = getCurrentTokens()
@@ -148,69 +170,120 @@ const ExerciseTracker = () => {
       ])
       setNewExerciseEntry({ type: '', reps: '', sets: '', additionalInfo: '' })
       setSelectedExerciseType('')
+      fetchExerciseLogs()
     } catch (error) {
       console.error('Error logging exercise:', error)
     }
   }
 
   const renderExerciseDetails = (item: ExerciseEntry) => {
-    const calculateCaloriesBurned = (intensity, time) => {
+    // Function to calculate calories burned
+    const calculateCaloriesBurned = (intensity: string, time: number, weight: number) => {
       const CALORIES_PER_MINUTE = {
         low: 3.5,
         medium: 7,
         high: 10,
         extreme: 12.5,
       }
-      const caloriesPerMinute = CALORIES_PER_MINUTE[intensity.toLowerCase()] || 0
+
+      // Base calories burned per minute based on intensity
+      const baseCaloriesPerMinute = CALORIES_PER_MINUTE[intensity.toLowerCase()] || 0
+
+      // Weight adjustment factor (e.g., calories burned per kg per minute)
+      const weightFactor = 0.005
+
+      // Calculate calories burned based on weight
+      const caloriesPerMinute = baseCaloriesPerMinute * weightFactor * weight
+
       return caloriesPerMinute * time
     }
 
+    // Calculate calories burned
     let caloriesBurned: number | null = null
-    if (item.intensity && item.time) {
-      caloriesBurned = calculateCaloriesBurned(item.intensity, item.time)
+
+    // Ensure item.time is converted to a number
+    if (item.intensity && item.time && userDetails.weight) {
+      // Convert item.time to a number
+      const timeInMinutes = Number(item.time)
+
+      if (!isNaN(timeInMinutes)) {
+        caloriesBurned = calculateCaloriesBurned(item.intensity, timeInMinutes, userDetails.weight)
+      } else {
+        console.error('Invalid time value')
+      }
     }
 
     switch (item.exerciseCategory) {
       case 'Cardio':
         return (
           <>
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
+            <div className='text-white'>
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
 
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
-            {item.intensity && <p style={{ fontSize: '16px', margin: '5px 0' }}>Intensity: {item.intensity}</p>}
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>Time: {item.time}</p>
-            {item.distance && <p style={{ fontSize: '16px', margin: '5px 0' }}>Distance: {item.distance}</p>}
-            {item.additionalInfo && (
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
-            )}
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
+              {item.intensity && <p style={{ fontSize: '16px', margin: '5px 0' }}>Intensity: {item.intensity}</p>}
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>Time: {item.time}</p>
+              {item.distance && <p style={{ fontSize: '16px', margin: '5px 0' }}>Distance: {item.distance}</p>}
+              {item.additionalInfo && (
+                <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
+              )}
 
-            <p style={{ fontSize: '24px', color: 'red', margin: '5px 0' }}>{caloriesBurned} calories burned</p>
+              <p style={{ fontSize: '24px', color: 'red', margin: '5px 0' }}>~ {caloriesBurned} calories burned</p>
+              <Button
+                onClick={() => {
+                  handleDelete(item.entryId)
+                }}
+                className='bg-red-600 text-gray-200 rounded shadow'
+              >
+                Delete
+              </Button>
+            </div>
           </>
         )
       case 'Strength training':
         return (
           <>
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
+            <div className='text-white'>
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
 
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
 
-            {item.weight && <p style={{ fontSize: '16px', margin: '5px 0' }}>Weight: {item.weight}</p>}
-            {item.reps && <p style={{ fontSize: '16px', margin: '5px 0' }}>Reps: {item.reps}</p>}
-            {item.sets && <p style={{ fontSize: '16px', margin: '5px 0' }}>Sets: {item.sets}</p>}
-            {item.additionalInfo && (
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>Comments: {item.additionalInfo}</p>
-            )}
+              {item.weight && <p style={{ fontSize: '16px', margin: '5px 0' }}>Weight: {item.weight}</p>}
+              {item.reps && <p style={{ fontSize: '16px', margin: '5px 0' }}>Reps: {item.reps}</p>}
+              {item.sets && <p style={{ fontSize: '16px', margin: '5px 0' }}>Sets: {item.sets}</p>}
+              {item.additionalInfo && (
+                <p style={{ fontSize: '16px', margin: '5px 0' }}>Comments: {item.additionalInfo}</p>
+              )}
+              <Button
+                onClick={() => {
+                  handleDelete(item.entryId)
+                }}
+                className='bg-red-600 text-gray-200 rounded shadow'
+              >
+                Delete
+              </Button>
+            </div>
           </>
         )
       default:
         return (
           <>
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
+            <div>
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
 
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.type}</p>
-            {item.additionalInfo && (
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
-            )}
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.type}</p>
+              {item.additionalInfo && (
+                <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
+              )}
+              <Button
+                onClick={() => {
+                  handleDelete(item.entryId)
+                }}
+                className='bg-red-600 text-gray-200 rounded shadow'
+              >
+                Delete
+              </Button>
+            </div>
           </>
         )
     }

@@ -66,6 +66,22 @@ export default function Results() {
 
   const deleteEndpoint = 'https://g1v3jlh2g5.execute-api.us-east-1.amazonaws.com/default/deleteCalculationResult'
 
+  const exerciseDeleteEndpoint = 'https://d4wil5bz64.execute-api.us-east-1.amazonaws.com/default/deleteExerciseLog'
+  const handleDeleteLogs = async entryId => {
+    try {
+      const storedTokens = getCurrentTokens()
+      const userDetails = await getUserDetails(storedTokens.accessToken)
+      const userId = userDetails.username
+
+      console.log('Deleting item with entryId:', entryId)
+      const response = await api.post(exerciseDeleteEndpoint, { entryId, userId })
+      console.log('Response from lambda:', response.data)
+      alert('Exercise log deleted.')
+    } catch (error) {
+      console.error('Error deleting item:', error)
+    }
+  }
+
   const handleDelete = async entryId => {
     try {
       const storedTokens = getCurrentTokens()
@@ -439,7 +455,16 @@ export default function Results() {
                             marginBottom: '20px',
                           }}
                         >
+                          {' '}
                           {renderExerciseDetails(item)}
+                          <Button
+                            onClick={() => {
+                              handleDeleteLogs(item.entryId)
+                            }}
+                            className='bg-red-600 text-gray-200 rounded shadow'
+                          >
+                            Delete
+                          </Button>
                         </div>
                       ))}
                     </div>

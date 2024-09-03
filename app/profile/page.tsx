@@ -9,6 +9,10 @@ interface UserData {
   email?: string
   nickname?: string
   username?: string
+  weight?: string
+  age?: string
+  sex?: string
+
   isAdmin?: boolean
   // Add other user properties as needed
 }
@@ -20,6 +24,9 @@ const ProfilePage: React.FC = () => {
     email: '',
     nickname: '',
     username: '',
+    weight: '',
+    age: '',
+    sex: '',
     isAdmin: '',
   })
   const [accessToken, setAccessToken] = useState<string | null>(null)
@@ -43,6 +50,9 @@ const ProfilePage: React.FC = () => {
             email: user?.email || '',
             nickname: user?.nickname || '',
             username: user?.username || '',
+            sex: user?.sex || '',
+            weight: user?.weight || '',
+            age: user?.age || '',
             isAdmin: user?.isAdmin ? 'true' : 'false',
           })
         } else {
@@ -87,6 +97,9 @@ const ProfilePage: React.FC = () => {
       nickname: userData?.nickname || '',
       username: userData?.username || '',
       isAdmin: userData?.isAdmin ? 'true' : 'false',
+      sex: userData?.sex || '',
+      weight: userData?.weight || '',
+      age: userData?.age || '',
     })
 
     setEditMode(false)
@@ -147,6 +160,33 @@ const ProfilePage: React.FC = () => {
                       className='mt-1 p-2 border rounded-md w-full'
                     />
 
+                    <label className='block mt-4 text-sm font-medium text-gray-700'>age:</label>
+                    <input
+                      type='text'
+                      name='age'
+                      value={formValues.age}
+                      onChange={handleChange}
+                      className='mt-1 p-2 border rounded-md w-full'
+                    />
+
+                    <label className='block mt-4 text-sm font-medium text-gray-700'>sex:</label>
+                    <input
+                      type='text'
+                      name='sex'
+                      value={formValues.sex}
+                      onChange={handleChange}
+                      className='mt-1 p-2 border rounded-md w-full'
+                    />
+
+                    <label className='block mt-4 text-sm font-medium text-gray-700'>weight:</label>
+                    <input
+                      type='text'
+                      name='weight'
+                      value={formValues.weight}
+                      onChange={handleChange}
+                      className='mt-1 p-2 border rounded-md w-full'
+                    />
+
                     <div className='mt-6 flex justify-end'>
                       <button
                         type='button'
@@ -169,6 +209,9 @@ const ProfilePage: React.FC = () => {
                     <p className='text-gray-200 '>Email: {userData.email}</p>
                     <p className='text-gray-200'>Nickname: {userData.nickname}</p>
                     <p className='text-gray-200'>Username: {userData.username}</p>
+                    <p className='text-gray-200 '>Weight: {userData.weight}</p>
+                    <p className='text-gray-200'>Age: {userData.age}</p>
+                    <p className='text-gray-200'>Sex: {userData.sex}</p>
                     <p className='text-gray-200'>Admin: {userData.isAdmin ? 'Yes' : 'No'}</p>
 
                     <button

@@ -5,7 +5,7 @@ import { setAuth } from '@/slices/auth-slice'
 import { CognitoIdentityServiceProvider } from './awsConfig'
 const cognitoIdentityServiceProvider = new CognitoIdentityServiceProvider()
 
-export async function signUp(username, password, email, nickname) {
+export async function signUp(username, password, email, nickname, sex, age, weight) {
   const params = {
     ClientId: '20n5vpkjqk7l4mmeilnuv5damm',
     Username: username,
@@ -19,6 +19,18 @@ export async function signUp(username, password, email, nickname) {
       {
         Name: 'nickname', // Correct attribute name
         Value: nickname,
+      },
+      {
+        Name: 'custom:sex', // Correct attribute name
+        Value: sex,
+      },
+      {
+        Name: 'custom:age1', // Correct attribute name
+        Value: age,
+      },
+      {
+        Name: 'custom:weight1', // Correct attribute name
+        Value: weight,
       },
     ],
   }
@@ -50,6 +62,9 @@ export async function getUserDetails(accessToken) {
     return {
       email: response?.UserAttributes?.find(attr => attr.Name === 'email')?.Value || '',
       nickname: response?.UserAttributes?.find(attr => attr.Name === 'nickname')?.Value || '',
+      sex: response?.UserAttributes?.find(attr => attr.Name === 'custom:sex')?.Value || '',
+      age: response?.UserAttributes?.find(attr => attr.Name === 'custom:age1')?.Value || '',
+      weight: response?.UserAttributes?.find(attr => attr.Name === 'custom:weight1')?.Value || '',
       username: response?.Username || '',
 
       isAdmin: response?.UserAttributes?.find(attr => attr.Name === 'custom:isAdmin' && attr.Value === 'true')

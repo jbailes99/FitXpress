@@ -43,6 +43,18 @@ const BmiCalculator: React.FC = () => {
   })
   const [isSignUpOpen, setSignUpOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    console.log('current gender:', gender)
+
+    if (userDetails) {
+      setWeight(userDetails.weight)
+      setAge(userDetails.age)
+      setGender(userDetails.sex || null)
+      setHeight(userDetails.height)
+    }
+  }, [userDetails])
+
   const openModal = () => {
     setIsModalOpen(true)
   }
@@ -206,6 +218,7 @@ const BmiCalculator: React.FC = () => {
                       <select
                         className='w-3/4 h-3/2 p-2 text-2xl text-center border rounded-md bg-gray-900 text-gray-300 cursor-pointer'
                         id='gender'
+                        value={gender || ''} // Ensure this matches the value attribute of <option>
                         name='gender'
                         onChange={e => handleGenderInputChange(e.target.value, setGender)}
                       >

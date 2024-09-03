@@ -9,6 +9,7 @@ import SuccessfulSignUpModal from '@/components/SuccessfulSignUp'
 import SignInModal from '@/components/SignInModal'
 import SignIn from '@/components/SignInModal'
 import { Panel } from '@/components/panel'
+import { String } from 'aws-sdk/clients/cloudsearchdomain'
 
 interface SignUpProps {
   onClose: () => void
@@ -18,12 +19,14 @@ const apiEndpoint = 'https://lz9iflahdk.execute-api.us-east-1.amazonaws.com/defa
 
 const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
   const [credentials, setCredentials] = useState<{
-    // gender: string
+    sex: string
     nickname: string
     username: string
     password: string
     email: string
-  }>({ nickname: '', username: '', password: '', email: '' })
+    weight: string
+    age: string
+  }>({ nickname: '', username: '', password: '', email: '', sex: '', weight: '', age: '' })
   const [open, setOpen] = useState(true)
   const [signUpSuccess, setSignUpSuccess] = useState(false)
   const [isSignInModal, setIsSignInModal] = useState(false)
@@ -36,8 +39,10 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
         credentials.username,
         credentials.password,
         credentials.email,
-        // credentials.gender,
-        credentials.nickname
+        credentials.nickname,
+        credentials.sex,
+        credentials.age,
+        credentials.weight
       )
       console.log('Sign-up successful')
       onClose()
@@ -176,6 +181,60 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
                           name='email'
                           onChange={e => setCredentials({ ...credentials, email: e.target.value })}
                           value={credentials.email}
+                          className='bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full'
+                        />
+                      </div>
+                      <div className='mb-4'>
+                        <label htmlFor='sex' className='block text-sm font-medium text-gray-300'>
+                          Sex
+                        </label>
+                        <select
+                          id='sex'
+                          name='sex'
+                          onChange={e => setCredentials({ ...credentials, sex: e.target.value })}
+                          value={credentials.sex}
+                          className='bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full'
+                        >
+                          <option value='' disabled>
+                            Select your sex
+                          </option>
+                          <option value='male'>Male</option>
+                          <option value='female'>Female</option>
+                        </select>
+                      </div>
+
+                      <div className='mb-4'>
+                        <label htmlFor='age' className='block text-sm font-medium text-gray-300'>
+                          Age
+                        </label>
+                        <select
+                          id='age'
+                          name='age'
+                          onChange={e => setCredentials({ ...credentials, age: e.target.value })}
+                          value={credentials.age}
+                          className='bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full'
+                        >
+                          <option value='' disabled>
+                            Select your age
+                          </option>
+                          {Array.from({ length: 100 - 16 + 1 }, (_, index) => 16 + index).map(age => (
+                            <option key={age} value={age}>
+                              {age}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className='mb-4'>
+                        <label htmlFor='weight' className='block text-sm font-medium text-gray-300'>
+                          Weight
+                        </label>
+                        <input
+                          type='text'
+                          id='weight'
+                          name='weight'
+                          onChange={e => setCredentials({ ...credentials, weight: e.target.value })}
+                          value={credentials.weight}
                           className='bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full'
                         />
                       </div>

@@ -192,7 +192,7 @@ export default function Navigation() {
                     </a>
                   )}
                 </Menu.Item>
-                <Menu.Item>
+                {/* <Menu.Item>
                   {({ active }) => (
                     <a
                       href='#'
@@ -201,7 +201,7 @@ export default function Navigation() {
                       Settings
                     </a>
                   )}
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item>
                   {({ active }) => (
                     <a
