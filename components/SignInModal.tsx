@@ -68,18 +68,6 @@ const SignIn: React.FC<SignInProps> = ({ onClose }) => {
     setOpen(true)
   }
 
-  const handleSignUp = async () => {
-    try {
-      // Cwwall signUp function from authService
-      await signUp(credentials.username, credentials.email, credentials.nickname, credentials.password)
-      console.log('Sign-up successful')
-      setSignInSuccess(true) // Set the state to trigger the successful sign-up modal
-      setIsSignUpOpen(false) // Close the sign-up modal after sign-up
-    } catch (error) {
-      console.error('Sign-up error:', error)
-    }
-  }
-
   const handleSignInClose = () => {
     onClose()
     setOpen(false)
