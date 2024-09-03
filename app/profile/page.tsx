@@ -31,39 +31,38 @@ const ProfilePage: React.FC = () => {
   })
   const [accessToken, setAccessToken] = useState<string | null>(null)
   const [error, setError] = useState<Error | null>(null)
+  const fetchUserData = async () => {
+    try {
+      // Retrieve stored tokens
+      const tokens = getCurrentTokens()
+      setAccessToken(tokens?.accessToken)
+      console.log('Access Token:', tokens?.accessToken)
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        // Retrieve stored tokens
-        const tokens = getCurrentTokens()
-        console.log('Access Token:', tokens?.accessToken)
+      if (tokens && tokens.accessToken) {
+        // Fetch user data using the stored access token
 
-        if (tokens && tokens.accessToken) {
-          // Fetch user data using the stored access token
+        const user = await getUserDetails(tokens.accessToken)
+        setUserData(user)
 
-          const user = await getUserDetails(tokens.accessToken)
-          setUserData(user)
-
-          // Set form values for editing
-          setFormValues({
-            email: user?.email || '',
-            nickname: user?.nickname || '',
-            username: user?.username || '',
-            sex: user?.sex || '',
-            weight: user?.weight || '',
-            age: user?.age || '',
-            isAdmin: user?.isAdmin ? 'true' : 'false',
-          })
-        } else {
-          console.error('Access token not found. User is not authenticated.')
-        }
-      } catch (error) {
-        setError(error as Error)
-        console.error('Error fetching user data:', error)
+        // Set form values for editing
+        setFormValues({
+          email: user?.email || '',
+          nickname: user?.nickname || '',
+          username: user?.username || '',
+          sex: user?.sex || '',
+          weight: user?.weight || '',
+          age: user?.age || '',
+          isAdmin: user?.isAdmin ? 'true' : 'false',
+        })
+      } else {
+        console.error('Access token not found. User is not authenticated.')
       }
+    } catch (error) {
+      setError(error as Error)
+      console.error('Error fetching user data:', error)
     }
-
+  }
+  useEffect(() => {
     fetchUserData()
   }, [])
 
@@ -73,21 +72,39 @@ const ProfilePage: React.FC = () => {
   const handleSaveClick = async () => {
     try {
       // Ensure that formValues is defined and contains necessary properties
-      if (formValues && formValues.email && formValues.nickname && formValues.username && accessToken) {
+      if (
+        formValues &&
+        formValues.nickname &&
+        formValues.username &&
+        formValues.weight &&
+        formValues.age &&
+        formValues.sex &&
+        accessToken
+      ) {
         await updateUserDetails(accessToken, {
           // Passing accessToken as the first argument
-          email: formValues.email,
-          nickname: formValues.nickname,
-          username: formValues.username,
+          'nickname': formValues.nickname,
+          // 'username': formValues.username, *cant update username, cognito error?
+          'custom:weight1': formValues.weight,
+          'custom:age1': formValues.age,
+          'custom:sex': formValues.sex,
         })
+
+        console.log('Updating user details with:', updateUserDetails)
+
         setEditMode(false)
         // You might want to refetch user data to ensure it's up to date
       } else {
-        console.error('Some form values are missing or undefined.')
+        console.error('Some form values are missing or undefined.', {
+          formValues,
+          accessToken,
+        })
       }
     } catch (error) {
       console.error('Error updating user data:', error)
     }
+
+    fetchUserData()
   }
 
   const handleCancelClick = () => {
@@ -105,12 +122,12 @@ const ProfilePage: React.FC = () => {
     setEditMode(false)
   }
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // Update form values as the user types
-    setFormValues({
-      ...formValues,
-      [e.target.name]: e.target.value,
-    })
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormValues(prevValues => ({
+      ...prevValues,
+      [name]: value,
+    }))
   }
 
   const fadeInUp = {
@@ -123,71 +140,81 @@ const ProfilePage: React.FC = () => {
       initial='hidden'
       animate='visible'
       variants={fadeInUp}
-      className='bg-gray-800shadow min-h-screen flex items-center justify-center'
+      className='bg-gray-800 shadow min-h-screen flex items-center justify-center'
     >
-      <div>
+      <div className='w-full max-w-2xl'>
+        {' '}
+        {/* Adjust max-width as needed */}
         <Panel className='rounded-xl'>
           <h1 className='text-2xl text-medium-purple-500 font-bold mb-6 text-center'>Your Profile</h1>
-          <form className='max-w-full w-full p-4 text-center'>
+          <form className='p-4 '>
             {userData ? (
               <>
                 {editMode ? (
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>Email:</label>
-                    <input
-                      type='email'
-                      name='email'
-                      value={formValues.email}
-                      onChange={handleChange}
-                      className='mt-1 p-2 border rounded-md w-full'
-                    />
+                  <div className='flex flex-col items-center space-y-4 w-full max-w-md mx-auto'>
+                    <div className='w-1/2'>
+                      <label className='block text-sm font-medium text-gray-700 text-center'>Email:</label>
+                      <input
+                        type='email'
+                        name='email'
+                        value={userData.email}
+                        readOnly
+                        className='mt-1 p-2 bg-gray-500 border rounded-md w-full text-center'
+                      />
 
-                    <label className='block mt-4 text-sm font-medium text-gray-700'>Nickname:</label>
-                    <input
-                      type='text'
-                      name='nickname'
-                      value={formValues.nickname}
-                      onChange={handleChange}
-                      className='mt-1 p-2 border rounded-md w-full'
-                    />
+                      <label className='block mt-4 text-sm font-medium text-gray-700 text-center'>Nickname:</label>
+                      <input
+                        type='text'
+                        name='nickname'
+                        value={formValues.nickname}
+                        onChange={handleChange}
+                        className='mt-1 p-2 border rounded-md w-full text-center'
+                      />
 
-                    <label className='block mt-4 text-sm font-medium text-gray-700'>Username:</label>
-                    <input
-                      type='text'
-                      name='username'
-                      value={formValues.username}
-                      onChange={handleChange}
-                      className='mt-1 p-2 border rounded-md w-full'
-                    />
+                      <label className='block mt-4 text-sm font-medium text-gray-700 text-center'>Username:</label>
+                      <input
+                        type='text'
+                        name='username'
+                        value={userData.username}
+                        readOnly
+                        className='mt-1 p-2 bg-gray-500 border rounded-md w-full text-center'
+                      />
 
-                    <label className='block mt-4 text-sm font-medium text-gray-700'>age:</label>
-                    <input
-                      type='text'
-                      name='age'
-                      value={formValues.age}
-                      onChange={handleChange}
-                      className='mt-1 p-2 border rounded-md w-full'
-                    />
+                      <label className='block mt-4 text-sm font-medium text-gray-700 text-center'>Weight:</label>
+                      <input
+                        type='text'
+                        name='weight'
+                        value={formValues.weight}
+                        onChange={handleChange}
+                        className='mt-1 p-2 border rounded-md w-full text-center'
+                      />
 
-                    <label className='block mt-4 text-sm font-medium text-gray-700'>sex:</label>
-                    <input
-                      type='text'
-                      name='sex'
-                      value={formValues.sex}
-                      onChange={handleChange}
-                      className='mt-1 p-2 border rounded-md w-full'
-                    />
+                      <label className='block mt-4 text-sm font-medium text-gray-700 text-center'>Age:</label>
 
-                    <label className='block mt-4 text-sm font-medium text-gray-700'>weight:</label>
-                    <input
-                      type='text'
-                      name='weight'
-                      value={formValues.weight}
-                      onChange={handleChange}
-                      className='mt-1 p-2 border rounded-md w-full'
-                    />
+                      <input
+                        type='text'
+                        name='age'
+                        value={formValues.age}
+                        onChange={handleChange}
+                        className='mt-1 p-2 border rounded-md w-full text-center'
+                      />
 
-                    <div className='mt-6 flex justify-end'>
+                      <label className='block mt-4 text-sm font-medium text-gray-700 text-center'>Sex:</label>
+                      <select
+                        name='sex'
+                        value={formValues.sex}
+                        onChange={handleChange}
+                        className='mt-1 p-2 border rounded-md w-full text-center'
+                      >
+                        <option value='' disabled>
+                          Select sex
+                        </option>
+                        <option value='male'>Male</option>
+                        <option value='female'>Female</option>
+                      </select>
+                    </div>
+
+                    <div className='mt-6 flex space-x-4'>
                       <button
                         type='button'
                         onClick={handleSaveClick}
@@ -198,26 +225,27 @@ const ProfilePage: React.FC = () => {
                       <button
                         type='button'
                         onClick={handleCancelClick}
-                        className='ml-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring focus:border-gray-300'
+                        className='px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring focus:border-gray-300'
                       >
                         Cancel
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className='grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-1'>
-                    <p className='text-gray-200 '>Email: {userData.email}</p>
+                  <div className='flex flex-col items-center gap-x-8 gap-y-6 border-gray-900/10 pb-12 md:grid-cols-1'>
+                    <p className='text-gray-200'>Email: {userData.email}</p>
                     <p className='text-gray-200'>Nickname: {userData.nickname}</p>
                     <p className='text-gray-200'>Username: {userData.username}</p>
-                    <p className='text-gray-200 '>Weight: {userData.weight}</p>
+                    <p className='text-gray-200'>Weight: {userData.weight}</p>
                     <p className='text-gray-200'>Age: {userData.age}</p>
                     <p className='text-gray-200'>Sex: {userData.sex}</p>
-                    <p className='text-gray-200'>Admin: {userData.isAdmin ? 'Yes' : 'No'}</p>
+
+                    {userData.isAdmin && <p className='text-gray-200'>Admin: Yes</p>}
 
                     <button
                       type='button'
                       onClick={handleEditClick}
-                      className='mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:ring focus:border-indigo-300'
+                      className='mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:ring focus:border-indigo-300 self-center justify-self-center'
                     >
                       Edit
                     </button>
@@ -227,32 +255,22 @@ const ProfilePage: React.FC = () => {
             ) : (
               <p>
                 {accessToken ? (
-                  // User is not logged in
                   <>
                     To view your profile, please <a href='/login'>log in</a>.
                   </>
                 ) : (
-                  // Access token is not found, likely expired
-
-                  // Unable to fetch user data
                   <>
                     {error ? (
-                      // Show error message if error exists
                       <>
                         {error instanceof Error ? (
-                          // Display the error message
-                          <>
-                            <p className='text-red-200'>Your session has expired. Please log in again</p>
-                          </>
+                          <p className='text-red-200'>Your session has expired. Please log in again</p>
                         ) : (
-                          // Show generic error message if the error is not an instance of Error
                           <>
                             Unable to fetch user data. Please try again later or <a href='/login'>log in</a>.
                           </>
                         )}
                       </>
                     ) : (
-                      // Show generic loading message if no error
                       <>
                         To view your profile, please <a href='/login'>log in</a>
                       </>
