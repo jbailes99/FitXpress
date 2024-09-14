@@ -99,17 +99,28 @@ const ExerciseTracker = () => {
 
   const fetchExerciseLogs = async () => {
     const storedTokens = getCurrentTokens()
-    const userDetails = await getUserDetails(storedTokens.accessToken)
-    const userId = userDetails.username
+
+    if (!storedTokens || !storedTokens.accessToken) {
+      console.warn('Access token is missing. User might not be logged in.')
+      return // Exit early if no access token is found
+    }
 
     try {
-      // Fetch exercise logs from your API
+      const userDetails = await getUserDetails(storedTokens.accessToken)
+      const userId = userDetails?.username
+
+      // Ensure userId is defined
+      if (!userId) {
+        console.error('User ID is not defined.')
+        return
+      }
+
       const response = await api.post(
         'https://dqb2sp9hpk.execute-api.us-east-1.amazonaws.com/default/getExerciseLogs',
         { userId }
       )
+
       const responseData = response.data.items
-      // Update exerciseEntries state with the fetched data
       setExerciseEntries(responseData)
     } catch (error) {
       console.error('Error fetching exercise logs:', error)
@@ -117,9 +128,8 @@ const ExerciseTracker = () => {
   }
 
   useEffect(() => {
-    // Call the fetchExerciseLogs function when the component mounts or when the dependencies change
     fetchExerciseLogs()
-  }, []) // Empty dependency array means this effect runs only once, similar to componentDidMount
+  }, [])
 
   const handleDelete = async entryId => {
     try {
@@ -227,7 +237,9 @@ const ExerciseTracker = () => {
               {item.additionalInfo && (
                 <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
               )}
-              <p style={{ fontSize: '24px', color: 'red', margin: '5px 0' }}>~ {caloriesBurned} calories burned</p>
+              <p className='text-medium-purple-300' style={{ fontSize: '24px', margin: '5px 0' }}>
+                ~ {caloriesBurned} calories burned
+              </p>
               <Button
                 onClick={() => {
                   handleDelete(item.entryId)
@@ -444,32 +456,32 @@ const ExerciseTracker = () => {
                   </div>
                 </div>
               </div>
-
-              {exerciseEntries.length > 0 && (
-                <div className='flex-grow w-1/2'>
-                  <div className='mt-12 justify-center text-center'>
-                    <h1 className='font-bold text-xl text-white'>Recent logs</h1>
-                    <div className='results-container'>
-                      {exerciseEntries.map(item => (
-                        <div key={item.id} className='bg-secondary-600 mt-2 p-4 rounded-md mb-4'>
-                          {renderExerciseDetails(item)}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
-        </div>
-      </div>
-
-      <div>
-        <div className='flex flex-col justify-center items-center'>
-          <div className='bg-secondary-400 rounded-xl p-4 font-bold text-center w-3/4 mb-4'>
-            <h1 className='text-6xl font-extrabold text-white  mb-4'>Weekly Planner</h1>
-            <CalendarView />
+          <div className='relative w-3/4 mt-12'>
+            <div aria-hidden='true' className='absolute inset-0 flex items-center'>
+              <div className='w-full border-t border-gray-300' />
+            </div>
+            <div className='relative flex justify-center'>
+              <span className='bg-gray-800 px-3 text-xl font-semibold leading-6 text-medium-purple-300'>
+                Recent Logs
+              </span>
+            </div>
           </div>
+
+          {exerciseEntries.length > 0 && (
+            <div className='flex-grow w-1/2'>
+              <div className='mt-12 justify-center text-center'>
+                <div className='results-container'>
+                  {exerciseEntries.map(item => (
+                    <div key={item.id} className='bg-secondary-400 mt-2 p-4 rounded-md mb-4'>
+                      {renderExerciseDetails(item)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

@@ -16,6 +16,7 @@ import { ClockIcon, ChartBarIcon, CalendarIcon } from '@heroicons/react/24/outli
 
 ChartJS.register(...registerables)
 interface WeeklyPlan {
+  planName: string
   isActive: any
   entryId: string
   userId: string
@@ -78,15 +79,22 @@ const BmiCalculator: React.FC = () => {
   useEffect(() => {
     const fetchActiveWeeklyPlan = async () => {
       const storedTokens = getCurrentTokens()
-      const userDetails = await getUserDetails(storedTokens.accessToken)
-      const userId = userDetails.username
 
-      if (!getWeeklyPlanApi || !userId) {
-        console.error('API endpoint is not defined')
-        return
+      // Check if the tokens or accessToken exist
+      if (!storedTokens || !storedTokens.accessToken) {
+        console.warn('User is not logged in or access token is missing.')
+        return // Exit the function early
       }
 
       try {
+        const userDetails = await getUserDetails(storedTokens.accessToken)
+        const userId = userDetails?.username
+
+        if (!getWeeklyPlanApi || !userId) {
+          console.error('API endpoint or userId is not defined.')
+          return
+        }
+
         const response = await api.post(getWeeklyPlanApi, { userId })
         const plans = response.data.items // Assuming your response contains a list of plans
 
@@ -103,7 +111,11 @@ const BmiCalculator: React.FC = () => {
         console.error('Error fetching weekly plan:', error)
       }
     }
-    fetchActiveWeeklyPlan()
+
+    // Only fetch if the API endpoint exists
+    if (getWeeklyPlanApi) {
+      fetchActiveWeeklyPlan()
+    }
   }, [getWeeklyPlanApi]) // Add getWeeklyPlanApi to the dependency array if it might change
 
   const openModal = () => {
@@ -184,6 +196,15 @@ const BmiCalculator: React.FC = () => {
     if ((e.keyCode < 48 || e.keyCode > 57) && !VALID_KEYS.includes(e.keyCode)) {
       e.preventDefault()
     }
+  }
+
+  const getColorForExercise = (exerciseName: string) => {
+    const colors = ['bg-red-200', 'bg-blue-200', 'bg-green-200', 'bg-yellow-200', 'bg-purple-200', 'bg-pink-200']
+    let hash = 0
+    for (let i = 0; i < exerciseName.length; i++) {
+      hash = exerciseName.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    return colors[Math.abs(hash) % colors.length]
   }
 
   const apiEndpoint = 'https://7c3u65ozgd.execute-api.us-east-1.amazonaws.com/default/calculations'
@@ -561,7 +582,7 @@ const BmiCalculator: React.FC = () => {
             {isLoggedIn && !isAdmin && (
               <Panel className='col-span-2 text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-2xl mt-16 w-full h-full'>
                 {' '}
-                <p className='text-sm md:text-2xl'>
+                <p className='text-sm text-gray-200 md:text-2xl'>
                   Welcome back, <span className='text-medium-purple-300'>{userDetails.nickname}</span>
                 </p>
               </Panel>
@@ -697,70 +718,87 @@ const BmiCalculator: React.FC = () => {
             </div>
           </div>
         </div>
-        {isLoggedIn && (
-          <Panel className='w-5/6 rounded-xl mb-12 shadow-2xl mt-8 justify-between'>
-            <div className='mb-16 mt-4 sm:text-5xl text-2xl font-bold text-center text-gray-400'>
-              <h1>My Weekly Plan</h1>
-            </div>
-            <div className='p-4'>
-              <h1 className='bg-blue-500 mt-6 text-white p-3 rounded-lg w-1/2 mx-auto mb-2'>Active Weekly Plan</h1>
-              {weeklyPlan ? (
-                <div className='bg-green-100 p-4 mb-4 rounded-lg shadow-md'>
-                  <h3 className='text-xl font-semibold mb-2'>{weeklyPlan.timestamp}</h3>
-                  <div className='grid grid-cols-7 gap-2'>
-                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-                      <div key={day} className='border p-2 rounded-md bg-white shadow-sm'>
-                        <h4 className='font-medium'>{day}</h4>
-                        <ul className='list-disc list-inside text-sm'>
-                          {weeklyPlan[day]?.map((exercise, index) => <li key={index}>{exercise}</li>) || (
-                            <li>No exercises</li>
-                          )}
-                        </ul>
+        <div className='w-full'>
+          {isLoggedIn && (
+            <Panel className='mx-10 rounded-xl mb-12 shadow-2xl mt-8 justify-between'>
+              <div className='mb-6 mt-4 sm:text-5xl text-2xl font-bold text-center text-gray-200'>
+                <h1>My Weekly Plan</h1>
+              </div>
+              <div className='p-4'>
+                {weeklyPlan ? (
+                  <>
+                    <h1 className='bg-medium-purple-500 text-gray-100 font-semibold p-3 rounded-lg text-center mx-auto mb-2'>
+                      Current Weekly Plan:{' '}
+                      <span className='text-yellow-400'>{weeklyPlan.planName || 'Unnamed Plan'}</span>
+                    </h1>
+
+                    <div className='bg-secondary-200 p-4 mb-4 rounded-lg shadow-md'>
+                      <div className='grid grid-cols-7 gap-2 w-full'>
+                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                          <div
+                            key={day}
+                            className='border p-2 rounded-md bg-white shadow-sm h-24 sm:h-32 md:h-40 lg:h-48 xl:h-56'
+                          >
+                            <h4 className='font-medium'>{day}</h4>
+                            <div className='flex flex-wrap gap-2'>
+                              {weeklyPlan[day]?.map((exercise, index) => (
+                                <span
+                                  key={index}
+                                  className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getColorForExercise(
+                                    exercise
+                                  )} text-gray-700`}
+                                >
+                                  {exercise}
+                                </span>
+                              )) || <span className='text-sm text-gray-500'>No exercises</span>}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <p>No active plan yet.</p>
-              )}
-            </div>
-          </Panel>
-        )}
+                      <h3 className='text-sm text-gray-200 font-semibold mt-2'>Created on {weeklyPlan.timestamp}</h3>
+                    </div>
+                  </>
+                ) : (
+                  <p className='text-gray-200 font-semibold text-lg justify-center text-center items-center'>
+                    No plans found. Go create a plan or make one active.
+                  </p>
+                )}
+              </div>
+            </Panel>
+          )}
+        </div>
 
         {!isLoggedIn && (
-          <Panel className='w-5/6 rounded-2xl mb-12 shadow-3xl mt-8'>
+          <Panel className='mx-10 rounded-xl mb-12 shadow-2xl mt-8 justify-between'>
             <div className='p-6'>
               <h1 className='text-4xl font-extrabold text-center text-gray-100 mb-12'>Explore Our Features</h1>
               <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'>
-                {/* Track Your Exercises */}
-                <div className='bg-gray-800 p-8 rounded-xl shadow-lg hover:bg-gray-700 transition-colors duration-300'>
-                  <div className='flex'>
-                    <ClockIcon className='h-10 w-10 mx-auto text-gray-300 mb-4' />
-                    <h2 className='text-2xl font-bold mx-auto text-gray-100 mb-4'>Track Your Exercises</h2>
+                <div className='bg-gray-800 p-8 rounded-xl shadow-lg hover:bg-gray-900 transition-colors duration-300'>
+                  <div className='flex justify-center space-x-4 '>
+                    <ClockIcon className='h-10 w-10  text-gray-300 mb-4' />
+                    <h2 className='text-2xl font-bold  text-gray-100 mb-4'>Track Your Exercises</h2>
                   </div>
-                  <p className='text-gray-400'>
+                  <p className='text-medium-purple-300 font-medium w-3/4 mx-auto'>
                     Monitor your workouts and log your exercises to keep track of your progress.
                   </p>
                 </div>
 
-                {/* Monitor Your Body Metrics and Weight Loss */}
-                <div className='bg-gray-800 p-8 rounded-xl shadow-lg hover:bg-gray-700 transition-colors duration-300'>
-                  <div className='flex space-x-4'>
-                    <ChartBarIcon className='h-10 w-10 text-gray-300 mb-4' />
-                    <h2 className='text-2xl font-bold text-gray-100 mb-4'>Monitor Your Body Metrics and Weight Loss</h2>
+                <div className='bg-gray-800 p-8 rounded-xl shadow-lg hover:bg-gray-900 transition-colors duration-300'>
+                  <div className='flex justify-center space-x-4 '>
+                    <ChartBarIcon className='h-10 w-10  text-gray-300 mb-4' />
+                    <h2 className='text-2xl font-bold text-gray-100 mb-4'>Monitor Body Metrics</h2>
                   </div>
-                  <p className='text-gray-400'>
+                  <p className='text-medium-purple-300 font-medium w-3/4 mx-auto'>
                     Keep track of your body metrics and weight loss journey with detailed reports and analytics.
                   </p>
                 </div>
 
-                {/* Make Weekly Workout Plans */}
-                <div className='bg-gray-800 p-8 rounded-xl shadow-lg hover:bg-gray-700 transition-colors duration-300'>
-                  <div className='flex'>
+                <div className='bg-gray-800 p-8 rounded-xl shadow-lg hover:bg-gray-900 transition-colors duration-300'>
+                  <div className='flex justify-center space-x-4 '>
                     <CalendarIcon className='h-10 w-10 text-gray-300 mb-4' />
                     <h2 className='text-2xl font-bold text-gray-100 mb-4'>Make Weekly Workout Plans</h2>
                   </div>
-                  <p className='text-gray-400'>
+                  <p className='text-medium-purple-300 font-medium w-3/4 mx-auto'>
                     Create and customize your weekly workout plans to stay organized and motivated.
                   </p>
                 </div>
@@ -769,6 +807,7 @@ const BmiCalculator: React.FC = () => {
           </Panel>
         )}
       </div>
+
       <footer className='bg-secondary-800 flex flex-col items-center justify-center  text-center text-gray-300 py-4'>
         <div className='container mx-auto px-4 items-center flex flex-col justify-center text-center'>
           <div className='flex flex-wrap space-x-36 *:justify-between text-center items-center'>

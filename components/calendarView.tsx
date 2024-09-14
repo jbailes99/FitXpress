@@ -7,6 +7,7 @@ import { getCurrentTokens, getUserDetails } from '@/utils/authService'
 import { useIsLoggedIn, useUserDetails, useIsAdmin } from '@/hooks'
 
 interface WeeklyPlan {
+  planName: string
   isActive: any
   entryId: string
   userId: string
@@ -26,6 +27,8 @@ const CalendarView = () => {
   const getExerciseTypesApi = process.env.NEXT_PUBLIC_GET_EXERCISES
   const deleteWeeklyPlanApi = process.env.NEXT_PUBLIC_DELETE_WEEKLY_PLAN
   const makeWeeklyPlanActiveApi = process.env.NEXT_PUBLIC_MAKE_PLAN_ACTIVE
+
+  const [planName, setPlanName] = useState('')
 
   const [activePlan, setActivePlan] = useState<string | null>(null)
   const [weeklyPlans, setWeeklyPlans] = useState<WeeklyPlan[]>([])
@@ -85,18 +88,31 @@ const CalendarView = () => {
   }
 
   const fetchWeeklyPlans = async () => {
+    // Get the stored tokens
     const storedTokens = getCurrentTokens()
-    const userDetails = await getUserDetails(storedTokens.accessToken)
-    const userId = userDetails.username
 
-    if (!getWeeklyPlanApi || !userId) {
-      console.error('API endpoint or user ID is not defined')
-      return
+    // Check if the tokens or access token exist before proceeding
+    if (!storedTokens || !storedTokens.accessToken) {
+      console.warn('Access token is missing. User might not be logged in.')
+      return // Exit early if no access token is found
     }
 
     try {
+      // Fetch user details
+      const userDetails = await getUserDetails(storedTokens.accessToken)
+      const userId = userDetails?.username
+
+      // Check if API endpoint and userId are defined
+      if (!getWeeklyPlanApi || !userId) {
+        console.error('API endpoint or user ID is not defined.')
+        return
+      }
+
+      // Make the API call
       const response = await api.post(getWeeklyPlanApi, { userId })
       const data: { items: WeeklyPlan[] } = response.data // Ensure data is structured correctly
+
+      // Sort and store the plans
       setWeeklyPlans(data.items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()))
     } catch (error) {
       console.error('Error fetching weekly plans:', error)
@@ -170,14 +186,25 @@ const CalendarView = () => {
     setCurrentDayIndex(prev => (direction === 'next' ? (prev + 1) % 7 : (prev - 1 + 7) % 7))
   }
 
+  const getColorForExercise = (exerciseName: string) => {
+    const colors = ['bg-red-200', 'bg-blue-200', 'bg-green-200', 'bg-yellow-200', 'bg-purple-200', 'bg-pink-200']
+    let hash = 0
+    for (let i = 0; i < exerciseName.length; i++) {
+      hash = exerciseName.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    return colors[Math.abs(hash) % colors.length]
+  }
+
   // Function to handle saving the weekly plan to the backend
   const handleSaveWeeklyPlan = async () => {
     const storedTokens = getCurrentTokens()
     const userDetails = await getUserDetails(storedTokens.accessToken)
     const userId = userDetails.username
+
     // Prepare the payload for the API
     const payload = {
       userId,
+      planName,
       Monday: selectedExercises.Monday || [],
       Tuesday: selectedExercises.Tuesday || [],
       Wednesday: selectedExercises.Wednesday || [],
@@ -197,8 +224,23 @@ const CalendarView = () => {
       })
 
       if (response.ok) {
-        alert('Weekly plan saved successfully!')
         await fetchWeeklyPlans()
+
+        // reset
+        setSelectedExercises({
+          Monday: [],
+          Tuesday: [],
+          Wednesday: [],
+          Thursday: [],
+          Friday: [],
+          Saturday: [],
+          Sunday: [],
+        })
+
+        //reset
+        setSelectedCategory('')
+        setExerciseTypes([])
+        setPlanName('')
       } else {
         alert('Failed to save weekly plan')
       }
@@ -213,7 +255,6 @@ const CalendarView = () => {
     return (
       <div className='day-card p-6 bg-gray-50 rounded-lg text-center'>
         <h2 className='text-xl font-bold mb-2'>{currentDay}</h2>
-        <p className='text-sm text-gray-600'>{format(daysOfWeek[currentDayIndex], 'MM/dd/yyyy')}</p>
 
         {/* Category Selector */}
         <div className='mt-4'>
@@ -268,28 +309,33 @@ const CalendarView = () => {
 
   const renderWeeklyOverview = () => {
     return (
-      <div className='mt-8'>
-        <h3 className='text-xl font-semibold mb-4'>Weekly Plan</h3>
-        <div className='grid grid-cols-7 gap-2 border-t border-l'>
+      <div className='mt-8 bg-secondary-300 p-4 rounded-xl'>
+        <h3 className='text-xl text-gray-200 font-semibold mb-4'>Weekly Plan</h3>
+        <div className='grid grid-cols-7 gap-2'>
           {daysOfWeek.map((day, index) => {
             const dayName = format(day, 'EEEE')
             return (
-              <div key={index} className='day-overview p-4 bg-gray-50 rounded-lg'>
-                <h4 className='text-lg font-bold mb-2'>{dayName}</h4>
-                <ul className='list-disc pl-4 text-left'>
+              <div
+                key={index}
+                className='border-0 p-6 rounded-md bg-white shadow-sm h-24 sm:h-42 md:h-40 lg:h-48 xl:h-64'
+              >
+                <h4 className='font-medium'>{dayName}</h4>
+                <div className='flex flex-wrap gap-2'>
                   {selectedExercises[dayName]?.length ? (
                     selectedExercises[dayName].map((exercise, i) => (
-                      <li
+                      <span
                         key={i}
-                        className={`inline-block px-3 py-1 rounded-full text-sm text-gray-700 ${getRandomColor()}`}
+                        className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getColorForExercise(
+                          exercise
+                        )} text-gray-700`}
                       >
                         {exercise}
-                      </li>
+                      </span>
                     ))
                   ) : (
-                    <li className='text-sm text-gray-500'>No exercises</li>
+                    <span className='text-sm text-gray-500'>No exercises</span>
                   )}
-                </ul>
+                </div>
               </div>
             )
           })}
@@ -300,34 +346,78 @@ const CalendarView = () => {
 
   return (
     <div className='calendar-view'>
-      <div className='flex justify-center'>{renderCurrentDay()}</div>
-      {renderWeeklyOverview()}
-      <button onClick={handleSaveWeeklyPlan} className='bg-blue-500 mt-6 text-white p-3 rounded-lg hover:bg-blue-600'>
-        Save Weekly Plan
-      </button>
+      <div className='bg-secondary-200 rounded-lg '>
+        <div className='p-6 w-1/2 mx-auto mt-4 rounded-lg'>
+          <h2 className='text-2xl font-semibold text-gray-200 mb-4'>What do you want to call this plan?</h2>
+          <div className='flex flex-col'>
+            <input
+              type='text'
+              id='planName'
+              value={planName}
+              onChange={e => setPlanName(e.target.value)} // Add this line
+              placeholder='Enter a name for your workout plan'
+              className='p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
+            />
+          </div>
+        </div>
+
+        <div className='p-6'>
+          <div className='flex justify-center'>{renderCurrentDay()}</div>
+          {renderWeeklyOverview()}
+        </div>
+        <div className='px-4 pt-3  bg-secondary-400  rounded-t-xl inline-block'>
+          <button
+            onClick={handleSaveWeeklyPlan}
+            className='bg-medium-purple-500 text-white p-3 rounded-lg hover:bg-medium-purple-600'
+          >
+            Save Weekly Plan
+          </button>
+        </div>
+      </div>
+
+      <div className='relative mt-12'>
+        <div aria-hidden='true' className='absolute inset-0 flex items-center'>
+          <div className='w-full border-t border-gray-300' />
+        </div>
+        <div className='relative flex justify-center'>
+          <span className='bg-secondary-400 px-3 text-base font-semibold leading-6 text-medium-purple-300'>
+            Your Plans
+          </span>
+        </div>
+      </div>
+
       <div className='p-4'>
-        <h1 className='bg-blue-500 mt-6 text-white p-3 rounded-lg w-1/2 mx-auto mb-2'>Your Plans</h1>
         {weeklyPlans.length === 0 ? (
           <p>No weekly plans available.</p>
         ) : (
           weeklyPlans.map(plan => (
             <div key={plan.entryId} className='bg-gray-100 p-4 mb-4 rounded-lg shadow-md'>
-              <h3 className='text-xl font-semibold mb-2'>{plan.timestamp}</h3>
+              <h3 className='text-xl font-semibold mb-2'>{plan.planName || 'Unnamed Plan'}</h3>{' '}
+              <p className='text-sm text-gray-500 mb-2'>{plan.timestamp}</p>
               <div className='grid grid-cols-7 gap-2'>
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
                   <div key={day} className='border p-2 rounded-md bg-white shadow-sm'>
                     <h4 className='font-medium'>{day}</h4>
-                    <ul className='list-disc list-inside text-sm'>
-                      {plan[day]?.map((exercise, index) => <li key={index}>{exercise}</li>) || <li>No exercises</li>}
-                    </ul>
+                    <div className='flex flex-wrap gap-2'>
+                      {plan[day]?.map((exercise, index) => (
+                        <span
+                          key={index}
+                          className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getColorForExercise(
+                            exercise
+                          )} text-gray-700`}
+                        >
+                          {exercise}
+                        </span>
+                      )) || <span className='text-sm text-gray-500'>No exercises</span>}
+                    </div>
                   </div>
                 ))}
               </div>
-              <div className='mt-4 flex justify-between'>
+              <div className='mt-4 flex justify-center space-x-24'>
                 <button
                   onClick={() => handleActivatePlan(plan.entryId)}
                   className={`px-4 py-2 rounded-lg ${
-                    plan.isActive ? 'bg-green-500 text-white' : 'bg-blue-500 text-white hover:bg-blue-600'
+                    plan.isActive ? 'bg-green-500 text-white' : 'bg-indigo-600 text-white hover:bg-indigo-700'
                   }`}
                   disabled={plan.isActive}
                 >

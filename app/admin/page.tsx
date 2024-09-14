@@ -20,13 +20,12 @@ const AdminPanel = () => {
 
     if (exerciseType && exerciseCategory) {
       try {
-        const response = await api.post(apiEndpoint, {
+        await api.post(apiEndpoint, {
           exerciseType,
           exerciseCategory,
         })
 
-        setExerciseList(response.data)
-        console.log(exerciseList)
+        fetchExerciseList()
 
         alert('Exercise saved successfully!')
       } catch (error) {
@@ -35,40 +34,43 @@ const AdminPanel = () => {
       }
     }
 
-    // Add logic to submit exercise type to the database
-    console.log('Exercise type submitted:', exerciseType)
-    // Add the new exercise type to the list
-    // Clear input field after submission
     setExerciseType('')
     setExerciseCategory('')
   }
 
-  const fetchEndpoint = 'https://yvxqyykabg.execute-api.us-east-1.amazonaws.com/default/getExerciseType'
+  const fetchEndpoint = 'https://bgcthf8l4l.execute-api.us-east-1.amazonaws.com/default/getAllExerciseTypes'
   const fetchExerciseList = async () => {
     try {
       const response = await api.get(fetchEndpoint)
-      // Assuming the response contains the list of exercises under the key "items"
-      setExerciseList(response.data.items)
+      const exercises = Array.isArray(response.data.exercises) ? response.data.exercises : []
+      setExerciseList(exercises)
     } catch (error) {
       console.error('Error fetching exercise list:', error)
-      // Handle error
+      setExerciseList([])
     }
   }
 
   useEffect(() => {
-    // Fetch the list of exercises when the component mounts
     fetchExerciseList()
   }, [])
 
+  const groupedExercises = exerciseList.reduce((acc, exercise) => {
+    if (!acc[exercise.exerciseCategory]) {
+      acc[exercise.exerciseCategory] = []
+    }
+    acc[exercise.exerciseCategory].push(exercise)
+    return acc
+  }, {} as Record<string, Exercise[]>)
+
   return (
-    <div className='flex justify-center items-center h-screen'>
-      <Panel className='max-w-lg mx-auto text-secondary-500 p-6 h-1/2 shadow-md bg-white rounded-3xl justify-content items-center text-center'>
-        <h1 className='text-3xl  font-semibold mb-14'>Welcome to the Admin Panel</h1>
-        <div>
-          <h2 className='text-xl font-semibold mb-2'>Add Exercise Type</h2>
-          <form onSubmit={handleExerciseSubmit}>
-            <div className='mb-4'>
-              <label htmlFor='exerciseType' className='block text-sm font-medium text-gray-700'>
+    <div className='flex flex-col items-center min-h-screen bg-gray-800 p-6'>
+      <Panel className='max-w-3xl w-full p-8 justify-center items-center bg-white rounded-xl shadow-lg'>
+        <h1 className='text-4xl font-bold mb-8 text-center text-gray-800'>Admin Panel</h1>
+        <div className='mb-8'>
+          <h2 className='text-2xl font-semibold mb-4'>Add Exercise Type</h2>
+          <form onSubmit={handleExerciseSubmit} className='space-y-4'>
+            <div className='flex flex-col'>
+              <label htmlFor='exerciseType' className='text-sm font-medium text-gray-700'>
                 Exercise Type:
               </label>
               <input
@@ -76,44 +78,51 @@ const AdminPanel = () => {
                 id='exerciseType'
                 value={exerciseType}
                 onChange={e => setExerciseType(e.target.value)}
-                className='mt-1 p-2 border rounded-md w-full focus:outline-none focus:border-blue-500'
+                className='mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500'
                 placeholder='Enter exercise type'
                 required
               />
             </div>
-            <div className='mb-4'>
-              <label htmlFor='exerciseType' className='block text-sm font-medium text-gray-700'>
+            <div className='flex flex-col'>
+              <label htmlFor='exerciseCategory' className='text-sm font-medium text-gray-700'>
                 Exercise Category:
               </label>
               <input
                 type='text'
-                id='exerciseType'
+                id='exerciseCategory'
                 value={exerciseCategory}
                 onChange={e => setExerciseCategory(e.target.value)}
-                className='mt-1 p-2 border rounded-md w-full focus:outline-none focus:border-blue-500'
-                placeholder='Enter exercise type'
+                className='mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500'
+                placeholder='Enter exercise category'
                 required
               />
             </div>
             <button
               type='submit'
-              className='bg-medium-purple-500 text-black py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600'
+              className='w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500'
             >
               Add Exercise Type
             </button>
           </form>
         </div>
         <div>
-          <h2 className='text-xl text-black font-semibold mt-8 mb-2'>Current List of Exercises:</h2>
-          <ul>
-            {exerciseList.map((exercise, index) => (
-              <li key={index}>
-                <li key={index}>
-                  {exercise.exerciseType} - {exercise.exerciseCategory}
-                </li>
-              </li>
-            ))}
-          </ul>
+          <h2 className='text-2xl font-semibold mb-4'>Current List of Exercises</h2>
+          {Object.keys(groupedExercises).length > 0 ? (
+            Object.keys(groupedExercises).map((category, index) => (
+              <div key={index} className='mb-6'>
+                <h3 className='text-xl font-semibold mb-2 text-gray-800'>{category}</h3>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
+                  {groupedExercises[category].map((exercise, index) => (
+                    <div key={index} className='p-4 bg-gray-200 rounded-lg shadow'>
+                      <p className='text-lg font-medium text-gray-700'>{exercise.exerciseType}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No exercises available</p>
+          )}
         </div>
       </Panel>
     </div>
