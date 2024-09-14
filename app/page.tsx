@@ -64,59 +64,51 @@ const BmiCalculator: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
-    console.log('current gender:', gender)
-
-    if (userDetails) {
-      setWeight(userDetails.weight)
-      setAge(userDetails.age)
-      setGender(userDetails.sex || null)
-      setHeight(userDetails.height)
+    if (isLoggedIn && userDetails?.username) {
+      fetchActiveWeeklyPlan(userDetails.username)
     }
-  }, [userDetails])
+  }, [isLoggedIn, userDetails?.username]) // Re-run when login status or username changes
+  const fetchActiveWeeklyPlan = async (username: any) => {
+    const storedTokens = getCurrentTokens()
 
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    // Check if the tokens or accessToken exist
+    if (!storedTokens || !storedTokens.accessToken) {
+      console.warn('User is not logged in or access token is missing.')
+      return // Exit the function early
+    }
+
+    try {
+      const userDetails = await getUserDetails(storedTokens.accessToken)
+      const userId = userDetails?.username
+
+      if (!getWeeklyPlanApi || !userId) {
+        console.error('API endpoint or userId is not defined.')
+        return
+      }
+
+      const response = await api.post(getWeeklyPlanApi, { userId })
+      const plans = response.data.items // Assuming your response contains a list of plans
+
+      // Find the plan that has isActive: true
+      const activePlan = plans.find((plan: { isActive: any }) => plan.isActive)
+
+      if (activePlan) {
+        setWeeklyPlan(activePlan) // Store the active plan in state
+        console.log(activePlan) // Log the active plan
+      } else {
+        console.warn('No active plan found.')
+      }
+    } catch (error) {
+      console.error('Error fetching weekly plan:', error)
+    }
+  }
 
   useEffect(() => {
-    const fetchActiveWeeklyPlan = async () => {
-      const storedTokens = getCurrentTokens()
-
-      // Check if the tokens or accessToken exist
-      if (!storedTokens || !storedTokens.accessToken) {
-        console.warn('User is not logged in or access token is missing.')
-        return // Exit the function early
-      }
-
-      try {
-        const userDetails = await getUserDetails(storedTokens.accessToken)
-        const userId = userDetails?.username
-
-        if (!getWeeklyPlanApi || !userId) {
-          console.error('API endpoint or userId is not defined.')
-          return
-        }
-
-        const response = await api.post(getWeeklyPlanApi, { userId })
-        const plans = response.data.items // Assuming your response contains a list of plans
-
-        // Find the plan that has isActive: true
-        const activePlan = plans.find((plan: { isActive: any }) => plan.isActive)
-
-        if (activePlan) {
-          setWeeklyPlan(activePlan) // Store the active plan in state
-          console.log(activePlan) // Log the active plan
-        } else {
-          console.warn('No active plan found.')
-        }
-      } catch (error) {
-        console.error('Error fetching weekly plan:', error)
-      }
-    }
-
     // Only fetch if the API endpoint exists
-    if (getWeeklyPlanApi) {
-      fetchActiveWeeklyPlan()
+    if (isLoggedIn && getWeeklyPlanApi) {
+      fetchActiveWeeklyPlan(userDetails.username)
     }
-  }, [getWeeklyPlanApi]) // Add getWeeklyPlanApi to the dependency array if it might change
+  }, [isLoggedIn, getWeeklyPlanApi]) // Add getWeeklyPlanApi to the dependency array if it might change
 
   const openModal = () => {
     setIsModalOpen(true)
