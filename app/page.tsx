@@ -11,13 +11,30 @@ import { useIsLoggedIn, useUserDetails, useIsAdmin } from '@/hooks'
 import { Panel } from '@/components/panel'
 import { Button } from '@/components/button'
 import GaugeChart from 'react-gauge-chart'
+import { get } from 'http'
+import { ClockIcon, ChartBarIcon, CalendarIcon } from '@heroicons/react/24/outline'
 
 ChartJS.register(...registerables)
+interface WeeklyPlan {
+  isActive: any
+  entryId: string
+  userId: string
+  Monday: string[]
+  Tuesday: string[]
+  Wednesday: string[]
+  Thursday: string[]
+  Friday: string[]
+  Saturday: string[]
+  Sunday: string[]
+  timestamp: string
+}
 
 //ONLY ALLOW BACK SPACE, QUOTES, LEFT AND RIGHT ARROW KEYS
 const VALID_KEYS = [8, 9, 37, 39, 222]
 
 const BmiCalculator: React.FC = () => {
+  const getWeeklyPlanApi = process.env.NEXT_PUBLIC_GET_WEEKLY_PLAN
+
   const isLoggedIn = useIsLoggedIn()
   const isAdmin = useIsAdmin()
   const userDetails = useUserDetails()
@@ -26,6 +43,7 @@ const BmiCalculator: React.FC = () => {
   const [neckMeasurement, setNeckMeasurement] = useState<number | undefined>(undefined)
   const [waistMeasurement, setWaistMeasurement] = useState<number | undefined>(undefined)
   const [hipMeasurement, setHipMeasurement] = useState<number | undefined>(undefined)
+  const [weeklyPlan, setWeeklyPlan] = useState<WeeklyPlan | null>(null)
 
   const [gender, setGender] = useState<string | null>(null)
   const [height, setHeight] = useState<string | undefined>(undefined)
@@ -54,6 +72,39 @@ const BmiCalculator: React.FC = () => {
       setHeight(userDetails.height)
     }
   }, [userDetails])
+
+  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+  useEffect(() => {
+    const fetchActiveWeeklyPlan = async () => {
+      const storedTokens = getCurrentTokens()
+      const userDetails = await getUserDetails(storedTokens.accessToken)
+      const userId = userDetails.username
+
+      if (!getWeeklyPlanApi || !userId) {
+        console.error('API endpoint is not defined')
+        return
+      }
+
+      try {
+        const response = await api.post(getWeeklyPlanApi, { userId })
+        const plans = response.data.items // Assuming your response contains a list of plans
+
+        // Find the plan that has isActive: true
+        const activePlan = plans.find((plan: { isActive: any }) => plan.isActive)
+
+        if (activePlan) {
+          setWeeklyPlan(activePlan) // Store the active plan in state
+          console.log(activePlan) // Log the active plan
+        } else {
+          console.warn('No active plan found.')
+        }
+      } catch (error) {
+        console.error('Error fetching weekly plan:', error)
+      }
+    }
+    fetchActiveWeeklyPlan()
+  }, [getWeeklyPlanApi]) // Add getWeeklyPlanApi to the dependency array if it might change
 
   const openModal = () => {
     setIsModalOpen(true)
@@ -203,12 +254,12 @@ const BmiCalculator: React.FC = () => {
               showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'
             }`}
           >
-            <h1 className='sm:text-3xl text-lg sm:mt-0 mt-2 mb-4 text-center text-gray-400 font-bold sm:mb-12'>
+            <h1 className='sm:text-3xl text-lg sm:mt-0 mt-2 mb-4 text-center text-gray-200 font-bold sm:mb-12'>
               Gain comprehensive insight into your body composition
             </h1>
             <div className='grid grid-cols-3 '>
               <div className={`col-span-3 sm:col-span-3 text-center mt-6 ${showResults ? 'hidden' : 'visible'}`}>
-                <h1 className='mb-4 text-3xl font-bold text-gray-400'>Body Calculations</h1>
+                <h1 className='mb-4 text-3xl font-bold text-gray-200'>Body Calculations</h1>
                 <form onSubmit={onSubmit}>
                   <div className='grid grid-cols-2 '>
                     <div className='mb-4'>
@@ -550,7 +601,7 @@ const BmiCalculator: React.FC = () => {
             )}
 
             <Panel className='text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-2xl  w-full h-full'>
-              <h1 className='mb-4 text-gray-400 font-bold text-xl md:text-2xl'>
+              <h1 className='mb-4 text-gray-200 font-bold text-xl md:text-2xl'>
                 Unlock insights into your body composition.
               </h1>
               <div className='leading-6 text-left font-bold  text-gray-400 '>
@@ -646,46 +697,77 @@ const BmiCalculator: React.FC = () => {
             </div>
           </div>
         </div>
-        <Panel className='w-5/6 rounded-xl mb-12 shadow-2xl mt-8 justify-between'>
-          <div className='mb-16  mt-4 sm:text-5xl text-2xl font-bold text-center text-gray-400'>
-            <h1>More Calculators</h1>
-          </div>
-          <div className='flex grid-cols-2 text-white justify-center items-center text-center gap-24'>
-            {/* <div className='bg-secondary-600 col-span-1 text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-md mt-2 sm:max-w-xl sm:w-full '>
-              <h1 className='mb-4 text-gray-400 font-bold text-xl md:text-2xl'>BMR calculator</h1>
+        {isLoggedIn && (
+          <Panel className='w-5/6 rounded-xl mb-12 shadow-2xl mt-8 justify-between'>
+            <div className='mb-16 mt-4 sm:text-5xl text-2xl font-bold text-center text-gray-400'>
+              <h1>My Weekly Plan</h1>
+            </div>
+            <div className='p-4'>
+              <h1 className='bg-blue-500 mt-6 text-white p-3 rounded-lg w-1/2 mx-auto mb-2'>Active Weekly Plan</h1>
+              {weeklyPlan ? (
+                <div className='bg-green-100 p-4 mb-4 rounded-lg shadow-md'>
+                  <h3 className='text-xl font-semibold mb-2'>{weeklyPlan.timestamp}</h3>
+                  <div className='grid grid-cols-7 gap-2'>
+                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                      <div key={day} className='border p-2 rounded-md bg-white shadow-sm'>
+                        <h4 className='font-medium'>{day}</h4>
+                        <ul className='list-disc list-inside text-sm'>
+                          {weeklyPlan[day]?.map((exercise, index) => <li key={index}>{exercise}</li>) || (
+                            <li>No exercises</li>
+                          )}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p>No active plan yet.</p>
+              )}
+            </div>
+          </Panel>
+        )}
 
-              <div className='bg-medium-purple-500 text-center p-4 md:p-6 rounded-lg shadow-2xl mt-4 md:mt-6'>
-                <p className='text-sm md:text-base text-gray-200'>
-                  Your Basal Metabolic Rate (BMR) is the number of calories you burn as your body performs basic (basal)
-                  life-sustaining function. Commonly also termed as Resting Metabolic Rate (RMR), which is the calories
-                  burned if you stayed in bed all day..{' '}
-                </p>
-                <a type='button' href='/bmr' className='text-gray-800 font-bold w-3/4 text-sm md:text-2xl'>
-                  <button className='bg-secondary-600 text-center text-white w-full max-w-2xl p-2 md:p-4 rounded-lg shadow-2xl mt-2'>
-                    Calculate
-                  </button>
-                </a>
-              </div>
-            </div> */}
-            <div className='bg-secondary-600 col-span-1 text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-md mt-2  sm:max-w-xl sm:w-1/2  '>
-              <h1 className='mb-4 text-gray-400 font-bold text-xl md:text-2xl'>Body Fat & BMI Calculator</h1>
+        {!isLoggedIn && (
+          <Panel className='w-5/6 rounded-2xl mb-12 shadow-3xl mt-8'>
+            <div className='p-6'>
+              <h1 className='text-4xl font-extrabold text-center text-gray-100 mb-12'>Explore Our Features</h1>
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'>
+                {/* Track Your Exercises */}
+                <div className='bg-gray-800 p-8 rounded-xl shadow-lg hover:bg-gray-700 transition-colors duration-300'>
+                  <div className='flex'>
+                    <ClockIcon className='h-10 w-10 mx-auto text-gray-300 mb-4' />
+                    <h2 className='text-2xl font-bold mx-auto text-gray-100 mb-4'>Track Your Exercises</h2>
+                  </div>
+                  <p className='text-gray-400'>
+                    Monitor your workouts and log your exercises to keep track of your progress.
+                  </p>
+                </div>
 
-              <div className='bg-medium-purple-500 text-center p-4 md:p-6 rounded-lg shadow-2xl mt-4 md:mt-6'>
-                {/* <h1 className='font-bold mb-2 text-lg md:text-xl'>Take the first step.</h1> */}
-                <p className='text-sm md:text-base text-gray-200'>
-                  Body fat percentage is a key indicator of good health. A high body fat percentage may put you at a
-                  higher risk of lifestyle diseases. Males are advised to maintain their body fat level at 15% or lower,
-                  while females are advised to maintain their body fat level at 25% or lower.{' '}
-                </p>
-                <a type='button' href='/' className='text-gray-800 font-bold  w-3/4 text-sm md:text-2xl'>
-                  <button className='bg-secondary-600 text-center text-white w-full max-w-2xl p-2 md:p-4 rounded-lg shadow-2xl mt-2'>
-                    Calculate
-                  </button>
-                </a>
+                {/* Monitor Your Body Metrics and Weight Loss */}
+                <div className='bg-gray-800 p-8 rounded-xl shadow-lg hover:bg-gray-700 transition-colors duration-300'>
+                  <div className='flex space-x-4'>
+                    <ChartBarIcon className='h-10 w-10 text-gray-300 mb-4' />
+                    <h2 className='text-2xl font-bold text-gray-100 mb-4'>Monitor Your Body Metrics and Weight Loss</h2>
+                  </div>
+                  <p className='text-gray-400'>
+                    Keep track of your body metrics and weight loss journey with detailed reports and analytics.
+                  </p>
+                </div>
+
+                {/* Make Weekly Workout Plans */}
+                <div className='bg-gray-800 p-8 rounded-xl shadow-lg hover:bg-gray-700 transition-colors duration-300'>
+                  <div className='flex'>
+                    <CalendarIcon className='h-10 w-10 text-gray-300 mb-4' />
+                    <h2 className='text-2xl font-bold text-gray-100 mb-4'>Make Weekly Workout Plans</h2>
+                  </div>
+                  <p className='text-gray-400'>
+                    Create and customize your weekly workout plans to stay organized and motivated.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </Panel>
+          </Panel>
+        )}
       </div>
       <footer className='bg-secondary-800 flex flex-col items-center justify-center  text-center text-gray-300 py-4'>
         <div className='container mx-auto px-4 items-center flex flex-col justify-center text-center'>

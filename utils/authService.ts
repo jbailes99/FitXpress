@@ -79,10 +79,6 @@ export async function getUserDetails(accessToken) {
 
 export async function updateUserDetails(accessToken: string, updatedUserData: { [key: string]: string }) {
   try {
-    // Use the accessToken and updatedUserData to make a request to your backend or Cognito to update user details
-    // Make sure to handle errors appropriately
-
-    // Example: Update user details on your backend or Cognito
     const params = {
       AccessToken: accessToken,
       UserAttributes: Object.entries(updatedUserData).map(([Name, Value]) => ({ Name, Value })),
@@ -90,7 +86,6 @@ export async function updateUserDetails(accessToken: string, updatedUserData: { 
 
     const response = await cognitoIdentityServiceProvider.updateUserAttributes(params).promise()
 
-    // Modify the return statement based on the structure of your response
     return response
   } catch (error) {
     console.error('Error updating user details:', error)
@@ -141,7 +136,6 @@ export async function refreshUserDetails(accessToken: string) {
 
 export function getCurrentTokens() {
   const storedTokens = localStorage.getItem(STORAGE_KEY)
-  console.log('Stored Tokens:', storedTokens)
   return storedTokens ? JSON.parse(storedTokens) : null
 }
 

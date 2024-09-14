@@ -2,13 +2,13 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { api } from '@/lib/api' // Import your API utility function
-import CalendarView from '@/components/calendarView'
 import { getCurrentTokens, getUserDetails } from '@/utils/authService'
 import { FaRunning, FaWalking, FaBiking, FaHeart } from 'react-icons/fa'
 import IntensitySelector from '@/components/intensitySelector' // Import the IntensitySelector component
 import { redirect } from 'next/dist/server/api-utils'
 import { useIsLoggedIn, useUserDetails, useIsAdmin } from '@/hooks'
 import { Button } from '@/components/button'
+import CalendarView from '@/components/calendarView'
 
 type ExerciseEntry = {
   entryId(entryId: any): unknown
@@ -32,6 +32,7 @@ interface ExerciseData {
 
 const ExerciseTracker = () => {
   const userDetails = useUserDetails()
+
   const [exerciseEntries, setExerciseEntries] = useState<ExerciseEntry[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -219,7 +220,6 @@ const ExerciseTracker = () => {
           <>
             <div className='text-white'>
               <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
-
               <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
               {item.intensity && <p style={{ fontSize: '16px', margin: '5px 0' }}>Intensity: {item.intensity}</p>}
               <p style={{ fontSize: '16px', margin: '5px 0' }}>Time: {item.time}</p>
@@ -227,7 +227,6 @@ const ExerciseTracker = () => {
               {item.additionalInfo && (
                 <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
               )}
-
               <p style={{ fontSize: '24px', color: 'red', margin: '5px 0' }}>~ {caloriesBurned} calories burned</p>
               <Button
                 onClick={() => {
@@ -469,8 +468,7 @@ const ExerciseTracker = () => {
         <div className='flex flex-col justify-center items-center'>
           <div className='bg-secondary-400 rounded-xl p-4 font-bold text-center w-3/4 mb-4'>
             <h1 className='text-6xl font-extrabold text-white  mb-4'>Weekly Planner</h1>
-            <CalendarView selectedDate={selectedDate} onDateChange={handleDateChange} />
-            <CalendarView selectedDate={selectedDate} onDateChange={handleDateChange} />
+            <CalendarView />
           </div>
         </div>
       </div>

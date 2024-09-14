@@ -83,3 +83,31 @@ body {
   width: 100%; /* Make the gradient fill the width on hover */
   opacity: 1; /* Make the gradient visible on hover */
 }
+
+
+/* Add this to your CSS file or a <style> block */
+
+.react-date-picker__wrapper {
+  border: 1px solid #e2e8f0; /* Tailwind's border-gray-300 */
+  border-radius: 0.375rem; /* Tailwind's rounded-md */
+  padding: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.react-date-picker__calendar {
+  border-radius: 0.375rem; /* Tailwind's rounded-md */
+}
+
+.react-date-picker__calendar-button {
+  background-color: #f3f4f6; /* Tailwind's bg-gray-50 */
+}
+
+.react-date-picker__calendar-month {
+  background-color: #f1f5f9; /* Tailwind's bg-gray-100 */
+  color: #4b5563; /* Tailwind's text-gray-800 */
+}
+
+.react-date-picker__calendar-day--selected {
+  background-color: #3b82f6; /* Tailwind's bg-blue-500 */
+  color: white;
+}
