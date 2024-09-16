@@ -31,9 +31,15 @@ export default function Results() {
   const [selectedDataset, setSelectedDataset] = useState<string>('bmi')
   const [results, setResults] = useState<any[]>([])
   const [exerciseResults, setExerciseResults] = useState<any[]>([])
+  const [exerciseStats, setExerciseStats] = useState({
+    weightLifting: { maxWeight: 0 },
+    cardio: { totalDistance: 0, totalTime: 0 },
+  })
+
   interface ExerciseResultItem {
     id: number
     type: string
+    amount?: number
     reps?: string
     sets?: string
     additionalInfo: string
@@ -77,6 +83,7 @@ export default function Results() {
       const response = await api.post(exerciseDeleteEndpoint, { entryId, userId })
       console.log('Response from lambda:', response.data)
       alert('Exercise log deleted.')
+      fetchExerciseLogs()
     } catch (error) {
       console.error('Error deleting item:', error)
     }
@@ -92,64 +99,98 @@ export default function Results() {
       const response = await api.post(deleteEndpoint, { entryId, userId })
       console.log('Response from lambda:', response.data)
       alert('Calculation entry deleted.')
+      fetchResults()
     } catch (error) {
       console.error('Error deleting item:', error)
     }
   }
-
-  useEffect(() => {
-    const fetchResults = async () => {
-      try {
-        const storedTokens = getCurrentTokens()
-
-        if (!storedTokens || !storedTokens.accessToken) {
-          console.error('Access token is missing for saving results.')
-          return
-        }
-
-        const userDetails = await getUserDetails(storedTokens.accessToken)
-        const userId = userDetails.username
-
-        const response = await api.post(lambdaEndpoint, { userId })
-
-        // Access the data from the response
-        const responseData = response.data.items
-        // Sort the results by timestamp
-        setResults(responseData)
-
-        // Process and use responseData as needed
-        console.log('Fetched data:', responseData)
-      } catch (error) {
-        console.error('Error fetching results:', error)
-      }
-    }
-
-    fetchResults()
-  }, [])
-
-  useEffect(() => {
-    const fetchExerciseLogs = async () => {
+  const fetchResults = async () => {
+    try {
       const storedTokens = getCurrentTokens()
+
+      if (!storedTokens || !storedTokens.accessToken) {
+        console.error('Access token is missing for saving results.')
+        return
+      }
+
       const userDetails = await getUserDetails(storedTokens.accessToken)
       const userId = userDetails.username
 
-      try {
-        // Fetch exercise logs
-        const response = await api.post(
-          'https://dqb2sp9hpk.execute-api.us-east-1.amazonaws.com/default/getExerciseLogs',
-          { userId }
-        )
-        const responseData = response.data.items
-        // Update exerciseEntries state with the fetched data
-        setExerciseResults(responseData)
-      } catch (error) {
-        console.error('Error fetching exercise logs:', error)
-      }
-    }
+      const response = await api.post(lambdaEndpoint, { userId })
 
+      // Access the data from the response
+      const responseData = response.data.items
+      // Sort the results by timestamp
+      setResults(responseData)
+
+      // Process and use responseData as needed
+      console.log('Fetched data:', responseData)
+    } catch (error) {
+      console.error('Error fetching results:', error)
+    }
+  }
+  useEffect(() => {
+    fetchResults()
+  }, [])
+
+  const fetchExerciseLogs = async () => {
+    const storedTokens = getCurrentTokens()
+    const userDetails = await getUserDetails(storedTokens.accessToken)
+    const userId = userDetails.username
+
+    try {
+      // Fetch exercise logs
+      const response = await api.post(
+        'https://dqb2sp9hpk.execute-api.us-east-1.amazonaws.com/default/getExerciseLogs',
+        { userId }
+      )
+      const responseData = response.data.items
+      // Update exerciseEntries state with the fetched data
+      setExerciseResults(responseData)
+      const stats = calculateExerciseStats(responseData)
+      setExerciseStats(stats) // Make sure you have a state for exerciseStats
+    } catch (error) {
+      console.error('Error fetching exercise logs:', error)
+    }
+  }
+  useEffect(() => {
     // Call the fetchExerciseLogs function when the component mounts or when the dependencies change
     fetchExerciseLogs()
   }, []) // Empty dependency array means this effect runs only once, similar to componentDidMount
+
+  const calculateExerciseStats = (entries: ExerciseResultItem[]) => {
+    const stats = {
+      weightLifting: { maxWeight: 0 },
+      cardio: { totalDistance: 0, totalTime: 0 },
+      // Add other categories here if needed
+    }
+
+    entries.forEach(entry => {
+      // Handle Strength training
+      if (entry.exerciseCategory === 'Strength training') {
+        if (entry.weight) {
+          const weight = parseFloat(entry.weight) // Convert to number if it's a string
+          stats.weightLifting.maxWeight = Math.max(stats.weightLifting.maxWeight, weight)
+        }
+      }
+
+      // Handle Cardio
+      if (entry.exerciseCategory === 'Cardio') {
+        if (entry.distance) {
+          const distance = parseFloat(entry.distance) // Convert to number if it's a string
+          stats.cardio.totalDistance += distance
+        }
+        if (entry.time) {
+          const time = parseFloat(entry.time) // Convert to number if it's a string
+          stats.cardio.totalTime += time
+        }
+      }
+
+      // Add logic for other categories if needed
+    })
+
+    return stats
+  }
 
   // Extracting required data for charts
   let bmiData = results.map((item: any) => ({
@@ -253,7 +294,7 @@ export default function Results() {
                   <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
                 )}
               </div>
-              <div className='justify-center items-center flex ml-36 px-4 bg-secondary-300  rounded-full '>
+              <div className='justify-center items-center flex ml-36 px-4 text'>
                 <p className='font-bold text-xl text-medium-purple-300' style={{ margin: '5px 0' }}>
                   {caloriesBurned} calories burned
                 </p>
@@ -277,13 +318,31 @@ export default function Results() {
             )}
           </>
         )
+      case 'Bodyweight Exercises':
+        return (
+          <>
+            <div className='text-white'>
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
+
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
+
+              {item.amount && <p style={{ fontSize: '16px', margin: '5px 0' }}>Reps: {item.amount}</p>}
+              {item.additionalInfo && (
+                <p style={{ fontSize: '16px', margin: '5px 0' }}>Comments: {item.additionalInfo}</p>
+              )}
+            </div>
+          </>
+        )
       default:
         return (
           <>
             <p style={{ fontSize: '16px', margin: '5px 0' }}>
               <strong>{item.timestamp}</strong>
             </p>
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.type}</p>
+            <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
+            <p className='text-red-200' style={{ fontSize: '16px', margin: '5px 0' }}>
+              <strong>No statistics provided</strong>
+            </p>
             {item.additionalInfo && (
               <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
             )}
@@ -346,23 +405,70 @@ export default function Results() {
             <div className='flex justify-center text-center ml-6 '>
               {/* <div className='flex space-x-24 items-center mt-4'> */}
               <div className='bg-secondary-300 rounded-2xl w-1/2  mr-4 p-12 mb-4 '>
-                <h3 className='font-bold'>Statistics</h3>
-                <div className='flex h-full'>
-                  <div className='flex flex-col justify-center font-bold text-2xl text-left mt-2 space-y-24'>
-                    <p className={`text-${bmiPercentageDifference < 0 ? 'green' : 'red'}-500`}>
-                      BMI Percentage Difference: {bmiPercentageDifference.toFixed(2)}%
-                    </p>
-                    <p className={`text-${fatMassPercentageDifference < 0 ? 'green' : 'red'}`}>
-                      Fat Mass Percentage Difference: {fatMassPercentageDifference.toFixed(2)}%
-                    </p>
-                    <p className={`text-${leanMassPercentageDifference >= 0 ? 'red' : 'green'}`}>
-                      Lean Mass Percentage Difference: {leanMassPercentageDifference.toFixed(2)}%
-                    </p>
-                    <p className={`text-${bodyFatPercentageDifference < 0 ? 'green' : 'red'}`}>
-                      Body Fat Percentage Difference: {bodyFatPercentageDifference.toFixed(2)}%
-                    </p>
+                <h3 className='font-bold text-gray-200'>Statistics</h3>
+                {selectedCategory === 'bodyMetrics' && (
+                  <div className='flex flex-col space-y-4'>
+                    {bmiPercentageDifference !== undefined &&
+                    bmiPercentageDifference !== null &&
+                    bmiPercentageDifference !== 0 ? (
+                      <>
+                        <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
+                          <h1 className='text-xl font-semibold mb-2'>BMI change:</h1>
+                          <span className={`text-${bmiPercentageDifference < 0 ? 'green' : 'red'}-500`}>
+                            {bmiPercentageDifference.toFixed(2)}%
+                          </span>
+                        </div>
+                        <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
+                          <h1 className='text-xl font-semibold mb-2'>Fat Mass change:</h1>
+                          <span className={`text-${fatMassPercentageDifference < 0 ? 'green' : 'red'}-500`}>
+                            {fatMassPercentageDifference.toFixed(2)}%
+                          </span>
+                        </div>
+                        <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
+                          <h1 className='text-xl font-semibold mb-2'>Lean Mass change:</h1>
+                          <span className={`text-${leanMassPercentageDifference >= 0 ? 'red' : 'green'}-500`}>
+                            {leanMassPercentageDifference.toFixed(2)}%
+                          </span>
+                        </div>
+                        <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
+                          <h1 className='text-xl font-semibold mb-2'>Body Fat change:</h1>
+                          <span className={`text-${bodyFatPercentageDifference < 0 ? 'green' : 'red'}-500`}>
+                            {bodyFatPercentageDifference.toFixed(2)}%
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className='p-4 bg-gray-800 text-red-300 rounded-lg shadow-md'>
+                        <h1 className='text-xl font-semibold'>Keep recording more metric data to display stats!</h1>
+                      </div>
+                    )}
                   </div>
-                </div>
+                )}
+
+                {selectedCategory === 'exercises' && (
+                  <div className='flex-row space-y-4'>
+                    {/* Weight Lifting Section */}
+                    {exerciseStats.weightLifting.maxWeight > 0 && (
+                      <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
+                        <h3 className='text-xl font-semibold mb-2'>Weight Lifting</h3>
+                        <p className='text-lg'>
+                          Max Weight: <span className='font-bold'>{exerciseStats.weightLifting.maxWeight} kg</span>
+                        </p>
+                      </div>
+                    )}
+                    {/* Cardio Section */}
+                    {(exerciseStats.cardio.totalDistance > 0 || exerciseStats.cardio.totalTime > 0) && (
+                      <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
+                        <h3 className='text-xl font-semibold mb-2'>Cardio</h3>
+
+                        <p className='text-lg'>
+                          Total Time: <span className='font-bold'>{exerciseStats.cardio.totalTime} minutes</span>
+                        </p>
+                      </div>
+                    )}
+                    {/* Add other categories if needed */}
+                  </div>
+                )}
               </div>
 
               <div className='bg-secondary-300 mr-6 mt-4 mb-4 rounded-2xl w-full'>

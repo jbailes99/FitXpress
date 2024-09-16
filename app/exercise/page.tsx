@@ -13,6 +13,7 @@ import CalendarView from '@/components/calendarView'
 type ExerciseEntry = {
   entryId(entryId: any): unknown
   id: number
+  amount?: number
   type: string
   reps?: string
   sets?: string
@@ -162,6 +163,7 @@ const ExerciseTracker = () => {
       userId,
       exerciseCategory: selectedCategory,
       exerciseType: selectedExerciseType,
+      amount: newExerciseEntry.amount,
       reps: newExerciseEntry.reps,
       sets: newExerciseEntry.sets,
       additionalInfo: newExerciseEntry.additionalInfo,
@@ -276,13 +278,37 @@ const ExerciseTracker = () => {
             </div>
           </>
         )
+      case 'Bodyweight Exercises':
+        return (
+          <>
+            <div className='text-white'>
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
+
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
+
+              {item.amount && <p style={{ fontSize: '16px', margin: '5px 0' }}>Reps: {item.amount}</p>}
+              {item.additionalInfo && (
+                <p style={{ fontSize: '16px', margin: '5px 0' }}>Comments: {item.additionalInfo}</p>
+              )}
+              <Button
+                onClick={() => {
+                  handleDelete(item.entryId)
+                }}
+                className='bg-red-600 text-gray-200 rounded shadow'
+              >
+                Delete
+              </Button>
+            </div>
+          </>
+        )
+
       default:
         return (
           <>
-            <div>
+            <div className='text-gray-200'>
               <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
 
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.type}</p>
+              <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
               {item.additionalInfo && (
                 <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
               )}
@@ -352,20 +378,6 @@ const ExerciseTracker = () => {
                       </select>
                     )}
 
-                    {selectedCategory === 'Strength training' && selectedExerciseType && (
-                      <input
-                        type='text'
-                        placeholder='Weight'
-                        className='mt-3 p-2 border border-gray-300 rounded-md w-full'
-                        value={newExerciseEntry.weight}
-                        onChange={e =>
-                          setNewExerciseEntry({
-                            ...newExerciseEntry,
-                            weight: e.target.value,
-                          })
-                        }
-                      />
-                    )}
                     {selectedCategory === 'Cardio' && selectedExerciseType && (
                       <>
                         <select
@@ -399,8 +411,37 @@ const ExerciseTracker = () => {
                       </>
                     )}
 
+                    {selectedCategory === 'Bodyweight Exercises' && selectedExerciseType && (
+                      <>
+                        <input
+                          type='number'
+                          placeholder='Amount'
+                          className='mt-3 p-2 border border-gray-300 rounded-md w-full'
+                          value={newExerciseEntry.amount !== undefined ? newExerciseEntry.amount : ''}
+                          onChange={e =>
+                            setNewExerciseEntry({
+                              ...newExerciseEntry,
+                              amount: e.target.value ? Number(e.target.value) : undefined,
+                            })
+                          }
+                        />
+                      </>
+                    )}
+
                     {selectedCategory == 'Strength training' && selectedExerciseType && (
                       <>
+                        <input
+                          type='text'
+                          placeholder='Weight'
+                          className='mt-3 p-2 border border-gray-300 rounded-md w-full'
+                          value={newExerciseEntry.weight}
+                          onChange={e =>
+                            setNewExerciseEntry({
+                              ...newExerciseEntry,
+                              weight: e.target.value,
+                            })
+                          }
+                        />
                         <input
                           type='text'
                           placeholder='Reps'
@@ -473,11 +514,19 @@ const ExerciseTracker = () => {
             <div className='flex-grow w-1/2'>
               <div className='mt-12 justify-center text-center'>
                 <div className='results-container'>
-                  {exerciseEntries.map(item => (
-                    <div key={item.id} className='bg-secondary-400 mt-2 p-4 rounded-md mb-4'>
-                      {renderExerciseDetails(item)}
-                    </div>
-                  ))}
+                  {exerciseEntries
+                    .sort((a, b) => {
+                      // Ensure both timestamps are valid Date objects
+                      const dateA = new Date(a.timestamp)
+                      const dateB = new Date(b.timestamp)
+
+                      return dateB.getTime() - dateA.getTime() // Compare by timestamp in milliseconds
+                    })
+                    .map(item => (
+                      <div key={item.id} className='bg-secondary-400 mt-2 p-4 rounded-md mb-4'>
+                        {renderExerciseDetails(item)}
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>

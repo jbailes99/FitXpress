@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { addDays, format, startOfWeek } from 'date-fns'
 import { api } from '@/lib/api' // Import your API utility function
+import { StarIcon } from '@heroicons/react/24/solid'
 
 import Select from 'react-select'
 import { getCurrentTokens, getUserDetails } from '@/utils/authService'
@@ -346,7 +347,7 @@ const CalendarView = () => {
 
   return (
     <div className='calendar-view'>
-      <div className='bg-secondary-200 rounded-lg '>
+      <div className='bg-secondary-300 rounded-lg '>
         <div className='p-6 w-1/2 mx-auto mt-4 rounded-lg'>
           <h2 className='text-2xl font-semibold text-gray-200 mb-4'>What do you want to call this plan?</h2>
           <div className='flex flex-col'>
@@ -421,7 +422,14 @@ const CalendarView = () => {
                   }`}
                   disabled={plan.isActive}
                 >
-                  {plan.isActive ? 'Active' : 'Make Active'}
+                  {plan.isActive ? (
+                    <span className='flex items-center'>
+                      <StarIcon className='w-6 h-6 mr-2 text-yellow-300' />
+                      Active
+                    </span>
+                  ) : (
+                    'Make Active'
+                  )}
                 </button>
                 <button
                   onClick={() => handleDeletePlan(plan.entryId)}

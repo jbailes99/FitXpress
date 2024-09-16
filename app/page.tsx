@@ -45,6 +45,7 @@ const BmiCalculator: React.FC = () => {
   const [waistMeasurement, setWaistMeasurement] = useState<number | undefined>(undefined)
   const [hipMeasurement, setHipMeasurement] = useState<number | undefined>(undefined)
   const [weeklyPlan, setWeeklyPlan] = useState<WeeklyPlan | null>(null)
+  const [dailyExercises, setDailyExercises] = useState<string[]>([])
 
   const [gender, setGender] = useState<string | null>(null)
   const [height, setHeight] = useState<string | undefined>(undefined)
@@ -68,6 +69,16 @@ const BmiCalculator: React.FC = () => {
       fetchActiveWeeklyPlan(userDetails.username)
     }
   }, [isLoggedIn, userDetails?.username]) // Re-run when login status or username changes
+
+  useEffect(() => {
+    if (userDetails) {
+      setWeight(userDetails.weight)
+      setAge(userDetails.age)
+      setGender(userDetails.sex || null)
+      setHeight(userDetails.height)
+    }
+  }, [userDetails])
+
   const fetchActiveWeeklyPlan = async (username: any) => {
     const storedTokens = getCurrentTokens()
 
@@ -94,13 +105,19 @@ const BmiCalculator: React.FC = () => {
 
       if (activePlan) {
         setWeeklyPlan(activePlan) // Store the active plan in state
-        console.log(activePlan) // Log the active plan
+        updateDailyExercises(activePlan) // Update daily exercises
       } else {
         console.warn('No active plan found.')
       }
     } catch (error) {
       console.error('Error fetching weekly plan:', error)
     }
+  }
+
+  const updateDailyExercises = (plan: any) => {
+    const today = new Date().toLocaleString('en-US', { weekday: 'long' })
+    const exercisesForToday = plan[today] || []
+    setDailyExercises(exercisesForToday)
   }
 
   useEffect(() => {
@@ -248,15 +265,8 @@ const BmiCalculator: React.FC = () => {
     } else {
       alert('Error: Fill in all fields to see calculation')
     }
-
-    console.log('gender:' + gender)
-    //test our values
-    console.log(weight)
-    console.log(height)
-    console.log(age)
-    console.log(neckMeasurement)
-    console.log(waistMeasurement)
   }
+  const currentDay = new Date().toLocaleString('en-US', { weekday: 'long' })
 
   return (
     <motion.div initial='hidden' animate='visible' variants={fadeInUp}>
@@ -573,10 +583,39 @@ const BmiCalculator: React.FC = () => {
           <div className='flex flex-col items-center justify-center '>
             {isLoggedIn && !isAdmin && (
               <Panel className='col-span-2 text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-2xl mt-16 w-full h-full'>
-                {' '}
                 <p className='text-sm text-gray-200 md:text-2xl'>
                   Welcome back, <span className='text-medium-purple-300'>{userDetails.nickname}</span>
                 </p>
+                {weeklyPlan && (
+                  <div className='mt-8 p-6 '>
+                    <div className='flex items-center mb-4'>
+                      <h1 className='text-2xl font-bold text-gray-100'>Today's Exercises</h1>
+                    </div>
+                    <ul className='mt-4 space-y-2'>
+                      {dailyExercises.length > 0 ? (
+                        dailyExercises.map((exercise, index) => (
+                          <li
+                            key={index}
+                            className='flex items-center bg-medium-purple-500 w-1/2 p-3 rounded-md shadow-md'
+                          >
+                            <svg
+                              className='w-5 h-5 text-green-300 mr-3'
+                              xmlns='http://www.w3.org/2000/svg'
+                              fill='none'
+                              viewBox='0 0 24 24'
+                              stroke='currentColor'
+                            >
+                              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' />
+                            </svg>
+                            <span className='text-gray-200 font-semibold'>{exercise}</span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className='text-gray-400'>No exercises for today.</li>
+                      )}
+                    </ul>
+                  </div>
+                )}
               </Panel>
             )}
             {!isLoggedIn && !isAdmin && (
@@ -697,15 +736,6 @@ const BmiCalculator: React.FC = () => {
                     more. Maintaining a healthy balance of lean mass is crucial for overall well-being.
                   </p>
                 </div>
-              </div>
-              <div className='col-span-2 sm:text-md text-md sm:ml-0 sm:mr-0 ml-4 mr-4 text-center mt-4 text-gray-300 '>
-                <strong>
-                  To learn more about the calculations used, look{' '}
-                  <a href='/info' className='text-blue-500'>
-                    here
-                  </a>
-                  .
-                </strong>
               </div>
             </div>
           </div>
