@@ -177,10 +177,23 @@ const CalendarView = () => {
   const handleExerciseChange = (selectedOptions: any) => {
     const selected = selectedOptions ? selectedOptions.map((opt: any) => opt.value) : []
     const currentDay = format(daysOfWeek[currentDayIndex], 'EEEE')
-    setSelectedExercises(prev => ({
-      ...prev,
-      [currentDay]: selected,
-    }))
+
+    setSelectedExercises(prev => {
+      const newExercises = selected.reduce(
+        (acc: string[], exercise: string) => {
+          if (!acc.includes(exercise)) {
+            acc.push(exercise)
+          }
+          return acc
+        },
+        [...(prev[currentDay] || [])]
+      )
+
+      return {
+        ...prev,
+        [currentDay]: newExercises,
+      }
+    })
   }
 
   const navigateDay = (direction: 'prev' | 'next') => {
@@ -250,12 +263,11 @@ const CalendarView = () => {
       alert('An error occurred while saving the plan.')
     }
   }
-
   const renderCurrentDay = () => {
     const currentDay = format(daysOfWeek[currentDayIndex], 'EEEE')
     return (
       <div className='day-card p-6 bg-gray-50 rounded-lg text-center'>
-        <h2 className='text-xl font-bold mb-2'>{currentDay}</h2>
+        <h2 className='text-2xl text-medium-purple-500 font-bold mb-2'>{currentDay}</h2>
 
         {/* Category Selector */}
         <div className='mt-4'>
@@ -295,13 +307,13 @@ const CalendarView = () => {
             onClick={() => navigateDay('prev')}
             className='bg-gray-300 text-gray-700 p-2 rounded-lg hover:bg-gray-400'
           >
-            ← Previous
+            ← Previous Day
           </button>
           <button
             onClick={() => navigateDay('next')}
             className='bg-gray-300 text-gray-700 p-2 rounded-lg hover:bg-gray-400'
           >
-            Next →
+            Next Day →
           </button>
         </div>
       </div>

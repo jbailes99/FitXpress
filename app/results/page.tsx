@@ -1,26 +1,26 @@
 'use client'
 import React, { Fragment, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Dialog, Menu, Transition } from '@headlessui/react'
-import {
-  ArrowDownCircleIcon,
-  ArrowPathIcon,
-  ArrowUpCircleIcon,
-  Bars3Icon,
-  EllipsisHorizontalIcon,
-  PlusSmallIcon,
-} from '@heroicons/react/20/solid'
-import { BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { api } from '@/lib/api'
 import { getCurrentTokens, getUserDetails } from '@/utils/authService'
 
 import { Button } from '@/components/button'
 
 import { Line } from 'react-chartjs-2'
-import { LinearScale, CategoryScale } from 'chart.js'
-import { Chart as ChartJS, registerables } from 'chart.js'
-import { Chart } from 'react-chartjs-2'
-ChartJS.register(...registerables)
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartOptions,
+} from 'chart.js'
+
+// Register required Chart.js components including PointElement
+ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend)
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -28,7 +28,7 @@ function classNames(...classes: string[]) {
 
 export default function Results() {
   const [selectedCategory, setSelectedCategory] = useState('bodyMetrics')
-  const [selectedDataset, setSelectedDataset] = useState<string>('bmi')
+  const [selectedDataset, setSelectedDataset] = useState<'bmi' | 'fatMass' | 'leanMass' | 'bodyFatPercentage'>('bmi')
   const [results, setResults] = useState<any[]>([])
   const [exerciseResults, setExerciseResults] = useState<any[]>([])
   const [exerciseStats, setExerciseStats] = useState({
@@ -192,71 +192,93 @@ export default function Results() {
     return stats
   }
 
-  // Extracting required data for charts
-  let bmiData = results.map((item: any) => ({
-    x: new Date(item.timestamp).getTime(),
-    y: item.bodyBMI,
-  }))
+  const processData = (data: any[]) => {
+    const sortedData = data
+      .map(item => ({
+        timestamp: new Date(item.timestamp).toISOString().split('T')[0], // YYYY-MM-DD format
+        bodyBMI: item.bodyBMI,
+        bodyFatMass: item.bodyFatMass,
+        bodyLeanMass: item.bodyLeanMass,
+        bodyFatCalc: item.bodyFatCalc,
+      }))
+      .sort((a, b) => a.timestamp.localeCompare(b.timestamp)) // Sorting by date string
 
-  let fatMassData = results.map((item: any) => ({
-    x: new Date(item.timestamp).getTime(),
-    y: item.bodyFatMass,
-  }))
+    return {
+      bmiData: sortedData.map(item => ({
+        x: item.timestamp,
+        y: item.bodyBMI,
+      })),
+      fatMassData: sortedData.map(item => ({
+        x: item.timestamp,
+        y: item.bodyFatMass,
+      })),
+      leanMassData: sortedData.map(item => ({
+        x: item.timestamp,
+        y: item.bodyLeanMass,
+      })),
+      bodyFatPercentageData: sortedData.map(item => ({
+        x: item.timestamp,
+        y: item.bodyFatCalc,
+      })),
+    }
+  }
 
-  let leanMassData = results.map((item: any) => ({
-    x: new Date(item.timestamp).getTime(),
-    y: item.bodyLeanMass,
-  }))
+  const { bmiData, fatMassData, leanMassData, bodyFatPercentageData } = processData(results)
 
-  let bodyFatPercentageData = results.map((item: any) => ({
-    x: new Date(item.timestamp).getTime(),
-    y: item.bodyFatCalc,
-  }))
+  const dataset = {
+    bmi: bmiData,
+    fatMass: fatMassData,
+    leanMass: leanMassData,
+    bodyFatPercentage: bodyFatPercentageData,
+  }[selectedDataset]
 
-  // Sort the data arrays by timestamp
-  bmiData.sort((a, b) => a.x - b.x)
-  fatMassData.sort((a, b) => a.x - b.x)
-  leanMassData.sort((a, b) => a.x - b.x)
-  bodyFatPercentageData.sort((a, b) => a.x - b.x)
-
-  const uniqueDates = Array.from(
-    new Set(results.map((item: any) => new Date(item.timestamp).toLocaleDateString()))
-  ).sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-
-  // Extracting unique dates for x-axis labels
-
-  const firstEntryChart = {
-    labels: uniqueDates,
+  const getColorForDataset = (dataset: string) => {
+    switch (dataset) {
+      case 'bmi':
+        return 'rgb(75, 192, 192)'
+      case 'fatMass':
+        return 'rgb(255, 99, 132)'
+      case 'leanMass':
+        return 'rgb(54, 162, 235)'
+      case 'bodyFatPercentage':
+        return 'rgb(153, 102, 255)'
+      default:
+        return 'rgb(0, 0, 0)'
+    }
+  }
+  const chartData = {
+    labels: dataset.map(data => data.x),
     datasets: [
       {
-        label: 'BMI',
-        data: bmiData.map(data => data.y),
+        label: selectedDataset.replace(/([A-Z])/g, ' $1').trim(), // Capitalize dataset label
+        data: dataset.map(data => data.y),
         fill: false,
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1,
-      },
-      {
-        label: 'Fat Mass',
-        data: fatMassData.map(data => data.y),
-        fill: false,
-        borderColor: 'rgb(255, 99, 132)',
-        tension: 0.1,
-      },
-      {
-        label: 'Lean Mass',
-        data: leanMassData.map(data => data.y),
-        fill: false,
-        borderColor: 'rgb(54, 162, 235)',
-        tension: 0.1,
-      },
-      {
-        label: 'Body Fat Percentage',
-        data: bodyFatPercentageData.map(data => data.y),
-        fill: false,
-        borderColor: 'rgb(153, 102, 255)',
+        borderColor: getColorForDataset(selectedDataset),
         tension: 0.1,
       },
     ],
+  }
+
+  const options: Partial<ChartOptions<'line'>> = {
+    plugins: {
+      legend: {
+        display: false, // Hide the legend
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: 'Time',
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: 'Value',
+        },
+      },
+    },
   }
 
   const renderExerciseDetails = (item: ExerciseResultItem) => {
@@ -376,6 +398,15 @@ export default function Results() {
       ? calculatePercentageDifference(results[0].bodyFatCalc, results[results.length - 1].bodyFatCalc)
       : 0
 
+  const darkenColor = (rgbColor: string) => {
+    const rgb = rgbColor.match(/\d+/g)
+    if (rgb && rgb.length === 3) {
+      const [r, g, b] = rgb.map(Number)
+      return `rgb(${Math.max(0, r - 30)}, ${Math.max(0, g - 30)}, ${Math.max(0, b - 30)})` // Darken by subtracting 30
+    }
+    return rgbColor
+  }
+
   return (
     <motion.div initial='hidden' animate='visible' variants={fadeInUp}>
       <>
@@ -470,32 +501,60 @@ export default function Results() {
                   </div>
                 )}
               </div>
-
               <div className='bg-secondary-300 mr-6 mt-4 mb-4 rounded-2xl w-full'>
-                <div className='mt-4 f '>
-                  <Button className='bg-medium-purple-300 rounded-xl mr-2' onClick={() => setSelectedDataset('bmi')}>
-                    BMI
-                  </Button>
-                  <Button
-                    className='bg-medium-purple-300 rounded-xl mr-2'
-                    onClick={() => setSelectedDataset('fatMass')}
-                  >
-                    Fat Mass
-                  </Button>
-                  <Button
-                    className='bg-medium-purple-300 rounded-xl mr-2'
-                    onClick={() => setSelectedDataset('leanMass')}
-                  >
-                    Lean Mass
-                  </Button>
-                  <Button
-                    className='bg-medium-purple-300 rounded-xl'
-                    onClick={() => setSelectedDataset('bodyFatPercentage')}
-                  >
-                    Body Fat Percentage
-                  </Button>
-                </div>
-                <Line data={firstEntryChart} />
+                {selectedCategory === 'bodyMetrics' && (
+                  <>
+                    <div className='mt-4 space-x-6 pb-2 '>
+                      <button
+                        className='rounded-xl p-2  px-4  mr-2 transition-colors duration-200'
+                        style={{ backgroundColor: getColorForDataset('bmi') }}
+                        onMouseOver={e =>
+                          (e.currentTarget.style.backgroundColor = darkenColor(getColorForDataset('bmi')))
+                        }
+                        onMouseOut={e => (e.currentTarget.style.backgroundColor = getColorForDataset('bmi'))}
+                        onClick={() => setSelectedDataset('bmi')}
+                      >
+                        BMI
+                      </button>
+                      <button
+                        className='rounded-xl p-2 mr-2 px-4 transition-colors duration-200'
+                        style={{ backgroundColor: getColorForDataset('fatMass') }}
+                        onMouseOver={e =>
+                          (e.currentTarget.style.backgroundColor = darkenColor(getColorForDataset('fatMass')))
+                        }
+                        onMouseOut={e => (e.currentTarget.style.backgroundColor = getColorForDataset('fatMass'))}
+                        onClick={() => setSelectedDataset('fatMass')}
+                      >
+                        Fat Mass
+                      </button>
+                      <button
+                        className='rounded-xl p-2  px-4  mr-2 transition-colors duration-200'
+                        style={{ backgroundColor: getColorForDataset('leanMass') }}
+                        onMouseOver={e =>
+                          (e.currentTarget.style.backgroundColor = darkenColor(getColorForDataset('leanMass')))
+                        }
+                        onMouseOut={e => (e.currentTarget.style.backgroundColor = getColorForDataset('leanMass'))}
+                        onClick={() => setSelectedDataset('leanMass')}
+                      >
+                        Lean Mass
+                      </button>
+                      <button
+                        className='rounded-xl p-2  px-4  transition-colors duration-200'
+                        style={{ backgroundColor: getColorForDataset('bodyFatPercentage') }}
+                        onMouseOver={e =>
+                          (e.currentTarget.style.backgroundColor = darkenColor(getColorForDataset('bodyFatPercentage')))
+                        }
+                        onMouseOut={e =>
+                          (e.currentTarget.style.backgroundColor = getColorForDataset('bodyFatPercentage'))
+                        }
+                        onClick={() => setSelectedDataset('bodyFatPercentage')}
+                      >
+                        Body Fat Percentage
+                      </button>
+                    </div>
+                    <Line data={chartData} options={options} />
+                  </>
+                )}
               </div>
             </div>
             {/* </div> */}

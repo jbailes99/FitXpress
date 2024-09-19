@@ -240,7 +240,7 @@ const ExerciseTracker = () => {
                 <p style={{ fontSize: '16px', margin: '5px 0' }}>Additional Info: {item.additionalInfo}</p>
               )}
               <p className='text-medium-purple-300' style={{ fontSize: '24px', margin: '5px 0' }}>
-                ~ {caloriesBurned} calories burned
+                {caloriesBurned !== null ? Math.round(caloriesBurned) : 'N/A'} calories burned
               </p>
               <Button
                 onClick={() => {

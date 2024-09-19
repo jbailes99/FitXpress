@@ -270,10 +270,47 @@ const BmiCalculator: React.FC = () => {
 
   return (
     <motion.div initial='hidden' animate='visible' variants={fadeInUp}>
+      {isLoggedIn && !isAdmin && (
+        <Panel className='text-center mx-4 mt-4 rounded-2xl shadow-2xl  sm:hidden block'>
+          <p className='text-md md:text-lg lg:text-2xl text-gray-200 '>
+            Welcome back, <span className='text-medium-purple-300'>{userDetails.nickname}</span>
+          </p>
+          {weeklyPlan && (
+            <div className='mt-6 md:mt-8 p-4 md:p-6'>
+              <div className='flex items-center mb-4'>
+                <h1 className='text-xl md:text-2xl font-bold text-gray-100'>Today's Exercises</h1>
+              </div>
+              <ul className='mt-4 space-y-2'>
+                {dailyExercises.length > 0 ? (
+                  dailyExercises.map((exercise, index) => (
+                    <li
+                      key={index}
+                      className='flex items-center bg-medium-purple-500 w-full md:w-3/4 p-3 rounded-md shadow-md sm:mx-0 mx-auto'
+                    >
+                      <svg
+                        className='w-4 h-4 md:w-5 md:h-5 text-green-300 mr-2 md:mr-3'
+                        xmlns='http://www.w3.org/2000/svg'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                        stroke='currentColor'
+                      >
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' />
+                      </svg>
+                      <span className='text-xs md:text-sm text-gray-200 font-semibold'>{exercise}</span>
+                    </li>
+                  ))
+                ) : (
+                  <li className='text-gray-400'>No exercises for today.</li>
+                )}
+              </ul>
+            </div>
+          )}
+        </Panel>
+      )}
       <div className=' flex flex-col justify-center items-center min-h-screen overflow-x-hidden '>
-        <div className='lg:grid lg:grid-cols-3 lg:px-12 px-4  space-x-8'>
+        <div className='lg:grid lg:grid-cols-3 lg:px-12 px-4  lg:space-x-8 lg:space-y-0'>
           <Panel
-            className={`text-center mb-6 p-4 md:p-12 mt-16 rounded-xl shadow-2xl col-span-2 ${
+            className={`text-center mb-6 p-4 md:p-12 sm:mt-16 mt-6 rounded-xl shadow-2xl col-span-2 ${
               showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'
             }`}
           >
@@ -282,7 +319,7 @@ const BmiCalculator: React.FC = () => {
             </h1>
             <div className='grid grid-cols-3 '>
               <div className={`col-span-3 sm:col-span-3 text-center mt-6 ${showResults ? 'hidden' : 'visible'}`}>
-                <h1 className='mb-4 text-3xl font-bold text-gray-200'>Body Calculations</h1>
+                <h1 className='mb-4 sm:text-3xl text-2xl font-bold text-gray-200'>Body Calculations</h1>
                 <form onSubmit={onSubmit}>
                   <div className='grid grid-cols-2 '>
                     <div className='mb-4'>
@@ -290,7 +327,7 @@ const BmiCalculator: React.FC = () => {
                         Biological Sex
                       </label>
                       <select
-                        className='w-3/4 h-3/2 p-2 text-2xl text-center border rounded-md bg-gray-900 text-gray-300 cursor-pointer'
+                        className='w-3/4 h-3/2 p-2 sm:text-2xl text-md text-center border rounded-md bg-gray-900 text-gray-300 cursor-pointer'
                         id='gender'
                         value={gender || ''} // Ensure this matches the value attribute of <option>
                         name='gender'
@@ -320,7 +357,7 @@ const BmiCalculator: React.FC = () => {
                         Weight (lb)
                       </label>
                       <input
-                        className='w-3/4 h-3/2 p-2 text-2xl border rounded-md bg-gray-900 text-center text-gray-300 focus:outline-none focus:shadow-outline'
+                        className='w-3/4 h-3/2 p-2 sm:text-2xl text-lg border rounded-md bg-gray-900 text-center text-gray-300 focus:outline-none focus:shadow-outline'
                         type='number'
                         inputMode='numeric'
                         pattern='/d*'
@@ -336,7 +373,7 @@ const BmiCalculator: React.FC = () => {
                         Height (feet ' inches ")
                       </label>
                       <input
-                        className='w-3/4 h-3/2 p-2 text-2xl border rounded-md bg-gray-900 text-center text-gray-300'
+                        className='w-3/4 h-3/2 p-2 sm:text-2xl text-lg border rounded-md bg-gray-900 text-center text-gray-300'
                         type='text'
                         id='height'
                         placeholder='Enter your height'
@@ -351,7 +388,7 @@ const BmiCalculator: React.FC = () => {
                         Age
                       </label>
                       <input
-                        className='w-3/4 h-3/2 p-2 text-2xl border rounded-md bg-gray-900 text-center text-gray-300'
+                        className='w-3/4 h-3/2 p-2 sm:text-2xl text-lg border rounded-md bg-gray-900 text-center text-gray-300'
                         type='number'
                         id='age'
                         placeholder='Enter your age'
@@ -365,7 +402,7 @@ const BmiCalculator: React.FC = () => {
                         Neck Measurement (inches)
                       </label>
                       <input
-                        className='w-3/4 h-3/2 p-2 text-2xl border rounded-md bg-gray-900 text-center text-gray-300'
+                        className='w-3/4 h-3/2 p-2 sm:text-2xl text-lg border rounded-md bg-gray-900 text-center text-gray-300'
                         type='number'
                         id='neckMeasurement'
                         placeholder='Circumference'
@@ -379,7 +416,7 @@ const BmiCalculator: React.FC = () => {
                         Waist Measurement (inches)
                       </label>
                       <input
-                        className='w-3/4 h-3/2 p-2 text-2xl border rounded-md bg-gray-900 text-center text-gray-300'
+                        className='w-3/4 h-3/2 p-2 sm:text-2xl text-lg border rounded-md bg-gray-900 text-center text-gray-300'
                         type='number'
                         id='waistMeasurement'
                         placeholder='Circumference'
@@ -394,7 +431,7 @@ const BmiCalculator: React.FC = () => {
                         Hip Measurement (inches)
                       </label>
                       <input
-                        className='w-1/2 h-3/2 p-2 text-2xl border rounded-md bg-gray-900 text-center text-gray-300'
+                        className='w-1/2 h-3/2 p-2 sm:text-2xl text-lg border rounded-md bg-gray-900 text-center text-gray-300'
                         type='number'
                         id='waistMeasurement'
                         placeholder='Circumference'
@@ -405,14 +442,15 @@ const BmiCalculator: React.FC = () => {
                   )}
 
                   <div>
-                    <div className='flex mt-16 h-full justify-center text-center items-center '>
-                      <div className='bg-secondary-600 hover-animation grid grid-cols-3 p-2 rounded-2xl text-right shadow-sm mt-2 sm:w-full sm:max-w-4xl'>
-                        <h1 className='col-span-2 text-left items-center justify-left flex text-gray-400 font-bold text-xl ml-24'>
-                          Let's calculate your body metrics!
-                        </h1>
+                    <div className='flex mt-16 h-full justify-center items-center px-4'>
+                      <div className='bg-secondary-600 hover-animation grid grid-cols-1 sm:grid-cols-3 p-4 rounded-2xl text-center shadow-sm w-full sm:max-w-4xl'>
+                        {/* Flex container to center text vertically on large screens */}
+                        <div className='flex items-center col-span-1 sm:col-span-2 text-left text-gray-400 font-bold text-xl mb-4 sm:mb-0 sm:ml-24'>
+                          <h1 className='w-full'>Let's calculate your body metrics!</h1>
+                        </div>
                         <button
                           type='submit'
-                          className=' bg-medium-purple-500 col-span-1 sm:mb-0 mb-6 sm:mr-6 mr-0 text-gray-200 font-semibold py-4 px-6 text-xl rounded-2xl hover:bg-medium-purple-600'
+                          className='bg-medium-purple-500 col-span-1 text-gray-200 font-semibold py-3 px-4 text-lg rounded-2xl hover:bg-medium-purple-600'
                         >
                           Calculate
                         </button>
@@ -582,24 +620,24 @@ const BmiCalculator: React.FC = () => {
 
           <div className='flex flex-col items-center justify-center '>
             {isLoggedIn && !isAdmin && (
-              <Panel className='col-span-2 text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-2xl mt-16 w-full h-full'>
-                <p className='text-sm text-gray-200 md:text-2xl'>
+              <Panel className='col-span-2 text-center mb-4 md:mb-6 p-4 md:p-6 rounded-2xl shadow-2xl mt-8 md:mt-16 w-full h-full sm:block hidden'>
+                <p className='text-md md:text-lg lg:text-2xl text-gray-200 '>
                   Welcome back, <span className='text-medium-purple-300'>{userDetails.nickname}</span>
                 </p>
                 {weeklyPlan && (
-                  <div className='mt-8 p-6 '>
+                  <div className='mt-6 md:mt-8 p-4 md:p-6'>
                     <div className='flex items-center mb-4'>
-                      <h1 className='text-2xl font-bold text-gray-100'>Today's Exercises</h1>
+                      <h1 className='text-xl md:text-2xl font-bold text-gray-100'>Today's Exercises</h1>
                     </div>
                     <ul className='mt-4 space-y-2'>
                       {dailyExercises.length > 0 ? (
                         dailyExercises.map((exercise, index) => (
                           <li
                             key={index}
-                            className='flex items-center bg-medium-purple-500 w-1/2 p-3 rounded-md shadow-md'
+                            className='flex items-center bg-medium-purple-500 w-full md:w-3/4 p-3 rounded-md shadow-md sm:mx-0 mx-auto'
                           >
                             <svg
-                              className='w-5 h-5 text-green-300 mr-3'
+                              className='w-4 h-4 md:w-5 md:h-5 text-green-300 mr-2 md:mr-3'
                               xmlns='http://www.w3.org/2000/svg'
                               fill='none'
                               viewBox='0 0 24 24'
@@ -607,7 +645,7 @@ const BmiCalculator: React.FC = () => {
                             >
                               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' />
                             </svg>
-                            <span className='text-gray-200 font-semibold'>{exercise}</span>
+                            <span className='text-xs md:text-sm text-gray-200 font-semibold'>{exercise}</span>
                           </li>
                         ))
                       ) : (
@@ -618,45 +656,41 @@ const BmiCalculator: React.FC = () => {
                 )}
               </Panel>
             )}
-            {!isLoggedIn && !isAdmin && (
-              <Panel className='!bg-medium-purple-500 col-span-2 flex flex-col justify-center items-center text-center md:mb-6 p-4 md:p-8 rounded-2xl shadow-2xl mt-16 w-full h-full'>
-                <div className='leading-tight mb-3'>
-                  <div className='font-bold text-lg md:text-3xl text-white leading-tight'>Take the first step.</div>
-                  <div className='text-md md:text-base font-medium text-md text-white/80'>
-                    Sign up to start your journey!
-                  </div>
-                </div>
 
-                <div className='text-md md:text-base text-white font-medium mb-3'>
+            {!isLoggedIn && !isAdmin && (
+              <Panel className='!bg-medium-purple-500 col-span-2 flex flex-col justify-center items-center text-center md:mb-6 p-4 md:p-6 rounded-2xl shadow-2xl mt-8 md:mt-16 w-full h-auto'>
+                <div className='leading-tight mb-3'>
+                  <div className='font-bold text-xl md:text-3xl text-white leading-tight'>Take the first step.</div>
+                  <div className='text-sm md:text-base font-medium text-white/80'>Sign up to start your journey!</div>
+                </div>
+                <div className='text-sm md:text-base text-white font-medium mb-3'>
                   Start easily tracking your progress and access personalized fitness and nutrition advice.
                 </div>
-
-                {/* <div className='bg-medium-purple-500  text-center p-2 md:p-4 rounded-lg shadow-2xl mt-6'> */}
                 <Button
                   onClick={openSignUpModal}
                   rounded
-                  className=' text-white font-bold bg-secondary-800 hover:bg-secondary-600 shadow-md text-lg px-4'
+                  className='text-white font-bold bg-secondary-800 hover:bg-secondary-600 shadow-md text-lg px-4'
                 >
                   Sign up
                 </Button>
-                {/* </div> */}
               </Panel>
             )}
+
             {isSignUpOpen && <SignUp onClose={() => setSignUpOpen(false)} />}
+
             {isAdmin && (
-              <Panel className='col-span-2 text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-2xl mt-16 w-full h-full'>
-                {' '}
-                <p className='text-sm md:text-2xl'>
+              <Panel className='col-span-2 text-center mb-4 md:mb-6 p-4 md:p-6 rounded-2xl shadow-2xl mt-8 md:mt-16 w-full h-auto'>
+                <p className='text-xs md:text-lg'>
                   Administrator: <span className='text-medium-purple-300'>{userDetails.nickname}</span>
                 </p>
               </Panel>
             )}
 
-            <Panel className='text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-2xl  w-full h-full'>
+            <Panel className='text-center mb-4 md:mb-6 p-4 md:p-6 rounded-2xl shadow-2xl w-full h-auto'>
               <h1 className='mb-4 text-gray-200 font-bold text-xl md:text-2xl'>
                 Unlock insights into your body composition.
               </h1>
-              <div className='leading-6 text-left font-bold  text-gray-400 '>
+              <div className='leading-6 text-left font-medium text-gray-400'>
                 <p>
                   <strong className='text-medium-purple-300'>BMI (Body Mass Index):</strong> This standardized measure
                   is based on your weight and height, providing an indication of your overall body fatness.
@@ -742,27 +776,27 @@ const BmiCalculator: React.FC = () => {
         </div>
         <div className='w-full'>
           {isLoggedIn && (
-            <Panel className='mx-10 rounded-xl mb-12 shadow-2xl mt-8 justify-between'>
-              <div className='mb-6 mt-4 sm:text-5xl text-2xl font-bold text-center text-gray-200'>
-                <h1>My Weekly Plan</h1>
+            <Panel className='mx-4 sm:mx-10 rounded-xl mb-6 sm:mb-12 shadow-2xl mt-6 sm:mt-8'>
+              <div className='mb-4 mt-4 sm:mb-6 sm:mt-4 text-center'>
+                <h1 className='text-3xl sm:text-5xl font-bold text-gray-200'>My Weekly Plan</h1>
               </div>
               <div className='p-4'>
                 {weeklyPlan ? (
                   <>
-                    <h1 className='bg-medium-purple-500 text-gray-100 font-semibold p-3 rounded-lg text-center mx-auto mb-2'>
+                    <h1 className='bg-medium-purple-500 text-gray-100 font-semibold p-3 rounded-lg text-center mb-4'>
                       Current Weekly Plan:{' '}
                       <span className='text-yellow-400'>{weeklyPlan.planName || 'Unnamed Plan'}</span>
                     </h1>
 
                     <div className='bg-secondary-200 p-4 mb-4 rounded-lg shadow-md'>
-                      <div className='grid grid-cols-7 gap-2 w-full'>
+                      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2'>
                         {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
                           <div
                             key={day}
                             className='border p-2 rounded-md bg-white shadow-sm h-24 sm:h-32 md:h-40 lg:h-48 xl:h-56'
                           >
-                            <h4 className='font-medium'>{day}</h4>
-                            <div className='flex flex-wrap gap-2'>
+                            <h4 className='font-medium text-sm sm:text-base'>{day}</h4>
+                            <div className='flex flex-wrap gap-2 mt-1'>
                               {weeklyPlan[day]?.map((exercise, index) => (
                                 <span
                                   key={index}
@@ -777,11 +811,13 @@ const BmiCalculator: React.FC = () => {
                           </div>
                         ))}
                       </div>
-                      <h3 className='text-sm text-gray-200 font-semibold mt-2'>Created on {weeklyPlan.timestamp}</h3>
+                      <h3 className='text-xs sm:text-sm text-gray-200 font-semibold mt-2 text-center'>
+                        Created on {weeklyPlan.timestamp}
+                      </h3>
                     </div>
                   </>
                 ) : (
-                  <p className='text-gray-200 font-semibold text-lg justify-center text-center items-center'>
+                  <p className='text-gray-200 font-semibold text-lg text-center'>
                     No plans found. Go create a plan or make one active.
                   </p>
                 )}
