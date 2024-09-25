@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { addDays, format, startOfWeek } from 'date-fns'
 import { api } from '@/lib/api' // Import your API utility function
 import { StarIcon } from '@heroicons/react/24/solid'
+import { components } from 'react-select'
 
 import Select from 'react-select'
 import { getCurrentTokens, getUserDetails } from '@/utils/authService'
@@ -174,20 +175,47 @@ const CalendarView = () => {
     }
   }, [selectedCategory])
 
+  const CustomMultiValueRemove = () => {
+    return null // Render nothing to hide the 'X'
+  }
+  const SelectedValue = props => {
+    return (
+      <components.MultiValue {...props}>
+        <div className='Select-value' title={props.data.label}>
+          <span className='Select-value-label'>{props.data.label}</span>
+        </div>
+      </components.MultiValue>
+    )
+  }
+
   const handleExerciseChange = (selectedOptions: any) => {
     const selected = selectedOptions ? selectedOptions.map((opt: any) => opt.value) : []
     const currentDay = format(daysOfWeek[currentDayIndex], 'EEEE')
 
     setSelectedExercises(prev => {
+      const currentExercises = prev[currentDay] || []
+
+      // Create a new set of exercises based on selected
       const newExercises = selected.reduce(
         (acc: string[], exercise: string) => {
+          // Check if the exercise is already in the list
           if (!acc.includes(exercise)) {
-            acc.push(exercise)
+            acc.push(exercise) // Add if not present
           }
           return acc
         },
-        [...(prev[currentDay] || [])]
+        [...currentExercises]
       )
+
+      // Remove deselected exercises
+      selected.forEach(exercise => {
+        if (!selected.includes(exercise)) {
+          const index = newExercises.indexOf(exercise)
+          if (index > -1) {
+            newExercises.splice(index, 1) // Remove if present
+          }
+        }
+      })
 
       return {
         ...prev,
@@ -263,13 +291,13 @@ const CalendarView = () => {
       alert('An error occurred while saving the plan.')
     }
   }
+
   const renderCurrentDay = () => {
     const currentDay = format(daysOfWeek[currentDayIndex], 'EEEE')
     return (
       <div className='day-card p-6 bg-gray-50 rounded-lg text-center'>
         <h2 className='text-2xl text-medium-purple-500 font-bold mb-2'>{currentDay}</h2>
 
-        {/* Category Selector */}
         <div className='mt-4'>
           <label className='text-sm font-medium'>Select Workout Category:</label>
           <select
@@ -286,7 +314,6 @@ const CalendarView = () => {
           </select>
         </div>
 
-        {/* Exercise Type Selector */}
         {selectedCategory && (
           <div className='mt-4'>
             <label className='block text-sm font-medium mb-2'>Select Exercise Type:</label>
@@ -295,8 +322,13 @@ const CalendarView = () => {
               isMulti
               value={exerciseTypes.filter(type => selectedExercises[currentDay]?.includes(type.value))}
               onChange={handleExerciseChange}
+              isClearable={false} // Disable the clear button
               placeholder='Select Exercises'
               className='w-full'
+              components={{
+                MultiValue: SelectedValue,
+                MultiValueRemove: CustomMultiValueRemove, // Use the custom remove component
+              }}
             />
           </div>
         )}
@@ -343,6 +375,13 @@ const CalendarView = () => {
                         )} text-gray-700`}
                       >
                         {exercise}
+                        <button
+                          onClick={() => handleRemoveExercise(dayName, exercise)}
+                          className='ml-2 text-red-500'
+                          title='Remove exercise'
+                        >
+                          &times; {/* X icon */}
+                        </button>
                       </span>
                     ))
                   ) : (
@@ -355,6 +394,16 @@ const CalendarView = () => {
         </div>
       </div>
     )
+  }
+
+  const handleRemoveExercise = (day: string, exercise: string) => {
+    setSelectedExercises(prev => {
+      const currentExercises = prev[day] || []
+      return {
+        ...prev,
+        [day]: currentExercises.filter(ex => ex !== exercise),
+      }
+    })
   }
 
   return (
