@@ -29,6 +29,7 @@ function classNames(...classes: string[]) {
 export default function Results() {
   const [selectedCategory, setSelectedCategory] = useState('bodyMetrics')
   const [selectedDataset, setSelectedDataset] = useState<'bmi' | 'fatMass' | 'leanMass' | 'bodyFatPercentage'>('bmi')
+  const [selectedExerciseDataset, setSelectedExerciseDataset] = useState<'weightLifting'>('weightLifting')
   const [results, setResults] = useState<any[]>([])
   const [exerciseResults, setExerciseResults] = useState<any[]>([])
   const [exerciseStats, setExerciseStats] = useState({
@@ -154,15 +155,13 @@ export default function Results() {
     }
   }
   useEffect(() => {
-    // Call the fetchExerciseLogs function when the component mounts or when the dependencies change
     fetchExerciseLogs()
-  }, []) // Empty dependency array means this effect runs only once, similar to componentDidMount
+  }, [])
 
   const calculateExerciseStats = (entries: ExerciseResultItem[]) => {
     const stats = {
       weightLifting: { maxWeight: 0 },
       cardio: { totalDistance: 0, totalTime: 0 },
-      // Add other categories here if needed
     }
 
     entries.forEach(entry => {
@@ -185,17 +184,50 @@ export default function Results() {
           stats.cardio.totalTime += time
         }
       }
-
-      // Add logic for other categories if needed
     })
 
     return stats
   }
 
+  const processExerciseData = (exerciseResults: ExerciseResultItem[]) => {
+    const sortedData = exerciseResults
+      .map(item => ({
+        timestamp: new Date(item.timestamp).toISOString().split('T')[0],
+        weight: item.weight ? parseFloat(item.weight) : 0, // Ensure weight is a number
+      }))
+      .sort((a, b) => a.timestamp.localeCompare(b.timestamp))
+
+    return {
+      weightData: sortedData.map(item => ({
+        x: item.timestamp,
+        y: item.weight,
+      })),
+    }
+  }
+
+  const { weightData } = processExerciseData(exerciseResults)
+
+  const exerciseDataset = {
+    weightLifting: weightData,
+  }[selectedExerciseDataset]
+
+  const exerciseChartData = {
+    labels: exerciseDataset.map(data => data.x),
+    datasets: [
+      {
+        label: 'Weight Lifting Progression',
+        data: exerciseDataset.map(data => data.y),
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)', // You can customize this color
+        tension: 0.1,
+      },
+    ],
+  }
+
   const processData = (data: any[]) => {
     const sortedData = data
       .map(item => ({
-        timestamp: new Date(item.timestamp).toISOString().split('T')[0], // YYYY-MM-DD format
+        timestamp: new Date(item.timestamp).toISOString().split('T')[0],
         bodyBMI: item.bodyBMI,
         bodyFatMass: item.bodyFatMass,
         bodyLeanMass: item.bodyLeanMass,
@@ -242,10 +274,15 @@ export default function Results() {
         return 'rgb(54, 162, 235)'
       case 'bodyFatPercentage':
         return 'rgb(153, 102, 255)'
+      case 'weightLifting':
+        return 'rgb(75, 192, 192)'
+      case 'cardio':
+        return 'rgb(255, 159, 64)' // Orange for cardio
       default:
-        return 'rgb(0, 0, 0)'
+        return 'rgb(0, 0, 0)' // Fallback color
     }
   }
+
   const chartData = {
     labels: dataset.map(data => data.x),
     datasets: [
@@ -374,6 +411,7 @@ export default function Results() {
   }
 
   // Calculate percentage difference
+
   const calculatePercentageDifference = (firstValue: number, lastValue: number) => {
     console.log(firstValue)
     console.log(lastValue)
@@ -479,14 +517,24 @@ export default function Results() {
                 {selectedCategory === 'exercises' && (
                   <div className='flex-row space-y-4'>
                     {/* Weight Lifting Section */}
-                    {exerciseStats.weightLifting.maxWeight > 0 && (
+                    {!exerciseStats.weightLifting.maxWeight ? (
                       <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
                         <h3 className='text-xl font-semibold mb-2'>Weight Lifting</h3>
                         <p className='text-lg'>
-                          Max Weight: <span className='font-bold'>{exerciseStats.weightLifting.maxWeight} kg</span>
+                          <span className='font-bold'>Record weight lifting exercises to display stats!</span>
                         </p>
                       </div>
+                    ) : (
+                      exerciseStats.weightLifting.maxWeight > 0 && (
+                        <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
+                          <h3 className='text-xl font-semibold mb-2'>Weight Lifting</h3>
+                          <p className='text-lg'>
+                            Max Weight: <span className='font-bold'>{exerciseStats.weightLifting.maxWeight} kg</span>
+                          </p>
+                        </div>
+                      )
                     )}
+
                     {/* Cardio Section */}
                     {(exerciseStats.cardio.totalDistance > 0 || exerciseStats.cardio.totalTime > 0) && (
                       <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
@@ -497,7 +545,6 @@ export default function Results() {
                         </p>
                       </div>
                     )}
-                    {/* Add other categories if needed */}
                   </div>
                 )}
               </div>
@@ -555,13 +602,43 @@ export default function Results() {
                     <Line data={chartData} options={options} />
                   </>
                 )}
+
+                {selectedCategory === 'exercises' && (
+                  <>
+                    <div className='mt-4 space-x-6 pb-2'>
+                      <button
+                        className='rounded-xl p-2 px-4 mr-2 transition-colors duration-200'
+                        style={{ backgroundColor: getColorForDataset('weightLifting') }}
+                        onMouseOver={e =>
+                          (e.currentTarget.style.backgroundColor = darkenColor(getColorForDataset('weightLifting')))
+                        }
+                        onMouseOut={e => (e.currentTarget.style.backgroundColor = getColorForDataset('weightLifting'))}
+                        onClick={() => setSelectedExerciseDataset('weightLifting')}
+                      >
+                        Weight Lifting
+                      </button>
+                      {/* <button
+                        className='rounded-xl p-2 px-4 mr-2 transition-colors duration-200'
+                        style={{ backgroundColor: getColorForDataset('cardio') }}
+                        onMouseOver={e =>
+                          (e.currentTarget.style.backgroundColor = darkenColor(getColorForDataset('cardio')))
+                        }
+                        onMouseOut={e => (e.currentTarget.style.backgroundColor = getColorForDataset('cardio'))}
+                        onClick={() => setSelectedExerciseDataset('cardio')}
+                      >
+                        Cardio
+                      </button> */}
+                    </div>
+
+                    {/* Render the exercise chart based on the selected dataset */}
+                    {selectedExerciseDataset === 'weightLifting' && <Line data={exerciseChartData} options={options} />}
+                  </>
+                )}
               </div>
             </div>
-            {/* </div> */}
           </div>
 
           <div className='bg-secondary-400 rounded-xl m-4 space-y-16 py-16 xl:space-y-20'>
-            {/* Recent activity table */}
             <div>
               <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
                 <h2 className='mx-auto max-w-2xl text-base font-semibold leading-6 text-gray-300 lg:mx-0 lg:max-w-none'>
