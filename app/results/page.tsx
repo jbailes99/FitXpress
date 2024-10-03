@@ -28,6 +28,7 @@ function classNames(...classes: string[]) {
 
 export default function Results() {
   const [selectedCategory, setSelectedCategory] = useState('bodyMetrics')
+  const [loading, setLoading] = useState(true)
   const [selectedDataset, setSelectedDataset] = useState<'bmi' | 'fatMass' | 'leanMass' | 'bodyFatPercentage'>('bmi')
   const [selectedExerciseDataset, setSelectedExerciseDataset] = useState<'weightLifting'>('weightLifting')
   const [results, setResults] = useState<any[]>([])
@@ -106,6 +107,7 @@ export default function Results() {
     }
   }
   const fetchResults = async () => {
+    setLoading(true)
     try {
       const storedTokens = getCurrentTokens()
 
@@ -129,6 +131,7 @@ export default function Results() {
     } catch (error) {
       console.error('Error fetching results:', error)
     }
+    setLoading(false)
   }
   useEffect(() => {
     fetchResults()
@@ -318,6 +321,21 @@ export default function Results() {
     },
   }
 
+  const Statistic = ({ title, value, loading }) => {
+    return (
+      <div>
+        <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
+          <h1 className='text-xl font-semibold mb-2'>{title}:</h1>
+          {!loading ? (
+            <span className={`text-${value < 0 ? 'green' : 'red'}-500`}>{value.toFixed(2)}%</span>
+          ) : (
+            <span className='text-white/50'>Loading</span>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   const renderExerciseDetails = (item: ExerciseResultItem) => {
     const calculateCaloriesBurned = (intensity, time) => {
       const CALORIES_PER_MINUTE = {
@@ -477,34 +495,12 @@ export default function Results() {
                 <h3 className='font-bold text-gray-200'>Statistics</h3>
                 {selectedCategory === 'bodyMetrics' && (
                   <div className='flex flex-col space-y-4'>
-                    {bmiPercentageDifference !== undefined &&
-                    bmiPercentageDifference !== null &&
-                    bmiPercentageDifference !== 0 ? (
+                    {true ? (
                       <>
-                        <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
-                          <h1 className='text-xl font-semibold mb-2'>BMI change:</h1>
-                          <span className={`text-${bmiPercentageDifference < 0 ? 'green' : 'red'}-500`}>
-                            {bmiPercentageDifference.toFixed(2)}%
-                          </span>
-                        </div>
-                        <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
-                          <h1 className='text-xl font-semibold mb-2'>Fat Mass change:</h1>
-                          <span className={`text-${fatMassPercentageDifference < 0 ? 'green' : 'red'}-500`}>
-                            {fatMassPercentageDifference.toFixed(2)}%
-                          </span>
-                        </div>
-                        <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
-                          <h1 className='text-xl font-semibold mb-2'>Lean Mass change:</h1>
-                          <span className={`text-${leanMassPercentageDifference >= 0 ? 'red' : 'green'}-500`}>
-                            {leanMassPercentageDifference.toFixed(2)}%
-                          </span>
-                        </div>
-                        <div className='p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md'>
-                          <h1 className='text-xl font-semibold mb-2'>Body Fat change:</h1>
-                          <span className={`text-${bodyFatPercentageDifference < 0 ? 'green' : 'red'}-500`}>
-                            {bodyFatPercentageDifference.toFixed(2)}%
-                          </span>
-                        </div>
+                        <Statistic loading={loading} title='BMI change' value={bmiPercentageDifference} />
+                        <Statistic loading={loading} title='Fat Mass change' value={fatMassPercentageDifference} />
+                        <Statistic loading={loading} title='Lean Mass change' value={leanMassPercentageDifference} />
+                        <Statistic loading={loading} title='Body Fat Change' value={bodyFatPercentageDifference} />
                       </>
                     ) : (
                       <div className='p-4 bg-gray-800 text-red-300 rounded-lg shadow-md'>
@@ -644,74 +640,79 @@ export default function Results() {
                 <h2 className='mx-auto max-w-2xl text-base font-semibold leading-6 text-gray-300 lg:mx-0 lg:max-w-none'>
                   Recent activity
                 </h2>
-                <div className='results-container'>
-                  {selectedCategory === 'bodyMetrics' &&
-                    results
-                      .sort(
-                        (a: ResultItem, b: ResultItem) =>
-                          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-                      )
-                      .map((item, index) => (
-                        <div
-                          key={index}
-                          className='bg-secondary-100 text-white'
-                          style={{
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                            padding: '20px',
-                            marginBottom: '20px',
-                          }}
-                        >
-                          <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                            <strong>{item.timestamp}</strong>
-                          </p>
-                          <h2 style={{ fontSize: '18px', marginBottom: '10px' }}>
-                            <strong>{item.userId}</strong>
-                          </h2>
-                          <p style={{ fontSize: '16px', marginBottom: '5px 0' }}>BMI: {item.bodyBMI}</p>
-                          <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Lean Mass: {item.bodyLeanMass}</p>
-                          <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Fat Calculation: {item.bodyFatCalc}</p>
-                          <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Fat Mass: {item.bodyFatMass}</p>
-                          <p style={{ fontSize: '16px', margin: '5px 0' }}>entryId: {item.entryId}</p>
+                {!loading ? (
+                  <div className='results-container'>
+                    {selectedCategory === 'bodyMetrics' &&
+                      results
+                        .sort(
+                          (a: ResultItem, b: ResultItem) =>
+                            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                        )
+                        .map((item, index) => (
+                          <div
+                            key={index}
+                            className='bg-secondary-100 text-white'
+                            style={{
+                              borderRadius: '8px',
+                              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                              padding: '20px',
+                              marginBottom: '20px',
+                            }}
+                          >
+                            <p style={{ fontSize: '16px', margin: '5px 0' }}>
+                              <strong>{item.timestamp}</strong>
+                            </p>
+                            <h2 style={{ fontSize: '18px', marginBottom: '10px' }}>
+                              <strong>{item.userId}</strong>
+                            </h2>
+                            <p style={{ fontSize: '16px', marginBottom: '5px 0' }}>BMI: {item.bodyBMI}</p>
+                            <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Lean Mass: {item.bodyLeanMass}</p>
+                            <p style={{ fontSize: '16px', margin: '5px 0' }}>
+                              Body Fat Calculation: {item.bodyFatCalc}
+                            </p>
+                            <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Fat Mass: {item.bodyFatMass}</p>
+                            <p style={{ fontSize: '16px', margin: '5px 0' }}>entryId: {item.entryId}</p>
 
-                          <Button
-                            onClick={() => {
-                              handleDelete(item.entryId)
+                            <Button
+                              onClick={() => {
+                                handleDelete(item.entryId)
+                              }}
+                              className='bg-red-600 text-gray-200 rounded shadow'
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        ))}
+                    {selectedCategory === 'exercises' && (
+                      <div className='results-container'>
+                        {exerciseResults.map(item => (
+                          <div
+                            key={item.id}
+                            className='bg-secondary-100 text-white'
+                            style={{
+                              borderRadius: '8px',
+                              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                              padding: '20px',
+                              marginBottom: '20px',
                             }}
-                            className='bg-red-600 text-gray-200 rounded shadow'
                           >
-                            Delete
-                          </Button>
-                        </div>
-                      ))}
-                  {selectedCategory === 'exercises' && (
-                    <div className='results-container'>
-                      {exerciseResults.map(item => (
-                        <div
-                          key={item.id}
-                          className='bg-secondary-100 text-white'
-                          style={{
-                            borderRadius: '8px',
-                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                            padding: '20px',
-                            marginBottom: '20px',
-                          }}
-                        >
-                          {' '}
-                          {renderExerciseDetails(item)}
-                          <Button
-                            onClick={() => {
-                              handleDeleteLogs(item.entryId)
-                            }}
-                            className='bg-red-600 text-gray-200 rounded shadow'
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                            {renderExerciseDetails(item)}
+                            <Button
+                              onClick={() => {
+                                handleDeleteLogs(item.entryId)
+                              }}
+                              className='bg-red-600 text-gray-200 rounded shadow'
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className='text-white/50 mx-auto text-2xl'>loading...</div>
+                )}
               </div>
             </div>
           </div>

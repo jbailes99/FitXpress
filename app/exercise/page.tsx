@@ -39,6 +39,7 @@ const ExerciseTracker = () => {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [exerciseTypes, setExerciseTypes] = useState<string[]>([])
   const [selectedExerciseType, setSelectedExerciseType] = useState<string>('')
+  const [loading, setLoading] = useState(true)
 
   const [newExerciseEntry, setNewExerciseEntry] = useState<Partial<ExerciseEntry>>({
     type: '',
@@ -100,17 +101,17 @@ const ExerciseTracker = () => {
 
   const fetchExerciseLogs = async () => {
     const storedTokens = getCurrentTokens()
+    setLoading(true)
 
     if (!storedTokens || !storedTokens.accessToken) {
       console.warn('Access token is missing. User might not be logged in.')
-      return // Exit early if no access token is found
+      return
     }
 
     try {
       const userDetails = await getUserDetails(storedTokens.accessToken)
       const userId = userDetails?.username
 
-      // Ensure userId is defined
       if (!userId) {
         console.error('User ID is not defined.')
         return
@@ -126,6 +127,7 @@ const ExerciseTracker = () => {
     } catch (error) {
       console.error('Error fetching exercise logs:', error)
     }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -190,7 +192,6 @@ const ExerciseTracker = () => {
   }
 
   const renderExerciseDetails = (item: ExerciseEntry) => {
-    // Function to calculate calories burned
     const calculateCaloriesBurned = (intensity: string, time: number, weight: number) => {
       const CALORIES_PER_MINUTE = {
         low: 3.5,
@@ -202,7 +203,7 @@ const ExerciseTracker = () => {
       // Base calories burned per minute based on intensity
       const baseCaloriesPerMinute = CALORIES_PER_MINUTE[intensity.toLowerCase()] || 0
 
-      // Weight adjustment factor (e.g., calories burned per kg per minute)
+      // Weight adjustment factor (calories burned per lb per minute)
       const weightFactor = 0.005
 
       // Calculate calories burned based on weight
@@ -510,26 +511,30 @@ const ExerciseTracker = () => {
             </div>
           </div>
 
-          {exerciseEntries.length > 0 && (
-            <div className='flex-grow w-1/2'>
-              <div className='mt-12 justify-center text-center'>
-                <div className='results-container'>
-                  {exerciseEntries
-                    .sort((a, b) => {
-                      // Ensure both timestamps are valid Date objects
-                      const dateA = new Date(a.timestamp)
-                      const dateB = new Date(b.timestamp)
+          {loading ? (
+            <div className='text-white/50 text-lg '>loading...</div>
+          ) : (
+            exerciseEntries.length > 0 && (
+              <div className='flex-grow w-1/2'>
+                <div className='mt-12 justify-center text-center'>
+                  <div className='results-container'>
+                    {exerciseEntries
+                      .sort((a, b) => {
+                        // Ensure both timestamps are valid Date objects
+                        const dateA = new Date(a.timestamp)
+                        const dateB = new Date(b.timestamp)
 
-                      return dateB.getTime() - dateA.getTime() // Compare by timestamp in milliseconds
-                    })
-                    .map(item => (
-                      <div key={item.id} className='bg-secondary-400 mt-2 p-4 rounded-md mb-4'>
-                        {renderExerciseDetails(item)}
-                      </div>
-                    ))}
+                        return dateB.getTime() - dateA.getTime() // Compare by timestamp in milliseconds
+                      })
+                      .map(item => (
+                        <div key={item.id} className='bg-secondary-400 mt-2 p-4 rounded-md mb-4'>
+                          {renderExerciseDetails(item)}
+                        </div>
+                      ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            )
           )}
         </div>
       </div>
