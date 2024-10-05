@@ -29,7 +29,9 @@ function classNames(...classes: string[]) {
 export default function Results() {
   const [selectedCategory, setSelectedCategory] = useState('bodyMetrics')
   const [loading, setLoading] = useState(true)
-  const [selectedDataset, setSelectedDataset] = useState<'bmi' | 'fatMass' | 'leanMass' | 'bodyFatPercentage'>('bmi')
+  const [selectedDataset, setSelectedDataset] = useState<
+    'bmi' | 'fatMass' | 'leanMass' | 'bodyFatPercentage' | 'bodyWeight'
+  >('bmi')
   const [selectedExerciseDataset, setSelectedExerciseDataset] = useState<'weightLifting'>('weightLifting')
   const [results, setResults] = useState<any[]>([])
   const [exerciseResults, setExerciseResults] = useState<any[]>([])
@@ -63,6 +65,7 @@ export default function Results() {
     bodyFatCalc: number
     timestamp: string
     bodyFatMass: number
+    weight: number
     // Add more fields as needed
   }
   const [fadeInUp, setFadeInUp] = useState({
@@ -230,41 +233,47 @@ export default function Results() {
   const processData = (data: any[]) => {
     const sortedData = data
       .map(item => ({
-        timestamp: new Date(item.timestamp).toISOString().split('T')[0],
+        timestamp: new Date(item.timestamp).getTime(), // Convert to milliseconds
         bodyBMI: item.bodyBMI,
         bodyFatMass: item.bodyFatMass,
         bodyLeanMass: item.bodyLeanMass,
         bodyFatCalc: item.bodyFatCalc,
+        weight: item.weight,
       }))
-      .sort((a, b) => a.timestamp.localeCompare(b.timestamp)) // Sorting by date string
+      .sort((a, b) => a.timestamp - b.timestamp) // Sort by timestamp
 
     return {
       bmiData: sortedData.map(item => ({
-        x: item.timestamp,
+        x: new Date(item.timestamp).toISOString().split('T')[0], // Convert back to date string
         y: item.bodyBMI,
       })),
       fatMassData: sortedData.map(item => ({
-        x: item.timestamp,
+        x: new Date(item.timestamp).toISOString().split('T')[0],
         y: item.bodyFatMass,
       })),
       leanMassData: sortedData.map(item => ({
-        x: item.timestamp,
+        x: new Date(item.timestamp).toISOString().split('T')[0],
         y: item.bodyLeanMass,
       })),
       bodyFatPercentageData: sortedData.map(item => ({
-        x: item.timestamp,
+        x: new Date(item.timestamp).toISOString().split('T')[0],
         y: item.bodyFatCalc,
+      })),
+      bodyWeightData: sortedData.map(item => ({
+        x: new Date(item.timestamp).toISOString().split('T')[0],
+        y: item.weight,
       })),
     }
   }
 
-  const { bmiData, fatMassData, leanMassData, bodyFatPercentageData } = processData(results)
+  const { bmiData, fatMassData, leanMassData, bodyFatPercentageData, bodyWeightData } = processData(results)
 
   const dataset = {
     bmi: bmiData,
     fatMass: fatMassData,
     leanMass: leanMassData,
     bodyFatPercentage: bodyFatPercentageData,
+    bodyWeight: bodyWeightData,
   }[selectedDataset]
 
   const getColorForDataset = (dataset: string) => {
@@ -273,6 +282,8 @@ export default function Results() {
         return 'rgb(75, 192, 192)'
       case 'fatMass':
         return 'rgb(255, 99, 132)'
+      case 'bodyWeight':
+        return 'rgb(256, 99, 132)'
       case 'leanMass':
         return 'rgb(54, 162, 235)'
       case 'bodyFatPercentage':
@@ -594,6 +605,17 @@ export default function Results() {
                       >
                         Body Fat Percentage
                       </button>
+                      <button
+                        className='rounded-xl p-2  px-4  transition-colors duration-200'
+                        style={{ backgroundColor: getColorForDataset('bodyWeight') }}
+                        onMouseOver={e =>
+                          (e.currentTarget.style.backgroundColor = darkenColor(getColorForDataset('bodyWeight')))
+                        }
+                        onMouseOut={e => (e.currentTarget.style.backgroundColor = getColorForDataset('bodyWeight'))}
+                        onClick={() => setSelectedDataset('bodyWeight')}
+                      >
+                        Body Weight
+                      </button>
                     </div>
                     <Line data={chartData} options={options} />
                   </>
@@ -672,6 +694,7 @@ export default function Results() {
                             </p>
                             <p style={{ fontSize: '16px', margin: '5px 0' }}>Body Fat Mass: {item.bodyFatMass}</p>
                             <p style={{ fontSize: '16px', margin: '5px 0' }}>entryId: {item.entryId}</p>
+                            <p style={{ fontSize: '16px', margin: '5px 0' }}>Weight: {item.weight}</p>
 
                             <Button
                               onClick={() => {

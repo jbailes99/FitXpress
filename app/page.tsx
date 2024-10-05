@@ -82,10 +82,9 @@ const BmiCalculator: React.FC = () => {
   const fetchActiveWeeklyPlan = async (username: any) => {
     const storedTokens = getCurrentTokens()
 
-    // Check if the tokens or accessToken exist
     if (!storedTokens || !storedTokens.accessToken) {
       console.warn('User is not logged in or access token is missing.')
-      return // Exit the function early
+      return
     }
 
     try {
@@ -98,9 +97,8 @@ const BmiCalculator: React.FC = () => {
       }
 
       const response = await api.post(getWeeklyPlanApi, { userId })
-      const plans = response.data.items // Assuming your response contains a list of plans
+      const plans = response.data.items
 
-      // Find the plan that has isActive: true
       const activePlan = plans.find((plan: { isActive: any }) => plan.isActive)
 
       if (activePlan) {
@@ -121,11 +119,10 @@ const BmiCalculator: React.FC = () => {
   }
 
   useEffect(() => {
-    // Only fetch if the API endpoint exists
     if (isLoggedIn && getWeeklyPlanApi) {
       fetchActiveWeeklyPlan(userDetails.username)
     }
-  }, [isLoggedIn, getWeeklyPlanApi]) // Add getWeeklyPlanApi to the dependency array if it might change
+  }, [isLoggedIn, getWeeklyPlanApi])
 
   const openModal = () => {
     setIsModalOpen(true)
@@ -165,6 +162,7 @@ const BmiCalculator: React.FC = () => {
       // Send a POST request to your Lambda f
       const response = await api.post(lambdaEndpoint, {
         userId,
+        weight,
         bodyFatCalc,
         bodyFatMass,
         bodyLeanMass,

@@ -1,6 +1,6 @@
 import { store } from '@/lib/store'
-import { setUser } from '@/slices/user-slice'
-import { setAuth } from '@/slices/auth-slice'
+import { setUser, clearUser } from '@/slices/user-slice'
+import { setAuth, logout } from '@/slices/auth-slice'
 
 import { CognitoIdentityServiceProvider } from './awsConfig'
 const cognitoIdentityServiceProvider = new CognitoIdentityServiceProvider()
@@ -51,7 +51,6 @@ export async function getUserDetails(accessToken) {
     // Use the accessToken to make a request to your backend or Cognito to fetch user details
     // Make sure to handle errors appropriately
 
-    // Example: Fetch user details from your backend or Cognito
     const params = {
       AccessToken: accessToken,
     }
@@ -173,7 +172,8 @@ export async function signOut() {
 
     // Clear stored tokens after sign-out
     localStorage.removeItem(STORAGE_KEY)
-
+    store.dispatch(logout())
+    store.dispatch(clearUser())
     return response
   } catch (error) {
     console.error('Sign-out error:', error)

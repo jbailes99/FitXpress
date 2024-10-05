@@ -4,27 +4,39 @@ import { Inter } from 'next/font/google'
 import Navigation from '@/components/navigation'
 import { StoreProvider } from './store-provider'
 import './globals.css'
+import React from 'react'
 
-const inter = Inter({ subsets: [ 'latin' ] })
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Body Fat Calculator',
   description: 'body fat calculator',
 }
 
+function AppWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <React.Fragment>
+      <Navigation />
+      {children}
+    </React.Fragment>
+  )
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        { /* eslint-disable-next-line @next/next/no-page-custom-font*/}
-        <link href="https://fonts.googleapis.com/css2?family=family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet" />
+        <link rel='preconnect' href='https://fonts.googleapis.com' />
+        <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='' />
+        {/* eslint-disable-next-line @next/next/no-page-custom-font*/}
+        <link
+          href='https://fonts.googleapis.com/css2?family=family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap'
+          rel='stylesheet'
+        />
       </head>
       <body className={inter.className}>
         <StoreProvider>
-          <Navigation />
-          <div>{children}</div>
+          <AppWrapper>{children}</AppWrapper>
         </StoreProvider>
       </body>
     </html>
