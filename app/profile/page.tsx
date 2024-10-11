@@ -83,7 +83,7 @@ const ProfilePage: React.FC = () => {
       ) {
         await updateUserDetails(accessToken, {
           // Passing accessToken as the first argument
-          'nickname': formValues.nickname,
+          nickname: formValues.nickname,
           // 'username': formValues.username, *cant update username, cognito error?
           'custom:weight1': formValues.weight,
           'custom:age1': formValues.age,
@@ -124,7 +124,7 @@ const ProfilePage: React.FC = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormValues(prevValues => ({
+    setFormValues((prevValues) => ({
       ...prevValues,
       [name]: value,
     }))
@@ -135,117 +135,132 @@ const ProfilePage: React.FC = () => {
     visible: { opacity: 1, y: 0 },
   }
 
+  // test
   return (
     <motion.div
-      initial='hidden'
-      animate='visible'
+      initial="hidden"
+      animate="visible"
       variants={fadeInUp}
-      className='bg-gray-800 shadow min-h-screen flex items-center justify-center'
+      className="shadow min-h-screen flex items-center justify-center"
     >
-      <div className='w-full max-w-2xl'>
+      <div className="w-full max-w-2xl">
         {' '}
         {/* Adjust max-width as needed */}
-        <Panel className='rounded-xl'>
-          <h1 className='text-2xl text-medium-purple-500 font-bold mb-6 text-center'>Your Profile</h1>
-          <form className='p-4 '>
+        <Panel className="rounded-xl">
+          <h1 className="text-2xl text-medium-purple-500 font-bold mb-6 text-center">
+            Your Profile
+          </h1>
+          <form className="p-4 ">
             {userData ? (
               <>
                 {editMode ? (
-                  <div className='flex flex-col items-center space-y-4 w-full max-w-md mx-auto'>
-                    <div className='w-1/2'>
-                      <label className='block text-sm font-medium text-gray-700 text-center'>Email:</label>
+                  <div className="flex flex-col items-center space-y-4 w-full max-w-md mx-auto">
+                    <div className="w-1/2">
+                      <label className="block text-sm font-medium text-gray-700 text-center">
+                        Email:
+                      </label>
                       <input
-                        type='email'
-                        name='email'
+                        type="email"
+                        name="email"
                         value={userData.email}
                         readOnly
-                        className='mt-1 p-2 bg-gray-500 border rounded-md w-full text-center'
+                        className="mt-1 p-2 bg-gray-500 border rounded-md w-full text-center"
                       />
 
-                      <label className='block mt-4 text-sm font-medium text-gray-700 text-center'>Nickname:</label>
+                      <label className="block mt-4 text-sm font-medium text-gray-700 text-center">
+                        Nickname:
+                      </label>
                       <input
-                        type='text'
-                        name='nickname'
+                        type="text"
+                        name="nickname"
                         value={formValues.nickname}
                         onChange={handleChange}
-                        className='mt-1 p-2 border rounded-md w-full text-center'
+                        className="mt-1 p-2 border rounded-md w-full text-center"
                       />
 
-                      <label className='block mt-4 text-sm font-medium text-gray-700 text-center'>Username:</label>
+                      <label className="block mt-4 text-sm font-medium text-gray-700 text-center">
+                        Username:
+                      </label>
                       <input
-                        type='text'
-                        name='username'
+                        type="text"
+                        name="username"
                         value={userData.username}
                         readOnly
-                        className='mt-1 p-2 bg-gray-500 border rounded-md w-full text-center'
+                        className="mt-1 p-2 bg-gray-500 border rounded-md w-full text-center"
                       />
 
-                      <label className='block mt-4 text-sm font-medium text-gray-700 text-center'>Weight:</label>
+                      <label className="block mt-4 text-sm font-medium text-gray-700 text-center">
+                        Weight:
+                      </label>
                       <input
-                        type='text'
-                        name='weight'
+                        type="text"
+                        name="weight"
                         value={formValues.weight}
                         onChange={handleChange}
-                        className='mt-1 p-2 border rounded-md w-full text-center'
+                        className="mt-1 p-2 border rounded-md w-full text-center"
                       />
 
-                      <label className='block mt-4 text-sm font-medium text-gray-700 text-center'>Age:</label>
+                      <label className="block mt-4 text-sm font-medium text-gray-700 text-center">
+                        Age:
+                      </label>
 
                       <input
-                        type='text'
-                        name='age'
+                        type="text"
+                        name="age"
                         value={formValues.age}
                         onChange={handleChange}
-                        className='mt-1 p-2 border rounded-md w-full text-center'
+                        className="mt-1 p-2 border rounded-md w-full text-center"
                       />
 
-                      <label className='block mt-4 text-sm font-medium text-gray-700 text-center'>Sex:</label>
+                      <label className="block mt-4 text-sm font-medium text-gray-700 text-center">
+                        Sex:
+                      </label>
                       <select
-                        name='sex'
+                        name="sex"
                         value={formValues.sex}
                         onChange={handleChange}
-                        className='mt-1 p-2 border rounded-md w-full text-center'
+                        className="mt-1 p-2 border rounded-md w-full text-center"
                       >
-                        <option value='' disabled>
+                        <option value="" disabled>
                           Select sex
                         </option>
-                        <option value='male'>Male</option>
-                        <option value='female'>Female</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
                       </select>
                     </div>
 
-                    <div className='mt-6 flex space-x-4'>
+                    <div className="mt-6 flex space-x-4">
                       <button
-                        type='button'
+                        type="button"
                         onClick={handleSaveClick}
-                        className='px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:ring focus:border-indigo-300'
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:ring focus:border-indigo-300"
                       >
                         Save
                       </button>
                       <button
-                        type='button'
+                        type="button"
                         onClick={handleCancelClick}
-                        className='px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring focus:border-gray-300'
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring focus:border-gray-300"
                       >
                         Cancel
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className='flex flex-col items-center gap-x-8 gap-y-6 border-gray-900/10 pb-12 md:grid-cols-1'>
-                    <p className='text-gray-200'>Email: {userData.email}</p>
-                    <p className='text-gray-200'>Nickname: {userData.nickname}</p>
-                    <p className='text-gray-200'>Username: {userData.username}</p>
-                    <p className='text-gray-200'>Weight: {userData.weight}</p>
-                    <p className='text-gray-200'>Age: {userData.age}</p>
-                    <p className='text-gray-200'>Sex: {userData.sex}</p>
+                  <div className="flex flex-col items-center gap-x-8 gap-y-6 border-gray-900/10 pb-12 md:grid-cols-1">
+                    <p className="text-gray-200">Email: {userData.email}</p>
+                    <p className="text-gray-200">Nickname: {userData.nickname}</p>
+                    <p className="text-gray-200">Username: {userData.username}</p>
+                    <p className="text-gray-200">Weight: {userData.weight}</p>
+                    <p className="text-gray-200">Age: {userData.age}</p>
+                    <p className="text-gray-200">Sex: {userData.sex}</p>
 
-                    {userData.isAdmin && <p className='text-gray-200'>Admin: Yes</p>}
+                    {userData.isAdmin && <p className="text-gray-200">Admin: Yes</p>}
 
                     <button
-                      type='button'
+                      type="button"
                       onClick={handleEditClick}
-                      className='mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:ring focus:border-indigo-300 self-center justify-self-center'
+                      className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:ring focus:border-indigo-300 self-center justify-self-center"
                     >
                       Edit
                     </button>
@@ -256,23 +271,26 @@ const ProfilePage: React.FC = () => {
               <p>
                 {accessToken ? (
                   <>
-                    To view your profile, please <a href='/login'>log in</a>.
+                    To view your profile, please <a href="/login">log in</a>.
                   </>
                 ) : (
                   <>
                     {error ? (
                       <>
                         {error instanceof Error ? (
-                          <p className='text-red-200'>Your session has expired. Please log in again</p>
+                          <p className="text-red-200">
+                            Your session has expired. Please log in again
+                          </p>
                         ) : (
                           <>
-                            Unable to fetch user data. Please try again later or <a href='/login'>log in</a>.
+                            Unable to fetch user data. Please try again later or{' '}
+                            <a href="/login">log in</a>.
                           </>
                         )}
                       </>
                     ) : (
                       <>
-                        To view your profile, please <a href='/login'>log in</a>
+                        To view your profile, please <a href="/login">log in</a>
                       </>
                     )}
                   </>
