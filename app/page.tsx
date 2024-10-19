@@ -350,361 +350,376 @@ const BmiCalculator: React.FC = () => {
       )}
       <div className=" flex flex-col justify-center items-center min-h-screen overflow-x-hidden ">
         <div className="lg:grid lg:grid-cols-3 lg:px-12 px-4  lg:space-x-8 lg:space-y-0">
-          <Card
-            shadow={true}
-            className={`text-center sm:mt-16 mt-6 outline outline-medium-purple-500 space-y-16 bg-secondary-400 rounded-xl  col-span-2 ${
-              showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'
-            }`}
-          >
-            <div className="flex items-center justify-center rounded-tr-xl rounded-tl-xl h-16 outline outline-secondary-800 bg-medium-purple-500 text-gray-200">
-              <Typography variant="h5" className="sm:text-2xl text-2xl font-bold">
-                Gain comprehensive insight into your body composition
-              </Typography>
-            </div>
-
-            <Typography variant="h1" color="white" className="text-2xl mt-12 font-bold">
-              Body Composition Calculator
-            </Typography>
-            <div className="mx-12">
-              <div
-                className={`col-span-3 sm:col-span-3 text-center mt-6 ${
-                  showResults ? 'hidden' : 'visible'
-                }`}
-              >
-                <form onSubmit={onSubmit}>
-                  <div className="space-y-8">
-                    <div className="flex space-x-4">
-                      <div className="flex-1">
-                        <Input
-                          label="Age"
-                          className=" bg-secondary-800"
-                          color="purple"
-                          type="number"
-                          id="age"
-                          value={age}
-                          autoComplete="off"
-                          onChange={(e: any) => handleNumberInputChange(e.target.value, setAge)}
-                        />
-                      </div>
-                      <div className="flex-1 flex-col space-y-7">
-                        <div className="">
-                          <Select
-                            color="purple"
-                            label="Select Gender"
-                            id="gender"
-                            value={gender || ''}
-                            name="gender"
-                            onChange={(value) =>
-                              handleGenderInputChange(value as string, setGender)
-                            }
-                          >
-                            <Option value="male">Male</Option>
-                            <Option value="female">Female</Option>
-                          </Select>
-                        </div>
-                        <div className="">
-                          <span
-                            className="underline cursor-pointer text-gray-400  "
-                            onClick={openModal}
-                          >
-                            More info
-                          </span>
-
-                          <GenderExplanationModal isOpen={isModalOpen} onClose={closeModal} />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex space-x-4">
-                      <div className="flex-1 ">
-                        <Input
-                          color="purple"
-                          label="Weight (lb)"
-                          type="number"
-                          inputMode="numeric"
-                          pattern="/d*"
-                          id="weight"
-                          value={weight}
-                          autoComplete="off"
-                          onChange={(e: any) => handleNumberInputChange(e.target.value, setWeight)}
-                        />
-                        {/* <label className='block text-gray-400 text-sm font-bold mb-2' htmlFor='weight'>
-                        Weight (lb)
-                      </label>
-                      <input
-                        className=' sm:text-2xl text-lg border rounded-md bg-gray-900 text-center text-gray-300 focus:outline-none focus:shadow-outline'
-                        type='number'
-                        inputMode='numeric'
-                        pattern='/d*'
-                        id='weight'
-                        placeholder='Enter your weight'
-                        value={weight}
-                        onChange={(e: any) => handleNumberInputChange(e.target.value, setWeight)}
-                      /> */}
-                      </div>
-
-                      <div className="flex-1 ">
-                        <Input
-                          color="purple"
-                          label="Height"
-                          type="text"
-                          id="height"
-                          placeholder="example...5'11"
-                          value={height}
-                          autoComplete="off"
-                          onKeyDown={onFeetDown}
-                          onChange={(e: any) => handleFeetInputChange(e.target.value, setHeight)}
-                          className="placeholder-gray-400 placeholder-opacity-50 h-14"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex space-x-4">
-                      <div className="flex-1">
-                        <Input
-                          size="lg"
-                          color="purple"
-                          label="Neck Measurement"
-                          type="number"
-                          id="neckMeasurement"
-                          value={neckMeasurement}
-                          className="placeholder-gray-400 placeholder-opacity-50 h-14"
-                          placeholder="in inches"
-                          autoComplete="off"
-                          onChange={(e: any) =>
-                            handleNumberInputChange(e.target.value, setNeckMeasurement)
-                          }
-                        />
-                      </div>
-
-                      <div className="flex-1 ">
-                        <Input
-                          label="Waist Measurement"
-                          size="lg"
-                          color="purple"
-                          type="number"
-                          id="waistMeasurement"
-                          value={waistMeasurement}
-                          className="placeholder-gray-400 placeholder-opacity-50 h-14"
-                          placeholder="in inches"
-                          autoComplete="off"
-                          onChange={(e: any) =>
-                            handleNumberInputChange(e.target.value, setWaistMeasurement)
-                          }
-                        />
-                      </div>
-                      {gender == 'female' && (
-                        <div className=" flex-1 ">
-                          <Input
-                            size="lg"
-                            color="purple"
-                            label="Hip Measurement"
-                            type="number"
-                            id="waistMeasurement"
-                            placeholder="Circumference"
-                            value={hipMeasurement}
-                            autoComplete="off"
-                            onChange={(e: any) =>
-                              handleNumberInputChange(e.target.value, setHipMeasurement)
-                            }
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex mt-12 h-full justify-center items-center px-4">
-                      <Button
-                        type="submit"
-                        size="lg"
-                        variant="gradient"
-                        color="purple"
-                        className="h-16"
-                      >
-                        Calculate
-                      </Button>
-                      <AnimatePresence>
-                        {showAlert && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -50 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -50 }}
-                            transition={{ duration: 0.3 }}
-                            className="fixed top-4 left-3/4 transform -translate-x-1/2 z-50"
-                          >
-                            <Alert color="red" className="bg-opacity-75">
-                              {alertMessage}
-                            </Alert>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                </form>
+          <div className="col-span-2 ">
+            <Card
+              shadow={true}
+              className={`text-center  sm:mt-16  mt-6 outline outline-medium-purple-500  bg-secondary-400 rounded-xl ${
+                showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'
+              }`}
+              // style={{ width: '100%', height: '50%' }}
+            >
+              <div className="flex items-center justify-center rounded-tr-xl rounded-tl-xl h-16 bg-medium-purple-500 text-gray-200">
+                <Typography variant="h5" className="sm:text-2xl text-2xl font-bold">
+                  Body Composition Calculator
+                </Typography>
               </div>
+              <div className="my-auto mt-4">
+                <Typography variant="h1" color="white" className="text-2xl mt-4 font-bold">
+                  Gain comprehensive insight into your body composition
+                </Typography>
+              </div>
+              <div className="py-12">
+                <div className="mx-12 ">
+                  <div
+                    className={`col-span-3 sm:col-span-3 text-center mt-6 ${
+                      showResults ? 'hidden' : 'visible'
+                    }`}
+                  >
+                    <form onSubmit={onSubmit}>
+                      <div className="space-y-10">
+                        <div className="xl:flex xl:space-x-4 xl:space-y-0 space-y-10">
+                          <div className="flex-1">
+                            <Input
+                              label="Age"
+                              className=" bg-secondary-800"
+                              color="purple"
+                              type="number"
+                              id="age"
+                              className="placeholder-gray-400 placeholder-opacity-50 h-14"
+                              value={age}
+                              autoComplete="off"
+                              onChange={(e: any) => handleNumberInputChange(e.target.value, setAge)}
+                            />
+                          </div>
+                          <div className="flex-1 flex-col space-y-7">
+                            <div className="">
+                              <Select
+                                color="purple"
+                                label="Select Gender"
+                                className="h-14"
+                                id="gender"
+                                value={gender || ''}
+                                name="gender"
+                                onChange={(value) =>
+                                  handleGenderInputChange(value as string, setGender)
+                                }
+                              >
+                                <Option value="male">Male</Option>
+                                <Option value="female">Female</Option>
+                              </Select>
+                              <div className="mt-4">
+                                <span
+                                  className="underline text-xs cursor-pointer text-gray-400  "
+                                  onClick={openModal}
+                                >
+                                  More info
+                                </span>
 
-              <div
-                className={`text-gray-300 font-bold sm:col-span-3 col-span-3 text-2xl ${
-                  showResults ? 'visible' : 'hidden'
-                }`}
-              >
-                {showResults && (
-                  <>
-                    <h1> Your Results </h1>
-                    <div className="mt-4 text-black" id="result">
-                      <div className="flex items-center justify-center">
-                        <div className="bg-blue-100 shadow w-full 2xl:w-3/4 px-2 py-2 rounded-3xl sm:rounded-lg mt-2">
-                          <h3 className="text-base font-semibold leading-6 text-gray-800">
-                            Body Fat
-                          </h3>
-                          <div className="mt-2 sm:flex sm:items-start sm:justify-center">
-                            <div className="text-md text-gray-800 text-center">
-                              {bodyFatCalc !== null ? (
-                                <>
-                                  <p className="text-center">{bodyFatCalc.toFixed(2)}</p>
-
-                                  <div className="flex justify-center items-center text-center">
-                                    <div className="">
-                                      <GaugeChart
-                                        id="gauge-chart1"
-                                        percent={parseFloat(bodyFatCalc.toFixed(2)) / 40} // Normalize bodyBMI to fit within the range of 0 to 100
-                                        nrOfLevels={30}
-                                        arcsLength={[0.2, 0.6, 0.2]}
-                                        colors={['#F5CD19', '#5BE12C', '#EA4228']}
-                                        labels={['Low', 'Medium', 'High']}
-                                        hideText
-                                      />
-                                    </div>
-                                  </div>
-                                </>
-                              ) : (
-                                ''
-                              )}
+                                <GenderExplanationModal isOpen={isModalOpen} onClose={closeModal} />
+                              </div>
                             </div>
                           </div>
                         </div>
+
+                        <div className="xl:flex xl:space-x-4 xl:space-y-0 space-y-10">
+                          <div className="flex-1 ">
+                            <Input
+                              color="purple"
+                              label="Weight (lb)"
+                              type="number"
+                              id="weight"
+                              className="placeholder-gray-400 placeholder-opacity-50 h-14"
+                              value={weight}
+                              autoComplete="off"
+                              onChange={(e: any) =>
+                                handleNumberInputChange(e.target.value, setWeight)
+                              }
+                            />
+                          </div>
+
+                          <div className="flex-1 ">
+                            <Input
+                              color="purple"
+                              label="Height"
+                              type="text"
+                              id="height"
+                              placeholder="example...5'11"
+                              value={height}
+                              autoComplete="off"
+                              onKeyDown={onFeetDown}
+                              onChange={(e: any) =>
+                                handleFeetInputChange(e.target.value, setHeight)
+                              }
+                              className="placeholder-gray-400 placeholder-opacity-50 h-14"
+                            />
+                          </div>
+                        </div>
+                        <div className="xl:flex xl:space-x-4 xl:space-y-0 space-y-10">
+                          <div className="flex-1">
+                            <Input
+                              size="lg"
+                              color="purple"
+                              label="Neck Measurement"
+                              type="number"
+                              id="neckMeasurement"
+                              value={neckMeasurement}
+                              className="placeholder-gray-400 placeholder-opacity-50 h-14"
+                              placeholder="in inches"
+                              autoComplete="off"
+                              onChange={(e: any) =>
+                                handleNumberInputChange(e.target.value, setNeckMeasurement)
+                              }
+                            />
+                          </div>
+
+                          <div className="flex-1 ">
+                            <Input
+                              label="Waist Measurement"
+                              size="lg"
+                              color="purple"
+                              type="number"
+                              id="waistMeasurement"
+                              value={waistMeasurement}
+                              className="placeholder-gray-400 placeholder-opacity-50 h-14"
+                              placeholder="in inches"
+                              autoComplete="off"
+                              onChange={(e: any) =>
+                                handleNumberInputChange(e.target.value, setWaistMeasurement)
+                              }
+                            />
+                          </div>
+                          {gender == 'female' && (
+                            <div className=" flex-1 ">
+                              <Input
+                                size="lg"
+                                color="purple"
+                                label="Hip Measurement"
+                                type="number"
+                                id="waistMeasurement"
+                                placeholder="Circumference"
+                                className="placeholder-gray-400 placeholder-opacity-50 h-14"
+                                value={hipMeasurement}
+                                autoComplete="off"
+                                onChange={(e: any) =>
+                                  handleNumberInputChange(e.target.value, setHipMeasurement)
+                                }
+                              />
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center justify-center">
-                        <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6 ">
-                          <h3 className="text-base font-semibold leading-6 text-gray-900"> BMI </h3>
-                          <div className="mt-2 flex-row items-center justify-center">
-                            <h1 className="text-md text-gray-800">
-                              {bodyBMI !== null ? (
-                                <>
-                                  <p className="text-center">{bodyBMI.toFixed(2)}</p>
-                                  <div className="flex justify-center items-center text-center">
-                                    <div className="w-1/4">
-                                      <GaugeChart
-                                        id="gauge-chart1"
-                                        percent={parseFloat(bodyBMI.toFixed(2)) / 40} // Normalize bodyBMI to fit within the range of 0 to 100
-                                        nrOfLevels={30}
-                                        arcsLength={[0.2, 0.6, 0.2]}
-                                        colors={['#F5CD19', '#5BE12C', '#EA4228']}
-                                        labels={['Low', 'Medium', 'High']}
-                                        hideText
-                                      />
-                                    </div>
-                                  </div>
-                                </>
-                              ) : (
-                                ''
-                              )}
-                            </h1>
-                            <div
-                              className="flex items-center justify-center mt-4 sm:mt-0 w-full 
+
+                      <div>
+                        <div className="flex mt-12 h-full justify-center items-center px-4">
+                          <Button
+                            type="submit"
+                            size="lg"
+                            variant="gradient"
+                            color="purple"
+                            className="h-16"
+                          >
+                            Calculate
+                          </Button>
+                          <AnimatePresence>
+                            {showAlert && (
+                              <motion.div
+                                initial={{ opacity: 0, y: -50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -50 }}
+                                transition={{ duration: 0.3 }}
+                                className="fixed top-4 left-3/4 transform -translate-x-1/2 z-50"
+                              >
+                                <Alert color="red" className="bg-opacity-75">
+                                  {alertMessage}
+                                </Alert>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div
+                    className={`text-gray-300 font-bold sm:col-span-3 col-span-3 text-2xl ${
+                      showResults ? 'visible' : 'hidden'
+                    }`}
+                  >
+                    {showResults && (
+                      <>
+                        <h1> Your Results </h1>
+                        <div className="mt-4 text-black" id="result">
+                          <div className="flex items-center justify-center">
+                            <div className="bg-blue-100 shadow w-full 2xl:w-3/4 px-2 py-2 rounded-3xl sm:rounded-lg mt-2">
+                              <h3 className="text-base font-semibold leading-6 text-gray-800">
+                                Body Fat
+                              </h3>
+                              <div className="mt-2 sm:flex sm:items-start sm:justify-center">
+                                <div className="text-md text-gray-800 text-center">
+                                  {bodyFatCalc !== null ? (
+                                    <>
+                                      <p className="text-center">{bodyFatCalc.toFixed(2)}</p>
+
+                                      <div className="flex justify-center items-center text-center">
+                                        <div className="">
+                                          <GaugeChart
+                                            id="gauge-chart1"
+                                            percent={parseFloat(bodyFatCalc.toFixed(2)) / 40} // Normalize bodyBMI to fit within the range of 0 to 100
+                                            nrOfLevels={30}
+                                            arcsLength={[0.2, 0.6, 0.2]}
+                                            colors={['#F5CD19', '#5BE12C', '#EA4228']}
+                                            labels={['Low', 'Medium', 'High']}
+                                            hideText
+                                          />
+                                        </div>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    ''
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6 ">
+                              <h3 className="text-base font-semibold leading-6 text-gray-900">
+                                {' '}
+                                BMI{' '}
+                              </h3>
+                              <div className="mt-2 flex-row items-center justify-center">
+                                <h1 className="text-md text-gray-800">
+                                  {bodyBMI !== null ? (
+                                    <>
+                                      <p className="text-center">{bodyBMI.toFixed(2)}</p>
+                                      <div className="flex justify-center items-center text-center">
+                                        <div className="w-1/4">
+                                          <GaugeChart
+                                            id="gauge-chart1"
+                                            percent={parseFloat(bodyBMI.toFixed(2)) / 40} // Normalize bodyBMI to fit within the range of 0 to 100
+                                            nrOfLevels={30}
+                                            arcsLength={[0.2, 0.6, 0.2]}
+                                            colors={['#F5CD19', '#5BE12C', '#EA4228']}
+                                            labels={['Low', 'Medium', 'High']}
+                                            hideText
+                                          />
+                                        </div>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    ''
+                                  )}
+                                </h1>
+                                <div
+                                  className="flex items-center justify-center mt-4 sm:mt-0 w-full 
 
                         "
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-center">
-                        <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6">
-                          <h3 className="text-base font-semibold leading-6 text-gray-800">
-                            Fat Mass
-                          </h3>
-                          <div className="mt-2 sm:flex sm:items-start sm:justify-center">
-                            <div className="justify-center text-md text-gray-800 text-center flex-1">
-                              {bodyFatMass !== null ? <p>{Math.round(bodyFatMass)} lbs</p> : ''}
+                                ></div>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
 
-                      <div className="flex items-center justify-center">
-                        <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6">
-                          <h3 className="text-base font-semibold leading-6 text-gray-800">BMR</h3>
-                          <div className="mt-2 sm:flex sm:items-start sm:justify-center">
-                            <div className="justify-center text-md text-gray-800 text-center flex-1">
-                              {bodyBMR !== null ? <p>{Math.round(bodyBMR)} calories/day</p> : ''}
+                          <div className="flex items-center justify-center">
+                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6">
+                              <h3 className="text-base font-semibold leading-6 text-gray-800">
+                                Fat Mass
+                              </h3>
+                              <div className="mt-2 sm:flex sm:items-start sm:justify-center">
+                                <div className="justify-center text-md text-gray-800 text-center flex-1">
+                                  {bodyFatMass !== null ? <p>{Math.round(bodyFatMass)} lbs</p> : ''}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
 
-                      <div className="flex items-center justify-center">
-                        <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6">
-                          <h3 className="text-base font-semibold leading-6 text-gray-800">
-                            Lean Mass
-                          </h3>
-                          <div className="mt-2 sm:flex sm:items-start sm:justify-center">
-                            <div className="justify-center text-md text-gray-800 text-center flex-1">
-                              {bodyLeanMass !== null ? <p>{Math.round(bodyLeanMass)} lbs</p> : ''}
+                          <div className="flex items-center justify-center">
+                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6">
+                              <h3 className="text-base font-semibold leading-6 text-gray-800">
+                                BMR
+                              </h3>
+                              <div className="mt-2 sm:flex sm:items-start sm:justify-center">
+                                <div className="justify-center text-md text-gray-800 text-center flex-1">
+                                  {bodyBMR !== null ? (
+                                    <p>{Math.round(bodyBMR)} calories/day</p>
+                                  ) : (
+                                    ''
+                                  )}
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                      <div className="flex mt-5 text-sm h-full justify-center items-center">
-                        {isLoggedIn && (
-                          <button
-                            type="submit"
-                            onClick={handleSave}
-                            className=" bg-red-600 mr-2 text-white font-semibold py-2 px-4 rounded hover:bg-red-700"
-                          >
-                            Save Results
-                          </button>
-                        )}
-                        <button
-                          type="submit"
-                          onClick={handleGoBack}
-                          className=" bg-blue-600 ml-2 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700"
-                        >
-                          Calculate Again
-                        </button>
-                      </div>
-                      <div className="flex items-center justify-center">
-                        {showSuccessMessage && (
-                          <p className="text-green-500 text-sm mt-2">Successfully saved results</p>
-                        )}
-                        {loader && (
-                          <div className="flex items-center mt-2 justify-center">
-                            <Spinner color="purple" />
+
+                          <div className="flex items-center justify-center">
+                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6">
+                              <h3 className="text-base font-semibold leading-6 text-gray-800">
+                                Lean Mass
+                              </h3>
+                              <div className="mt-2 sm:flex sm:items-start sm:justify-center">
+                                <div className="justify-center text-md text-gray-800 text-center flex-1">
+                                  {bodyLeanMass !== null ? (
+                                    <p>{Math.round(bodyLeanMass)} lbs</p>
+                                  ) : (
+                                    ''
+                                  )}
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        )}
-                        {showAlert && (
-                          <Alert color="red">
-                            <span>error</span>
-                          </Alert>
-                        )}
-                      </div>
-                      {/* {bodyFatCalc !== null ? <p>Your Body Fat is: {bodyFatCalc.toFixed(2)}%</p> : ''}
+                          <div className="flex mt-5 text-sm h-full justify-center items-center">
+                            {isLoggedIn && (
+                              <button
+                                type="submit"
+                                onClick={handleSave}
+                                className=" bg-red-600 mr-2 text-white font-semibold py-2 px-4 rounded hover:bg-red-700"
+                              >
+                                Save Results
+                              </button>
+                            )}
+                            <button
+                              type="submit"
+                              onClick={handleGoBack}
+                              className=" bg-blue-600 ml-2 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700"
+                            >
+                              Calculate Again
+                            </button>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            {showSuccessMessage && (
+                              <p className="text-green-500 text-sm mt-2">
+                                Successfully saved results
+                              </p>
+                            )}
+                            {loader && (
+                              <div className="flex items-center mt-2 justify-center">
+                                <Spinner color="purple" />
+                              </div>
+                            )}
+                            {showAlert && (
+                              <Alert color="red">
+                                <span>error</span>
+                              </Alert>
+                            )}
+                          </div>
+                          {/* {bodyFatCalc !== null ? <p>Your Body Fat is: {bodyFatCalc.toFixed(2)}%</p> : ''}
               {bodyFatMass !== null ? <p>Body Fat Mass is: {Math.round(bodyFatMass)} lbs</p> : ''}
               {bodyLeanMass !== null ? <p>Body Lean Mass is: {Math.round(bodyLeanMass)} lbs</p> : ''}
               {bodyBMI !== null ? <p>BMI: {bodyBMI.toFixed(2)}</p> : ''} */}
-                    </div>
-                  </>
-                )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* <div className='mt-4 text-black' id='result'>
+              {/* <div className='mt-4 text-black' id='result'>
           {bodyFatCalc !== null ? <p>Your Body Fat is: {bodyFatCalc.toFixed(2)}%</p> : ''}
           {bodyFatMass !== null ? <p>Body Fat Mass is: {Math.round(bodyFatMass)} lbs</p> : ''}
           {bodyLeanMass !== null ? <p>Body Lean Mass is: {Math.round(bodyLeanMass)} lbs</p> : ''}
           {bodyBMI !== null ? <p>BMI: {bodyBMI.toFixed(2)}</p> : ''}
         </div> */}
-          </Card>
+            </Card>
+          </div>
+
           {/* <div className='flex flex-col items-center justify-center '>
             {!isLoggedIn && (
               <div className='flex flex-col items-center justify-center '>
@@ -804,36 +819,29 @@ const BmiCalculator: React.FC = () => {
             )}
 
             <Panel className="text-center mb-4 md:mb-6 p-4 md:p-6 rounded-2xl shadow-2xl w-full h-auto">
-              <h1 className="mb-4 text-gray-200 font-bold text-xl md:text-2xl">
+              <h1 className="mb-4 text-gray-200 font-bold sm:text-xl">
                 Unlock insights into your body composition.
               </h1>
-              <div className="leading-6 text-left font-medium text-gray-400">
+              <div className="leading-6 text-left text-xsm text-gray-400 space-y-2">
                 <p>
-                  <strong className="text-medium-purple-300">BMI (Body Mass Index):</strong> This
-                  standardized measure is based on your weight and height, providing an indication
-                  of your overall body fatness.
+                  <strong className="text-medium-purple-300 ">BMI (Body Mass Index):</strong> Uses
+                  your height and weight to indicate body wellness.
                 </p>
                 <p>
-                  <strong className="text-medium-purple-300">Body Fat Percentage:</strong> This
-                  measurement reveals the proportion of fat to your total body weight, helping you
-                  understand your body's composition more deeply.
+                  <strong className="text-medium-purple-300">Body Fat Percentage:</strong> The
+                  proportion of fat to your body weight.
                 </p>
                 <p>
-                  <strong className="text-medium-purple-300">Lean Mass:</strong> Your lean mass
-                  represents the weight of everything in your body except for fat, encompassing
-                  muscle, bones, and organs. Understanding your lean mass can guide muscle-building
-                  efforts and overall body composition goals.
+                  <strong className="text-medium-purple-300">Lean Mass:</strong> Represents the
+                  weight of everything in your body except for fat.
                 </p>
                 <p>
-                  <strong className="text-medium-purple-300">Fat Mass:</strong> This measurement
-                  indicates the weight of your body fat specifically, providing insights into your
-                  body fat distribution and overall health.
+                  <strong className="text-medium-purple-300">Fat Mass:</strong> Indicates the weight
+                  of your body fat.
                 </p>
                 <p>
                   <strong className="text-medium-purple-300">BMR (Basal Metabolic Rate):</strong>{' '}
-                  BMR reflects the energy required to keep your body functioning at a state of rest
-                  and is influenced by factors. BMR can help you determine your daily caloric needs
-                  and create an effective diet or fitness plan.
+                  Helps you determine your daily caloric needs.
                 </p>
               </div>
             </Panel>
@@ -900,20 +908,20 @@ const BmiCalculator: React.FC = () => {
         <div className="w-full">
           {isLoggedIn && (
             <Panel className="mx-4 sm:mx-10 rounded-xl mb-6 sm:mb-12 shadow-2xl mt-6 sm:mt-8">
-              <div className="mb-4 mt-4 sm:mb-6 sm:mt-4 text-center">
+              {/* <div className="mb-4 mt-4 sm:mb-6 sm:mt-4 text-center">
                 <h1 className="text-3xl sm:text-4xl font-bold text-gray-200">My Weekly Plan</h1>
-              </div>
+              </div> */}
               <div className="p-4">
                 {weeklyPlan ? (
                   <>
                     <h1 className="bg-medium-purple-500 text-gray-100 font-semibold p-3 w-1/2 mx-auto rounded-lg text-center mb-4">
-                      Current Weekly Plan:{' '}
+                      My Active Weekly Plan:{' '}
                       <span className="text-yellow-400">
                         {weeklyPlan.planName || 'Unnamed Plan'}
                       </span>
                     </h1>
 
-                    <div className="bg-secondary-200 p-4 mb-4 rounded-md shadow-md">
+                    <div className=" p-4 mb-4 outline outline-medium-purple-500 rounded-sm">
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
                         {[
                           'Monday',
@@ -960,13 +968,13 @@ const BmiCalculator: React.FC = () => {
         </div>
 
         {!isLoggedIn && (
-          <Panel className="mx-10 rounded-xl mb-12 shadow-2xl mt-8 justify-between">
+          <div className="mx-10 rounded-xl mb-12 mt-8 justify-between">
             <div className="p-6">
-              <h1 className="text-4xl font-extrabold text-center text-gray-100 mb-12">
+              {/* <h1 className="text-4xl font-extrabold text-center text-gray-100 mb-12">
                 Explore Our Features
-              </h1>
+              </h1> */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div className="bg-secondary-800 p-8 rounded-xl shadow-lg transition-colors duration-300">
+                <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
                   <div className="flex justify-center space-x-4 ">
                     <ClockIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
                     <h2 className="text-2xl font-bold  text-gray-100 mb-4">Track Your Exercises</h2>
@@ -976,7 +984,7 @@ const BmiCalculator: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="bg-secondary-800 p-8 rounded-xl shadow-lg transition-colors duration-300">
+                <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
                   <div className="flex justify-center space-x-4 ">
                     <ChartBarIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
                     <h2 className="text-2xl font-bold text-gray-100 mb-4">Monitor Body Metrics</h2>
@@ -987,7 +995,7 @@ const BmiCalculator: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="bg-secondary-800 p-8 rounded-xl shadow-lg  transition-colors duration-300">
+                <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
                   <div className="flex justify-center space-x-4 ">
                     <CalendarIcon className="h-10 w-10 text-medium-purple-300 mb-4" />
                     <h2 className="text-2xl font-bold text-gray-100 mb-4">
@@ -1000,7 +1008,7 @@ const BmiCalculator: React.FC = () => {
                 </div>
               </div>
             </div>
-          </Panel>
+          </div>
         )}
       </div>
     </motion.div>

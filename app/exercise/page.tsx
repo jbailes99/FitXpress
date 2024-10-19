@@ -544,7 +544,7 @@ const ExerciseTracker = () => {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-gray-800 px-3 text-xl font-semibold leading-6 text-medium-purple-300">
+              <span className="bg-medium-purple-500 text-white rounded px-3 text-xl font-semibold leading-6 text-medium-purple-300">
                 Recent Logs
               </span>
             </div>

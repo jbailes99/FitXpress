@@ -544,10 +544,10 @@ export default function Results() {
             </div>
             <div className="flex justify-center text-center ml-6 ">
               {/* <div className='flex space-x-24 items-center mt-4'> */}
-              <div className="bg-secondary-300 rounded-2xl w-1/2  mr-4 p-12 mb-4 ">
+              <div className=" rounded-2xl w-1/2  mr-4 p-12 mb-4 ">
                 <h3 className="font-bold text-gray-200">Statistics</h3>
                 {selectedCategory === 'bodyMetrics' && (
-                  <div className="flex flex-col space-y-4">
+                  <div className="flex  flex-col space-y-4">
                     {true ? (
                       <>
                         <Statistic
