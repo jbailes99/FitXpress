@@ -128,7 +128,7 @@ export default function Navigation() {
               (!item.requireAdmin || (isLoggedIn && isAdmin)) && (
                 <Link
                   className={cn('flex items-center  px-4 transition-all', {
-                    'bg-medium-purple-500/70 text-white rounded-full h-2/3':
+                    'bg-medium-purple-500/90 text-white rounded-full h-2/3':
                       item.key === currentPage,
                     'text-gray-400 hover:bg-gray-900/30 hover:text-gray-300':
                       item.key !== currentPage,

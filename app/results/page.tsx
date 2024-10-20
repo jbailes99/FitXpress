@@ -350,7 +350,7 @@ export default function Results() {
   const Statistic = ({ title, value, loading }) => {
     return (
       <div>
-        <div className="p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md">
+        <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-lg">
           <h1 className="text-xl font-semibold mb-2">{title}:</h1>
           {!loading ? (
             <span className={`text-${value < 0 ? 'green' : 'red'}-500`}>{value.toFixed(2)}%</span>
@@ -547,7 +547,7 @@ export default function Results() {
               <div className=" rounded-2xl w-1/2  mr-4 p-12 mb-4 ">
                 <h3 className="font-bold text-gray-200">Statistics</h3>
                 {selectedCategory === 'bodyMetrics' && (
-                  <div className="flex  flex-col space-y-4">
+                  <div className="  flex-col space-y-4">
                     {true ? (
                       <>
                         <Statistic
@@ -585,7 +585,7 @@ export default function Results() {
                   <div className="flex-row space-y-4">
                     {/* Weight Lifting Section */}
                     {!exerciseStats.weightLifting.maxWeight ? (
-                      <div className="p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md">
+                      <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-md">
                         <h3 className="text-xl font-semibold mb-2">Weight Lifting</h3>
                         <p className="text-lg">
                           <span className="font-bold">
@@ -595,7 +595,7 @@ export default function Results() {
                       </div>
                     ) : (
                       exerciseStats.weightLifting.maxWeight > 0 && (
-                        <div className="p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md">
+                        <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-md">
                           <h3 className="text-xl font-semibold mb-2">Weight Lifting</h3>
                           <p className="text-lg">
                             Max Weight:{' '}
@@ -610,7 +610,7 @@ export default function Results() {
                     {/* Cardio Section */}
                     {(exerciseStats.cardio.totalDistance > 0 ||
                       exerciseStats.cardio.totalTime > 0) && (
-                      <div className="p-4 bg-gray-800 text-gray-200 rounded-lg shadow-md">
+                      <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-md">
                         <h3 className="text-xl font-semibold mb-2">Cardio</h3>
 
                         <p className="text-lg">
@@ -624,7 +624,7 @@ export default function Results() {
                   </div>
                 )}
               </div>
-              <div className="bg-secondary-300 mr-6 mt-4 mb-4 rounded-2xl w-full">
+              <div className="bg-secondary-600 outline outline-medium-purple-500 mr-6 mt-4 mb-4 rounded-2xl w-full">
                 {selectedCategory === 'bodyMetrics' && (
                   <>
                     <div className="mt-4 space-x-6 pb-2 ">
