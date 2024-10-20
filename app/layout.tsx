@@ -86,11 +86,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} flex flex-col min-h-screen`}>
         <StoreProvider>
-          <AppWrapper>{children}</AppWrapper>
+          <AppWrapper>
+            <main className="flex-grow">{children}</main>
+          </AppWrapper>
+          <Footer />
         </StoreProvider>
-        <Footer />
       </body>
     </html>
   )

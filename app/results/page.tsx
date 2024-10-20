@@ -355,7 +355,9 @@ export default function Results() {
           {!loading ? (
             <span className={`text-${value < 0 ? 'green' : 'red'}-500`}>{value.toFixed(2)}%</span>
           ) : (
-            <span className="text-white/50">Loading</span>
+            <div className="flex items-center mt-2 justify-center">
+              <Spinner color="purple" />
+            </div>
           )}
         </div>
       </div>
@@ -839,7 +841,9 @@ export default function Results() {
                     )}
                   </div>
                 ) : (
-                  <div className="text-white/50 mx-auto text-2xl">loading...</div>
+                  <div className="flex items-center mt-2 justify-center">
+                    <Spinner color="purple" />
+                  </div>
                 )}
               </div>
             </div>

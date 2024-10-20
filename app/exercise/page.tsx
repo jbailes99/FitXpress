@@ -35,6 +35,7 @@ interface ExerciseData {
 
 const ExerciseTracker = () => {
   const userDetails = useUserDetails()
+  const [isLoading, setIsLoading] = useState(true)
 
   const [exerciseEntries, setExerciseEntries] = useState<ExerciseEntry[]>([])
   const [showSuccessMessage, setShowSuccessMessage] = useState(false)
@@ -104,6 +105,8 @@ const ExerciseTracker = () => {
   }, [selectedCategory])
 
   const fetchExerciseLogs = async () => {
+    setIsLoading(true)
+
     const storedTokens = getCurrentTokens()
 
     if (!storedTokens || !storedTokens.accessToken) {
@@ -129,6 +132,8 @@ const ExerciseTracker = () => {
       setExerciseEntries(responseData)
     } catch (error) {
       console.error('Error fetching exercise logs:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -544,23 +549,25 @@ const ExerciseTracker = () => {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-medium-purple-500 text-white rounded px-3 text-xl font-semibold leading-6 text-medium-purple-300">
+              <span className="bg-medium-purple-500 text-white rounded px-3 text-xl font-semibold leading-6 ">
                 Recent Logs
               </span>
             </div>
           </div>
 
-          {exerciseEntries.length > 0 && (
+          {isLoading ? (
+            <div className="flex items-center mt-2 justify-center">
+              <Spinner color="purple" />
+            </div>
+          ) : exerciseEntries.length > 0 ? (
             <div className="flex-grow w-1/2">
               <div className="mt-12 justify-center text-center">
                 <div className="results-container">
                   {exerciseEntries
                     .sort((a, b) => {
-                      // Ensure both timestamps are valid Date objects
                       const dateA = new Date(a.timestamp)
                       const dateB = new Date(b.timestamp)
-
-                      return dateB.getTime() - dateA.getTime() // Compare by timestamp in milliseconds
+                      return dateB.getTime() - dateA.getTime()
                     })
                     .map((item) => (
                       <div key={item.id} className="bg-secondary-400 mt-2 p-4 rounded-md mb-4">
@@ -569,6 +576,10 @@ const ExerciseTracker = () => {
                     ))}
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="flex justify-center items-center h-full">
+              <p className="text-gray-500 text-lg">No exercise logs found</p>
             </div>
           )}
         </div>

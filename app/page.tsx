@@ -21,6 +21,7 @@ import { Typography } from '@material-tailwind/react'
 import Footer from '@/components/footer'
 import { Tooltip } from '@material-tailwind/react'
 import { FaQuestionCircle } from 'react-icons/fa' // Importing from react-icons/fa
+import Loading from '@/components/Loading'
 
 ChartJS.register(...registerables)
 interface WeeklyPlan {
@@ -67,6 +68,7 @@ const BmiCalculator: React.FC = () => {
   const [bodyFatBMI, setBodyFatBMI] = useState<number | null>(null)
   const [bodyBMR, setBodyBMR] = useState<number | null>(null)
   const [showResults, setShowResults] = useState(false) // set to false
+
   const [bmi, setBmi] = useState<number | null>(null)
   const [fadeInUp, setFadeInUp] = useState({
     hidden: { opacity: 0, y: 20 },
@@ -352,7 +354,7 @@ const BmiCalculator: React.FC = () => {
         </Panel>
       )}
       <div className=" flex flex-col justify-center items-center min-h-screen overflow-x-hidden ">
-        <div className="lg:grid lg:grid-cols-3 lg:px-12 px-4  lg:space-x-8 lg:space-y-0">
+        <div className="w-full lg:grid lg:grid-cols-3 lg:px-12 px-4  lg:space-x-8 lg:space-y-0">
           <div className="col-span-2 ">
             <Card
               shadow={true}
@@ -384,7 +386,6 @@ const BmiCalculator: React.FC = () => {
                           <div className="flex-1">
                             <Input
                               label="Age"
-                              className=" bg-secondary-800"
                               color="purple"
                               type="number"
                               id="age"
@@ -412,7 +413,7 @@ const BmiCalculator: React.FC = () => {
                               </Select>
                               <div className="mt-4">
                                 <span
-                                  className="underline text-xs cursor-pointer text-gray-400  "
+                                  className="underline text-xs cursor-pointer text-medium-purple-500 hover:text-medium-purple-200  "
                                   onClick={openModal}
                                 >
                                   More info
@@ -426,51 +427,56 @@ const BmiCalculator: React.FC = () => {
 
                         <div className="xl:flex xl:space-x-4 xl:space-y-0 space-y-10">
                           <div className="flex-1 ">
-                            <Input
-                              color="purple"
-                              label="Weight (lb)"
-                              type="number"
-                              id="weight"
-                              className="placeholder-gray-400 placeholder-opacity-50 h-14"
-                              value={weight}
-                              autoComplete="off"
-                              onChange={(e: any) =>
-                                handleNumberInputChange(e.target.value, setWeight)
-                              }
-                            />
-                          </div>
-                          <Tooltip
-                            className="bg-medium-purple-500"
-                            content={
-                              <div className="w-80">
-                                <Typography color="white" className="font-medium">
-                                  Material Tailwind
-                                </Typography>
-                                <Typography
-                                  variant="small"
-                                  color="white"
-                                  className="font-normal opacity-80"
-                                >
-                                  To change your weight, go to profile and weigh in.
-                                </Typography>
-                              </div>
-                            }
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                              className="h-5 w-5 cursor-pointer text-blue-gray-500"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                            <div className="relative w-full">
+                              <Input
+                                color="purple"
+                                label="Weight (lb)"
+                                type="number"
+                                id="weight"
+                                className="placeholder-gray-400 placeholder-opacity-50 h-14 pr-10" // Add padding-right to make space for the icon
+                                value={weight}
+                                autoComplete="off"
+                                onChange={(e: any) =>
+                                  handleNumberInputChange(e.target.value, setWeight)
+                                }
                               />
-                            </svg>
-                          </Tooltip>
+                              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <Tooltip
+                                  className="bg-medium-purple-500"
+                                  content={
+                                    <div className="w-80">
+                                      <Typography color="white" className="font-medium">
+                                        Material Tailwind
+                                      </Typography>
+                                      <Typography
+                                        variant="small"
+                                        color="white"
+                                        className="font-normal opacity-80"
+                                      >
+                                        To change your weight, go to profile and weigh in.
+                                      </Typography>
+                                    </div>
+                                  }
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                    className="h-5 w-5 cursor-pointer text-medium-purple-500"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                                    />
+                                  </svg>
+                                </Tooltip>
+                              </div>
+                            </div>
+                          </div>
+
                           <div className="flex-1 ">
                             <Input
                               color="purple"
@@ -857,23 +863,23 @@ const BmiCalculator: React.FC = () => {
                 Unlock insights into your body composition.
               </h1>
               <div className="leading-6 text-left text-xsm text-gray-400 space-y-2">
-                <p>
+                <p className="text-gray-200">
                   <strong className="text-medium-purple-300 ">BMI (Body Mass Index):</strong> Uses
                   your height and weight to indicate body wellness.
                 </p>
-                <p>
+                <p className="text-gray-200">
                   <strong className="text-medium-purple-300">Body Fat Percentage:</strong> The
                   proportion of fat to your body weight.
                 </p>
-                <p>
+                <p className="text-gray-200">
                   <strong className="text-medium-purple-300">Lean Mass:</strong> Represents the
                   weight of everything in your body except for fat.
                 </p>
-                <p>
+                <p className="text-gray-200">
                   <strong className="text-medium-purple-300">Fat Mass:</strong> Indicates the weight
                   of your body fat.
                 </p>
-                <p>
+                <p className="text-gray-200">
                   <strong className="text-medium-purple-300">BMR (Basal Metabolic Rate):</strong>{' '}
                   Helps you determine your daily caloric needs.
                 </p>
@@ -892,10 +898,10 @@ const BmiCalculator: React.FC = () => {
             <div className="grid grid-cols-2 grid-rows-2 gap-8 sm:gap-12">
               <div className="col-span-1 row-span-1">
                 <div className="mt-0 sm:mt-6 text-sm ml-4 sm:ml-0 sm:text-lg text-center text-gray-300">
-                  <p>
+                  <p className="text-medium-purple-500">
                     <strong>BMI (Body Mass Index):</strong>
                   </p>
-                  <p>
+                  <p className="text-gray-200">
                     A BMI range of 18.5 to 24.9 is considered healthy. The higher the BMI, the
                     greater the risk of developing or experiencing health problems. A BMI of 30 or
                     higher may indicate obesity.
@@ -904,10 +910,10 @@ const BmiCalculator: React.FC = () => {
               </div>
               <div className="col-span-1 row-span-1">
                 <div className="mt-0 sm:mt-6  mr-4 sm:mr-0 text-sm sm:text-lg sm:ml-0 text-center text-gray-300">
-                  <p>
+                  <p className="text-medium-purple-500">
                     <strong>Body Fat:</strong>
                   </p>
-                  <p>
+                  <p className="text-gray-200">
                     Body fat percentage is a measure of the amount of body fat compared to total
                     body weight. Healthy body fat percentages vary by age and gender.
                   </p>
@@ -915,10 +921,10 @@ const BmiCalculator: React.FC = () => {
               </div>
               <div className="col-span-1 row-span-1">
                 <div className="mt-0 sm:mt-6 ml-4 text-sm sm:text-lg sm:ml-0 text-center text-gray-300">
-                  <p>
+                  <p className="text-medium-purple-500">
                     <strong>Fat Mass:</strong>
                   </p>
-                  <p>
+                  <p className="text-gray-200">
                     Fat mass refers to the total weight of fat in the body. Monitoring fat mass is
                     essential for assessing overall health and fitness levels.
                   </p>
@@ -926,10 +932,10 @@ const BmiCalculator: React.FC = () => {
               </div>
               <div className="col-span-1 row-span-1">
                 <div className="mt-0 sm:mt-6  mr-4 text-sm sm:text-lg sm:mr-0 text-center text-gray-300">
-                  <p>
+                  <p className="text-medium-purple-500">
                     <strong>Lean Mass:</strong>
                   </p>
-                  <p>
+                  <p className="text-gray-200">
                     Lean mass is the weight of everything in the body except fat, including muscles,
                     bones, organs, and more. Maintaining a healthy balance of lean mass is crucial
                     for overall well-being.
