@@ -33,6 +33,14 @@ body {
   background-color: #f0f0f0;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active  {
+  transition: background-color 5000s;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
 .spinner {
   border: 4px solid rgba(0, 0, 0, 0.1);
   border-left-color: #3498db; /* Customize your color */

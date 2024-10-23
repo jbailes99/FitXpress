@@ -22,6 +22,7 @@ import Footer from '@/components/footer'
 import { Tooltip } from '@material-tailwind/react'
 import { FaQuestionCircle } from 'react-icons/fa' // Importing from react-icons/fa
 import Loading from '@/components/Loading'
+import Link from 'next/link'
 
 ChartJS.register(...registerables)
 interface WeeklyPlan {
@@ -346,7 +347,7 @@ const BmiCalculator: React.FC = () => {
                     </li>
                   ))
                 ) : (
-                  <li className="text-gray-400">No exercises for today.</li>
+                  <li className="text-gray-400 text-left">No exercises for today.</li>
                 )}
               </ul>
             </div>
@@ -361,7 +362,6 @@ const BmiCalculator: React.FC = () => {
               className={`text-center  sm:mt-16  mt-6 outline outline-medium-purple-500  bg-secondary-400 rounded-xl ${
                 showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'
               }`}
-              // style={{ width: '100%', height: '50%' }}
             >
               <div className="flex items-center justify-center rounded-tr-xl rounded-tl-xl h-16 bg-medium-purple-500 text-gray-200">
                 <Typography variant="h5" className="sm:text-2xl text-2xl font-bold">
@@ -441,38 +441,40 @@ const BmiCalculator: React.FC = () => {
                                 }
                               />
                               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                <Tooltip
-                                  className="bg-medium-purple-500"
-                                  content={
-                                    <div className="w-80">
-                                      <Typography color="white" className="font-medium">
-                                        Material Tailwind
-                                      </Typography>
-                                      <Typography
-                                        variant="small"
-                                        color="white"
-                                        className="font-normal opacity-80"
-                                      >
-                                        To change your weight, go to profile and weigh in.
-                                      </Typography>
-                                    </div>
-                                  }
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    strokeWidth={2}
-                                    className="h-5 w-5 cursor-pointer text-medium-purple-500"
+                                {isLoggedIn && (
+                                  <Tooltip
+                                    className="bg-medium-purple-500"
+                                    content={
+                                      <div className="w-80">
+                                        <Typography color="white" className="font-medium">
+                                          Weight Changes
+                                        </Typography>
+                                        <Typography
+                                          variant="small"
+                                          color="white"
+                                          className="font-normal opacity-80"
+                                        >
+                                          To change your weight, go to profile and weigh in.
+                                        </Typography>
+                                      </div>
+                                    }
                                   >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-                                    />
-                                  </svg>
-                                </Tooltip>
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                      strokeWidth={2}
+                                      className="h-5 w-5 cursor-pointer text-medium-purple-500"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                                      />
+                                    </svg>
+                                  </Tooltip>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -858,31 +860,47 @@ const BmiCalculator: React.FC = () => {
               </Panel>
             )}
 
-            <Panel className="text-center mb-4 md:mb-6 p-4 md:p-6 rounded-2xl shadow-2xl w-full h-auto">
-              <h1 className="mb-4 text-gray-200 font-bold sm:text-xl">
+            <Panel className="text-center mb-4 md:mb-6 p-4 mt-10 sm:mt-0 md:p-6 rounded-2xl shadow-2xl w-full h-auto">
+              <h1 className="mb-4 text-gray-200 font-bold text-xl sm:text-2xl">
                 Unlock insights into your body composition.
               </h1>
-              <div className="leading-6 text-left text-xsm text-gray-400 space-y-2">
-                <p className="text-gray-200">
-                  <strong className="text-medium-purple-300 ">BMI (Body Mass Index):</strong> Uses
-                  your height and weight to indicate body wellness.
-                </p>
-                <p className="text-gray-200">
-                  <strong className="text-medium-purple-300">Body Fat Percentage:</strong> The
-                  proportion of fat to your body weight.
-                </p>
-                <p className="text-gray-200">
-                  <strong className="text-medium-purple-300">Lean Mass:</strong> Represents the
-                  weight of everything in your body except for fat.
-                </p>
-                <p className="text-gray-200">
-                  <strong className="text-medium-purple-300">Fat Mass:</strong> Indicates the weight
-                  of your body fat.
-                </p>
-                <p className="text-gray-200">
-                  <strong className="text-medium-purple-300">BMR (Basal Metabolic Rate):</strong>{' '}
-                  Helps you determine your daily caloric needs.
-                </p>
+              <div className="leading-6 text-left text-sm sm:text-base space-y-2">
+                <div className="flex-col flex text-left ">
+                  <span className="text-gray-200">
+                    <strong className="text-medium-purple-300">BMI (Body Mass Index):</strong>
+                  </span>
+                  <span className="text-gray-200">
+                    Uses your height and weight to indicate body wellness.
+                  </span>
+                </div>
+                <div className="flex-col flex text-left">
+                  <span className="text-gray-200">
+                    <strong className="text-medium-purple-300">Body Fat Percentage:</strong>
+                  </span>
+                  <span className="text-gray-200">The proportion of fat to your body weight.</span>
+                </div>
+                <div className="flex-col flex text-left">
+                  <span className="text-gray-200">
+                    <strong className="text-medium-purple-300">Lean Mass:</strong>
+                  </span>
+                  <span className="text-gray-200">
+                    Represents the weight of everything in your body except for fat.
+                  </span>
+                </div>
+                <div className="flex-col flex text-left">
+                  <span className="text-gray-200">
+                    <strong className="text-medium-purple-300">Fat Mass:</strong>
+                  </span>
+                  <span className="text-gray-200">Indicates the weight of your body fat.</span>
+                </div>
+                <div className="flex-col flex text-left">
+                  <span className="text-gray-200">
+                    <strong className="text-medium-purple-300">BMR (Basal Metabolic Rate):</strong>
+                  </span>
+                  <span className="text-gray-200">
+                    Helps you determine your daily caloric needs.
+                  </span>
+                </div>
               </div>
             </Panel>
           </div>
@@ -945,111 +963,167 @@ const BmiCalculator: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="w-full">
+        <div className="w-full flex flex-col items-center justify-center">
           {isLoggedIn && (
-            <Panel className="mx-4 sm:mx-10 rounded-xl mb-6 sm:mb-12 shadow-2xl mt-6 sm:mt-8">
-              {/* <div className="mb-4 mt-4 sm:mb-6 sm:mt-4 text-center">
-                <h1 className="text-3xl sm:text-4xl font-bold text-gray-200">My Weekly Plan</h1>
-              </div> */}
-              <div className="p-4">
-                {weeklyPlan ? (
-                  <>
-                    <h1 className="bg-medium-purple-500 text-gray-100 font-semibold p-3 w-1/2 mx-auto rounded-lg text-center mb-4">
-                      My Active Weekly Plan:{' '}
-                      <span className="text-yellow-400">
-                        {weeklyPlan.planName || 'Unnamed Plan'}
-                      </span>
-                    </h1>
-
-                    <div className=" p-4 mb-4 outline outline-medium-purple-500 rounded-sm">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
-                        {[
-                          'Monday',
-                          'Tuesday',
-                          'Wednesday',
-                          'Thursday',
-                          'Friday',
-                          'Saturday',
-                          'Sunday',
-                        ].map((day) => (
-                          <Card
-                            key={day}
-                            className="border p-2 rounded-md bg-white shadow-sm h-24 sm:h-32 md:h-40 lg:h-48 xl:h-56"
-                          >
-                            <h4 className="font-medium text-sm sm:text-base">{day}</h4>
-                            <div className="flex flex-wrap gap-2 mt-1">
-                              {weeklyPlan[day]?.map((exercise, index) => (
-                                <span
-                                  key={index}
-                                  className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getColorForExercise(
-                                    exercise
-                                  )} text-gray-700`}
-                                >
-                                  {exercise}
-                                </span>
-                              )) || <span className="text-sm text-gray-500">No exercises</span>}
-                            </div>
-                          </Card>
-                        ))}
-                      </div>
-                      <h3 className="text-xs sm:text-sm text-gray-200 font-semibold mt-2 text-center">
-                        Created on {weeklyPlan.timestamp}
-                      </h3>
+            <Card
+              className={`mx-4 sm:mx-10 rounded-xl mb-6 sm:mb-4 shadow-2xl mt-6 sm:mt-8 bg-secondary-400 px-6 ${
+                !weeklyPlan ? 'sm:w-[94.5%]  mx-2 pb-4  sm:mx-auto' : 'w-[94.5%] '
+              }`}
+            >
+              {weeklyPlan ? (
+                <>
+                  <h1 className="bg-medium-purple-500 text-gray-100 font-semibold p-3 sm:w-1/2 w-3/4 mx-auto rounded-bl-lg rounded-br-lg text-center mb-4 border-secondary-600 border-b-[2px] border-l-[2px] border-r-[2px]">
+                    My Active Weekly Plan:{' '}
+                    <span className="text-yellow-400">{weeklyPlan.planName || 'Unnamed Plan'}</span>
+                  </h1>
+                  <div className=" p-4 mb-4 outline outline-medium-purple-500 rounded-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2">
+                      {[
+                        'Monday',
+                        'Tuesday',
+                        'Wednesday',
+                        'Thursday',
+                        'Friday',
+                        'Saturday',
+                        'Sunday',
+                      ].map((day) => (
+                        <Card
+                          key={day}
+                          className="border p-2 rounded-md bg-white shadow-sm h-24 sm:h-32 md:h-40 lg:h-48 xl:h-56"
+                        >
+                          <h4 className="font-medium text-sm sm:text-base">{day}</h4>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {weeklyPlan[day]?.map((exercise, index) => (
+                              <span
+                                key={index}
+                                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getColorForExercise(
+                                  exercise
+                                )} text-gray-700`}
+                              >
+                                {exercise}
+                              </span>
+                            )) || <span className="text-sm text-gray-500">No exercises</span>}
+                          </div>
+                        </Card>
+                      ))}
                     </div>
-                  </>
-                ) : (
-                  <p className="text-gray-200 font-semibold text-lg text-center">
-                    No plans found. Go create a plan or make one active.
+                    <h3 className="text-xs sm:text-sm text-gray-200 font-semibold mt-2 text-center">
+                      Created on {weeklyPlan.timestamp}
+                    </h3>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-200  font-semibold text-2xl text-center">
+                    Don't have a weekly plan yet?
                   </p>
-                )}
-              </div>
-            </Panel>
+                  <p className="text-gray-200 text-sm text-center">Go create or make one active.</p>
+                </>
+              )}
+            </Card>
           )}
-        </div>
 
-        {!isLoggedIn && (
-          <div className="mx-10 rounded-xl mb-12 mt-8 justify-between">
-            <div className="p-6">
+          <div
+            className={`mx-10 rounded-xl mb-12 justify-between ${
+              !isLoggedIn ? 'mt-6' : ''
+            } hidden sm:block`}
+          >
+            <div className="sm:p-6 p-0">
               {/* <h1 className="text-4xl font-extrabold text-center text-gray-100 mb-12">
                 Explore Our Features
               </h1> */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
-                  <div className="flex justify-center space-x-4 ">
-                    <ClockIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
-                    <h2 className="text-2xl font-bold  text-gray-100 mb-4">Track Your Exercises</h2>
+                {isLoggedIn ? (
+                  <Link href="/exercise">
+                    <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 cursor-pointer hover:bg-secondary-500">
+                      <div className="flex justify-center space-x-4 ">
+                        <ClockIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
+                        <h2 className="text-2xl font-bold  text-gray-100 mb-4">
+                          Track Your Exercises
+                        </h2>
+                      </div>
+                      <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                        Monitor your workouts and log your exercises to keep track of your progress.
+                      </p>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
+                    <div className="flex justify-center space-x-4 ">
+                      <ClockIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
+                      <h2 className="text-2xl font-bold  text-gray-100 mb-4">
+                        Track Your Exercises
+                      </h2>
+                    </div>
+                    <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                      Monitor your workouts and log your exercises to keep track of your progress.
+                    </p>
                   </div>
-                  <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
-                    Monitor your workouts and log your exercises to keep track of your progress.
-                  </p>
-                </div>
+                )}
 
-                <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
-                  <div className="flex justify-center space-x-4 ">
-                    <ChartBarIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
-                    <h2 className="text-2xl font-bold text-gray-100 mb-4">Monitor Body Metrics</h2>
+                {isLoggedIn ? (
+                  <Link href="/results">
+                    <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 cursor-pointer hover:bg-secondary-500">
+                      <div className="flex justify-center space-x-4 ">
+                        <ChartBarIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
+                        <h2 className="text-2xl font-bold text-gray-100 mb-4">
+                          Monitor Body Metrics
+                        </h2>
+                      </div>
+                      <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                        Keep track of your body metrics and weight loss journey with detailed
+                        reports and analytics.
+                      </p>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
+                    <div className="flex justify-center space-x-4 ">
+                      <ChartBarIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
+                      <h2 className="text-2xl font-bold text-gray-100 mb-4">
+                        Monitor Body Metrics
+                      </h2>
+                    </div>
+                    <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                      Keep track of your body metrics and weight loss journey with detailed reports
+                      and analytics.
+                    </p>
                   </div>
-                  <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
-                    Keep track of your body metrics and weight loss journey with detailed reports
-                    and analytics.
-                  </p>
-                </div>
+                )}
 
-                <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
-                  <div className="flex justify-center space-x-4 ">
-                    <CalendarIcon className="h-10 w-10 text-medium-purple-300 mb-4" />
-                    <h2 className="text-2xl font-bold text-gray-100 mb-4">
-                      Make Weekly Workout Plans
-                    </h2>
+                {isLoggedIn ? (
+                  <Link href="/weeklyPlanner">
+                    <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 cursor-pointer hover:bg-secondary-500">
+                      <div className="flex justify-center space-x-4 ">
+                        <CalendarIcon className="h-10 w-10 text-medium-purple-300 mb-4" />
+                        <h2 className="text-2xl font-bold text-gray-100 mb-4">
+                          Make Weekly Workout Plans
+                        </h2>
+                      </div>
+                      <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                        Create and customize your weekly workout plans to stay organized and
+                        motivated.
+                      </p>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
+                    <div className="flex justify-center space-x-4 ">
+                      <CalendarIcon className="h-10 w-10 text-medium-purple-300 mb-4" />
+                      <h2 className="text-2xl font-bold text-gray-100 mb-4">
+                        Make Weekly Workout Plans
+                      </h2>
+                    </div>
+                    <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                      Create and customize your weekly workout plans to stay organized and
+                      motivated.
+                    </p>
                   </div>
-                  <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
-                    Create and customize your weekly workout plans to stay organized and motivated.
-                  </p>
-                </div>
+                )}
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </motion.div>
   )

@@ -1,16 +1,20 @@
 // SignUp.tsx
 
-import React, { Fragment, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/24/outline'
+import React, { Fragment, useState, useEffect } from 'react'
 import { signUp } from '@/utils/authService'
-import SuccessModal from '@/components/SuccessfulSignUp' // Import the SuccessModal component
 import SuccessfulSignUpModal from '@/components/SuccessfulSignUp'
-import SignInModal from '@/components/SignInModal'
-import SignIn from '@/components/SignInModal'
-import { Panel } from '@/components/panel'
-import { String } from 'aws-sdk/clients/cloudsearchdomain'
-import { Button } from '@material-tailwind/react/components/Button'
+import SignIn from './SignInModal'
+import {
+  Button,
+  Dialog as MTDialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Input,
+  Select,
+  Option,
+} from '@material-tailwind/react'
+
 interface SignUpProps {
   onClose: () => void
 }
@@ -31,6 +35,41 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
   const [signUpSuccess, setSignUpSuccess] = useState(false)
   const [isSignInModal, setIsSignInModal] = useState(false)
   const [error, setError] = useState<string | null>(null) // Explicitly type error state
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    hasNumber: false,
+    hasSpecialChar: false,
+    hasUppercase: false,
+    hasLowercase: false,
+  })
+  const [isSignInOpen, setIsSignInOpen] = useState(false)
+
+  useEffect(() => {
+    const checkPasswordRequirements = (password: string) => {
+      setPasswordRequirements({
+        hasNumber: /\d/.test(password),
+        hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+        hasUppercase: /[A-Z]/.test(password),
+        hasLowercase: /[a-z]/.test(password),
+      })
+    }
+
+    if (credentials.password) {
+      checkPasswordRequirements(credentials.password)
+    } else {
+      setPasswordRequirements({
+        hasNumber: false,
+        hasSpecialChar: false,
+        hasUppercase: false,
+        hasLowercase: false,
+      })
+    }
+  }, [credentials.password])
+
+  const unmetRequirements = Object.entries(passwordRequirements)
+    .filter(([_, isMet]) => !isMet)
+    .map(([requirement]) => requirement)
+
+  const allRequirementsMet = Object.values(passwordRequirements).every(Boolean)
 
   const handleSubmit = async () => {
     try {
@@ -75,237 +114,177 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
     handleSignUpClose()
   }
 
+  const handleSignInClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsSignInOpen(true)
+    setOpen(false)
+  }
+
   return (
-    <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={handleSignUpClose}>
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-85 transition-opacity" />
-        </Transition.Child>
-
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              enterTo="opacity-100 translate-y-0 sm:scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-secondary-500 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
-                <div>
-                  <div className="mt-3 text-center sm:mt-5">
-                    <Dialog.Title as="h3" className="text-xl font-semibold leading-6 text-gray-300">
-                      Sign Up
-                    </Dialog.Title>
-                    {/* {signUpSuccess ? (
-                      <SuccessModal onGoToSignIn={handleGoToSignIn} />
-                    ) : ( */}
-                    <div className="mt-2">
-                      {/* <div className='mb-4'>
-                        <label htmlFor='gender' className='block text-sm font-medium text-gray-300'>
-                          Gender
-                        </label>6
-                        <input
-                          type='text'
-                          id='nickname'
-                          name='nickname'
-                          onChange={e => setCredentials({ ...credentials, gender: e.target.value })}
-                          value={credentials.gender}
-                          className='bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full'
-                        />
-                      </div> */}
-                      <div className="mb-4">
-                        <label
-                          htmlFor="nickname"
-                          className="block text-sm font-medium text-gray-300"
-                        >
-                          Nickname
-                        </label>
-                        <input
-                          type="text"
-                          id="nickname"
-                          name="nickname"
-                          onChange={(e) =>
-                            setCredentials({ ...credentials, nickname: e.target.value })
-                          }
-                          value={credentials.nickname}
-                          className="bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full"
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <label
-                          htmlFor="username"
-                          className="block text-sm font-medium text-gray-300"
-                        >
-                          Username
-                        </label>
-                        <input
-                          type="text"
-                          id="username"
-                          name="username"
-                          onChange={(e) =>
-                            setCredentials({ ...credentials, username: e.target.value })
-                          }
-                          value={credentials.username}
-                          className="bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full"
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <label
-                          htmlFor="password"
-                          className="block text-sm font-medium text-gray-300"
-                        >
-                          Password
-                        </label>
-                        <input
-                          type="password"
-                          id="password"
-                          name="password"
-                          onChange={(e) =>
-                            setCredentials({ ...credentials, password: e.target.value })
-                          }
-                          value={credentials.password}
-                          className="bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full"
-                        />
-                        <p className="text-left text-sm text-red-200">
-                          <p className="text-center mt-2 text-sm text-red-300 font-bold">
-                            Password requirements
-                          </p>
-                          <ul className="list-disc list-inside">
-                            <li>Contains at least 1 number</li>
-                            <li>Contains at least 1 special character</li>
-                            <li>Contains at least 1 uppercase letter</li>
-                            <li>Contains at least 1 lowercase letter</li>
-                          </ul>
-                        </p>
-                      </div>
-                      <div className="mb-4">
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                          Email
-                        </label>
-                        <input
-                          type="text"
-                          id="email"
-                          name="email"
-                          onChange={(e) =>
-                            setCredentials({ ...credentials, email: e.target.value })
-                          }
-                          value={credentials.email}
-                          className="bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full"
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <label htmlFor="sex" className="block text-sm font-medium text-gray-300">
-                          Sex
-                        </label>
-                        <select
-                          id="sex"
-                          name="sex"
-                          onChange={(e) => setCredentials({ ...credentials, sex: e.target.value })}
-                          value={credentials.sex}
-                          className="bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full"
-                        >
-                          <option value="" disabled>
-                            Select your sex
-                          </option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                        </select>
-                      </div>
-
-                      <div className="mb-4">
-                        <label htmlFor="age" className="block text-sm font-medium text-gray-300">
-                          Age
-                        </label>
-                        <select
-                          id="age"
-                          name="age"
-                          onChange={(e) => setCredentials({ ...credentials, age: e.target.value })}
-                          value={credentials.age}
-                          className="bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full"
-                        >
-                          <option value="" disabled>
-                            Select your age
-                          </option>
-                          {Array.from({ length: 100 - 16 + 1 }, (_, index) => 16 + index).map(
-                            (age) => (
-                              <option key={age} value={age}>
-                                {age}
-                              </option>
-                            )
-                          )}
-                        </select>
-                      </div>
-
-                      <div className="mb-4">
-                        <label htmlFor="weight" className="block text-sm font-medium text-gray-300">
-                          Weight
-                        </label>
-                        <input
-                          type="text"
-                          id="weight"
-                          name="weight"
-                          onChange={(e) =>
-                            setCredentials({ ...credentials, weight: e.target.value })
-                          }
-                          value={credentials.weight}
-                          className="bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full"
-                        />
-                      </div>
-                    </div>
-                    {/* )} */}
-                  </div>
-                </div>
-                <div className="mt-5 sm:mt-6">
-                  <Button
-                    type="button"
-                    className="inline-flex w-full justify-center rounded-md bg-medium-purple-300 px-3 py-2 text-sm font-semibold text-white shadow-sm"
-                    onClick={handleSubmit}
-                  >
-                    Sign Up
-                  </Button>
-
-                  {error && (
-                    <div className="text-red-500 text-center mt-2 font-bold text-sm">{error}</div>
-                  )}
-                </div>
-
-                <div className="mt-2">
-                  <p className="text-sm text-gray-300">
-                    Already have an account?{' '}
-                    <span
-                      className="text-medium-purple-300 cursor-pointer"
-                      onClick={handleSignInOpen}
-                    >
-                      Sign in
-                    </span>
-                  </p>
-                </div>
-                {isSignInModal && (
-                  <SignIn
-                    onClose={() => setIsSignInModal(false)}
-                    onSignUpClick={function (): void {
-                      throw new Error('Function not implemented.')
-                    }}
-                  />
-                )}
-              </Dialog.Panel>
-            </Transition.Child>
+    <>
+      <MTDialog
+        size="xs"
+        open={open}
+        handler={handleSignUpClose}
+        className="bg-secondary-500 outline outline-medium-purple-500/70  bg-opacity-90"
+      >
+        <DialogHeader className="text-center text-gray-300 flex justify-center items-center">
+          Sign Up
+        </DialogHeader>
+        <DialogBody className="overflow-y-auto flex-col justify-center items-center ">
+          {/* Nickname input */}
+          <div className="mb-4 w-3/4 mx-auto">
+            <Input
+              type="text"
+              label="Nickname"
+              onChange={(e) => setCredentials({ ...credentials, nickname: e.target.value })}
+              value={credentials.nickname}
+              className=" text-medium-purple-500"
+            />
           </div>
-        </div>
-        <SuccessfulSignUpModal open={signUpSuccess} onClose={() => setSignUpSuccess(false)} />
-      </Dialog>
-    </Transition.Root>
+
+          {/* Username input */}
+          <div className="mb-4 w-3/4 mx-auto">
+            <Input
+              type="text"
+              label="Username"
+              onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+              value={credentials.username}
+              className=" text-medium-purple-500"
+            />
+          </div>
+
+          {/* Password input */}
+          <div className="mb-4 w-3/4 mx-auto">
+            <Input
+              type="password"
+              label="Password"
+              onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+              value={credentials.password}
+              className=" text-medium-purple-500"
+            />
+            {credentials.password && (
+              <div className="text-left text-sm mt-2">
+                <p className="text-center text-sm text-gray-200 font-bold">
+                  Password requirements:
+                </p>
+                <ul className="list-disc list-inside">
+                  <li
+                    className={passwordRequirements.hasNumber ? 'text-green-500' : 'text-red-200'}
+                  >
+                    Contains at least 1 number
+                  </li>
+                  <li
+                    className={
+                      passwordRequirements.hasSpecialChar ? 'text-green-500' : 'text-red-200'
+                    }
+                  >
+                    Contains at least 1 special character
+                  </li>
+                  <li
+                    className={
+                      passwordRequirements.hasUppercase ? 'text-green-500' : 'text-red-200'
+                    }
+                  >
+                    Contains at least 1 uppercase letter
+                  </li>
+                  <li
+                    className={
+                      passwordRequirements.hasLowercase ? 'text-green-500' : 'text-red-200'
+                    }
+                  >
+                    Contains at least 1 lowercase letter
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Email input */}
+          <div className="mb-4 w-3/4 mx-auto">
+            <Input
+              type="email"
+              label="Email"
+              onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
+              value={credentials.email}
+              className=" text-medium-purple-500"
+            />
+          </div>
+
+          {/* Sex select */}
+          <div className="mb-4 w-3/4 mx-auto">
+            <Select
+              label="Sex"
+              onChange={(value) => setCredentials({ ...credentials, sex: value as string })}
+              value={credentials.sex}
+              className="text-medium-purple-500"
+            >
+              <Option value="male">Male</Option>
+              <Option value="female">Female</Option>
+            </Select>
+          </div>
+
+          {/* Age select */}
+          <div className="mb-4 w-3/4 mx-auto">
+            <Select
+              label="Age"
+              onChange={(value) => setCredentials({ ...credentials, age: value as string })}
+              value={credentials.age}
+              className="text-medium-purple-500"
+            >
+              {Array.from({ length: 100 - 16 + 1 }, (_, index) => 16 + index).map((age) => (
+                <Option key={age} value={age.toString()}>
+                  {age}
+                </Option>
+              ))}
+            </Select>
+          </div>
+
+          {/* Weight input */}
+          <div className="mb-4 w-3/4 mx-auto">
+            <Input
+              type="text"
+              label="Weight"
+              onChange={(e) => setCredentials({ ...credentials, weight: e.target.value })}
+              value={credentials.weight}
+              className=" text-medium-purple-500"
+            />
+          </div>
+        </DialogBody>
+        <DialogFooter className="flex flex-col items-center">
+          <Button
+            onClick={handleSubmit}
+            disabled={!allRequirementsMet}
+            className="bg-medium-purple-300 text-white w-1/2 mx-auto "
+          >
+            Sign Up
+          </Button>
+          {!allRequirementsMet && credentials.password && (
+            <p className="text-red-500 text-center mt-2 text-sm">
+              Please meet all password requirements before signing up.
+            </p>
+          )}
+          {error && <div className="text-red-500 text-center mt-2 font-bold text-sm">{error}</div>}
+          <p className="text-sm text-gray-300 mt-2">
+            Already have an account?{' '}
+            <span className="text-medium-purple-300 cursor-pointer" onClick={handleSignInClick}>
+              Sign in
+            </span>
+          </p>
+        </DialogFooter>
+      </MTDialog>
+      <SuccessfulSignUpModal open={signUpSuccess} onClose={() => setSignUpSuccess(false)} />
+      {isSignInOpen && (
+        <SignIn
+          onClose={() => setIsSignInOpen(false)}
+          onSignUpClick={() => {
+            setIsSignInOpen(false)
+            setOpen(true)
+          }}
+        />
+      )}
+    </>
   )
 }
 

@@ -1,12 +1,16 @@
 // SignIn.tsx
 
-import React, { Fragment, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import { CheckIcon } from '@heroicons/react/24/outline'
+import React, { useState } from 'react'
+import {
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Input,
+} from '@material-tailwind/react'
 import SignUp from './SignUp'
-import { signIn, getUserDetails, signUp } from '@/utils/authService'
-import SuccessfulSignUp from './SuccessfulSignUp' // Import the modal for successful sign-up
-import { Button } from '@material-tailwind/react/components/Button'
+import { signIn, getUserDetails } from '@/utils/authService'
 
 interface SignInProps {
   onClose: () => void
@@ -25,6 +29,13 @@ const SignIn: React.FC<SignInProps> = ({ onClose }) => {
   const [isSignUpOpen, setIsSignUpOpen] = useState(false)
   const [signInSuccess, setSignInSuccess] = useState(false) // State for successful sign-in
   const [error, setError] = useState<string | null>(null)
+
+  const handleOpen = () => {
+    setOpen(!open)
+    if (open) {
+      onClose()
+    }
+  }
 
   const handleSubmit = async () => {
     try {
@@ -75,110 +86,63 @@ const SignIn: React.FC<SignInProps> = ({ onClose }) => {
   }
 
   return (
-    <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={handleSignInClose}>
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-        </Transition.Child>
-
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-              enterTo="opacity-100 translate-y-0 sm:scale-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-              leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-secondary-500 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
-                <div>
-                  {/* <div className='mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100'>
-                    <CheckIcon className='h-6 w-6 text-green-600' aria-hidden='true' />
-                  </div> */}
-                  <div className="mt-3 text-center sm:mt-2">
-                    <Dialog.Title as="h2" className="text-xl font-semibold leading-6 text-gray-300">
-                      Welcome
-                    </Dialog.Title>
-                    <div className="mt-3">
-                      <div className="mb-4">
-                        <label
-                          htmlFor="username"
-                          className="block text-sm font-medium text-gray-300"
-                        >
-                          Username
-                        </label>
-                        <input
-                          type="text"
-                          id="username"
-                          name="username"
-                          onChange={(e) =>
-                            setCredentials({ ...credentials, username: e.target.value })
-                          }
-                          value={credentials.username}
-                          className="bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full"
-                        />
-                      </div>
-                      <div className="mb-4">
-                        <label
-                          htmlFor="password"
-                          className="block text-sm font-medium text-gray-300"
-                        >
-                          Password
-                        </label>
-                        <input
-                          type="password"
-                          id="password"
-                          name="password"
-                          onChange={(e) =>
-                            setCredentials({ ...credentials, password: e.target.value })
-                          }
-                          value={credentials.password}
-                          className="bg-gray-500 mt-1 p-2 border border-gray-600 rounded-md w-full"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-5 sm:mt-6">
-                  {error && (
-                    <div className="text-red-500 text-center mt-2 font-bold text-sm">{error}</div>
-                  )}
-                  <Button
-                    type="button"
-                    className="inline-flex w-full justify-center rounded-md bg-medium-purple-300 px-3 py-2 text-sm font-semibold text-white shadow-sm "
-                    onClick={handleSubmit}
-                  >
-                    Sign In
-                  </Button>
-                </div>
-                <div className="mt-2 text-center ">
-                  <p className="text-sm text-gray-300">
-                    Dont have an account?{' '}
-                    <span
-                      className="text-medium-purple-300 cursor-pointer"
-                      onClick={handleSignUpClick}
-                    >
-                      Create one
-                    </span>
-                  </p>
-                  {isSignUpOpen && <SignUp onClose={handleSignUpClose} />}
-                </div>
-              </Dialog.Panel>
-            </Transition.Child>
+    <>
+      <Dialog
+        className="bg-secondary-500 outline outline-medium-purple-500/70  bg-opacity-90"
+        open={open}
+        handler={handleOpen}
+        size="sm"
+        dismiss={{
+          outsidePress: () => {
+            handleSignInClose()
+            return true
+          },
+        }}
+      >
+        <DialogHeader className="text-white text-center flex justify-center items-center">
+          Welcome back!
+        </DialogHeader>
+        <DialogBody>
+          <div className="mt-3 flex flex-col justify-center items-center">
+            <div className="mb-4 sm:w-1/2 ">
+              <Input
+                color="purple"
+                type="text"
+                label="Username"
+                onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+                value={credentials.username}
+              />
+            </div>
+            <div className="mb-4 sm:w-1/2 ">
+              <Input
+                type="password"
+                label="Password"
+                onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                value={credentials.password}
+              />
+            </div>
           </div>
+          {error && <div className="text-red-500 text-center mt-2 font-bold text-sm">{error}</div>}
+        </DialogBody>
+        <DialogFooter className="flex justify-center items-center">
+          <Button variant="text" color="red" onClick={handleSignInClose} className="mr-1">
+            <span>Cancel</span>
+          </Button>
+          <Button variant="gradient" color="purple" onClick={handleSubmit}>
+            <span>Sign In</span>
+          </Button>
+        </DialogFooter>
+        <div className="mt-2 text-center pb-4">
+          <p className="text-sm text-white">
+            Don&apos;t have an account?{' '}
+            <span className="text-medium-purple-500 cursor-pointer" onClick={handleSignUpClick}>
+              Create one
+            </span>
+          </p>
+          {isSignUpOpen && <SignUp onClose={handleSignUpClose} />}
         </div>
       </Dialog>
-    </Transition.Root>
+    </>
   )
 }
 

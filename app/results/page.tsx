@@ -336,12 +336,28 @@ export default function Results() {
         title: {
           display: true,
           text: 'Time',
+          font: {
+            size: 0, // Adjust this value to change the x-axis title font size
+          },
+        },
+        ticks: {
+          font: {
+            size: 0, // Adjust this value to change the x-axis tick label font size
+          },
         },
       },
       y: {
         title: {
           display: true,
           text: 'Value',
+          font: {
+            size: 0, // Adjust this value to change the y-axis title font size
+          },
+        },
+        ticks: {
+          font: {
+            size: 0, // Adjust this value to change the y-axis tick label font size
+          },
         },
       },
     },
@@ -544,9 +560,9 @@ export default function Results() {
                 </button>
               </div>
             </div>
-            <div className="flex justify-center text-center ml-6 ">
+            <div className="flex flex-col sm:flex-row justify-center text-center sm:ml-6">
               {/* <div className='flex space-x-24 items-center mt-4'> */}
-              <div className=" rounded-2xl w-1/2  mr-4 p-12 mb-4 ">
+              <div className=" rounded-2xl sm:w-1/2 w-full  mr-4 p-12 sm:mb-4 ">
                 <h3 className="font-bold text-gray-200">Statistics</h3>
                 {selectedCategory === 'bodyMetrics' && (
                   <div className="  flex-col space-y-4">
@@ -626,86 +642,102 @@ export default function Results() {
                   </div>
                 )}
               </div>
-              <div className="bg-secondary-600 outline outline-medium-purple-500 mr-6 mt-4 mb-4 rounded-2xl w-full">
+              <div className="bg-secondary-600 outline outline-medium-purple-500 sm:mr-6 sm:mt-4 mb-4 rounded-2xl w-11/12 mx-auto sm:w-full">
                 {selectedCategory === 'bodyMetrics' && (
                   <>
-                    <div className="mt-4 space-x-6 pb-2 ">
-                      <button
-                        className="rounded-xl p-2  px-4  mr-2 transition-colors duration-200"
-                        style={{ backgroundColor: getColorForDataset('bmi') }}
-                        onMouseOver={(e) =>
-                          (e.currentTarget.style.backgroundColor = darkenColor(
-                            getColorForDataset('bmi')
-                          ))
-                        }
-                        onMouseOut={(e) =>
-                          (e.currentTarget.style.backgroundColor = getColorForDataset('bmi'))
-                        }
-                        onClick={() => setSelectedDataset('bmi')}
-                      >
-                        BMI
-                      </button>
-                      <button
-                        className="rounded-xl p-2 mr-2 px-4 transition-colors duration-200"
-                        style={{ backgroundColor: getColorForDataset('fatMass') }}
-                        onMouseOver={(e) =>
-                          (e.currentTarget.style.backgroundColor = darkenColor(
-                            getColorForDataset('fatMass')
-                          ))
-                        }
-                        onMouseOut={(e) =>
-                          (e.currentTarget.style.backgroundColor = getColorForDataset('fatMass'))
-                        }
-                        onClick={() => setSelectedDataset('fatMass')}
-                      >
-                        Fat Mass
-                      </button>
-                      <button
-                        className="rounded-xl p-2  px-4  mr-2 transition-colors duration-200"
-                        style={{ backgroundColor: getColorForDataset('leanMass') }}
-                        onMouseOver={(e) =>
-                          (e.currentTarget.style.backgroundColor = darkenColor(
-                            getColorForDataset('leanMass')
-                          ))
-                        }
-                        onMouseOut={(e) =>
-                          (e.currentTarget.style.backgroundColor = getColorForDataset('leanMass'))
-                        }
-                        onClick={() => setSelectedDataset('leanMass')}
-                      >
-                        Lean Mass
-                      </button>
-                      <button
-                        className="rounded-xl p-2  px-4  transition-colors duration-200"
-                        style={{ backgroundColor: getColorForDataset('bodyFatPercentage') }}
-                        onMouseOver={(e) =>
-                          (e.currentTarget.style.backgroundColor = darkenColor(
-                            getColorForDataset('bodyFatPercentage')
-                          ))
-                        }
-                        onMouseOut={(e) =>
-                          (e.currentTarget.style.backgroundColor =
-                            getColorForDataset('bodyFatPercentage'))
-                        }
-                        onClick={() => setSelectedDataset('bodyFatPercentage')}
-                      >
-                        Body Fat Percentage
-                      </button>
-                      <button
-                        className="rounded-xl p-2  px-4  transition-colors duration-200"
-                        style={{ backgroundColor: getColorForDataset('bodyWeight') }}
-                        onMouseOver={(e) =>
-                          (e.currentTarget.style.backgroundColor = darkenColor(
-                            getColorForDataset('bodyWeight')
-                          ))
-                        }
-                        onMouseOut={(e) =>
-                          (e.currentTarget.style.backgroundColor = getColorForDataset('bodyWeight'))
-                        }
-                        onClick={() => setSelectedDataset('bodyWeight')}
-                      >
-                        Body Weight
-                      </button>
+                    <div className="mt-1 sm:space-x-6 space-x-2 space-y-1 pb-2">
+                      <div className="sm:hidden">
+                        <select
+                          className="rounded-xl p-2 text-xs bg-secondary-500 text-white"
+                          onChange={(e) => setSelectedDataset(e.target.value as any)}
+                          value={selectedDataset}
+                        >
+                          <option value="bmi">BMI</option>
+                          <option value="fatMass">Fat Mass</option>
+                          <option value="leanMass">Lean Mass</option>
+                          <option value="bodyFatPercentage">Body Fat Percentage</option>
+                          <option value="bodyWeight">Body Weight</option>
+                        </select>
+                      </div>
+                      <div className="hidden sm:block">
+                        <button
+                          className="rounded-xl sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
+                          style={{ backgroundColor: getColorForDataset('bmi') }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.backgroundColor = darkenColor(
+                              getColorForDataset('bmi')
+                            ))
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.backgroundColor = getColorForDataset('bmi'))
+                          }
+                          onClick={() => setSelectedDataset('bmi')}
+                        >
+                          BMI
+                        </button>
+                        <button
+                          className="rounded-xl sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
+                          style={{ backgroundColor: getColorForDataset('fatMass') }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.backgroundColor = darkenColor(
+                              getColorForDataset('fatMass')
+                            ))
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.backgroundColor = getColorForDataset('fatMass'))
+                          }
+                          onClick={() => setSelectedDataset('fatMass')}
+                        >
+                          Fat Mass
+                        </button>
+                        <button
+                          className="rounded-xl sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
+                          style={{ backgroundColor: getColorForDataset('leanMass') }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.backgroundColor = darkenColor(
+                              getColorForDataset('leanMass')
+                            ))
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.backgroundColor = getColorForDataset('leanMass'))
+                          }
+                          onClick={() => setSelectedDataset('leanMass')}
+                        >
+                          Lean Mass
+                        </button>
+                        <button
+                          className="rounded-xl sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
+                          style={{ backgroundColor: getColorForDataset('bodyFatPercentage') }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.backgroundColor = darkenColor(
+                              getColorForDataset('bodyFatPercentage')
+                            ))
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.backgroundColor =
+                              getColorForDataset('bodyFatPercentage'))
+                          }
+                          onClick={() => setSelectedDataset('bodyFatPercentage')}
+                        >
+                          Body Fat Percentage
+                        </button>
+                        <button
+                          className="rounded-xl sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
+                          style={{ backgroundColor: getColorForDataset('bodyWeight') }}
+                          onMouseOver={(e) =>
+                            (e.currentTarget.style.backgroundColor = darkenColor(
+                              getColorForDataset('bodyWeight')
+                            ))
+                          }
+                          onMouseOut={(e) =>
+                            (e.currentTarget.style.backgroundColor =
+                              getColorForDataset('bodyWeight'))
+                          }
+                          onClick={() => setSelectedDataset('bodyWeight')}
+                        >
+                          Body Weight
+                        </button>
+                      </div>
                     </div>
                     <Line data={chartData} options={options} />
                   </>
@@ -756,7 +788,7 @@ export default function Results() {
           <div className="bg-secondary-400 rounded-xl m-4 space-y-16 py-16 xl:space-y-20">
             <div>
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <h2 className="mx-auto max-w-2xl text-base font-semibold leading-6 text-gray-300 lg:mx-0 lg:max-w-none">
+                <h2 className="mx-auto text-center mb-2 max-w-2xl  text-base font-semibold leading-6 text-gray-300 lg:mx-0 lg:max-w-none">
                   Recent activity
                 </h2>
                 {!loading ? (
@@ -770,44 +802,38 @@ export default function Results() {
                         .map((item, index) => (
                           <div
                             key={index}
-                            className="bg-secondary-100 text-white"
-                            style={{
-                              borderRadius: '8px',
-                              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                              padding: '20px',
-                              marginBottom: '20px',
-                            }}
+                            className="bg-secondary-100  text-white rounded-lg shadow-md sm:p-5 p-2 mb-5"
                           >
-                            <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                              <strong>{item.timestamp}</strong>
-                            </p>
-                            <h2 style={{ fontSize: '18px', marginBottom: '10px' }}>
-                              <strong>{item.userId}</strong>
-                            </h2>
-                            <p style={{ fontSize: '16px', marginBottom: '5px 0' }}>
-                              BMI: {item.bodyBMI}
-                            </p>
-                            <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                              Body Lean Mass: {item.bodyLeanMass}
-                            </p>
-                            <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                              Body Fat Calculation: {item.bodyFatCalc}
-                            </p>
-                            <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                              Body Fat Mass: {item.bodyFatMass}
-                            </p>
-                            <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                              entryId: {item.entryId}
-                            </p>
-                            <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                              Weight: {item.weight}
-                            </p>
+                            <div className="space-y-2 sm:space-y-1">
+                              <p className="text-gray-200 text-xs sm:text-sm font-bold">
+                                {item.timestamp}
+                              </p>
+                              <h2 className="text-gray-200 text-xs sm:text-base font-bold mb-2">
+                                {item.userId}
+                              </h2>
+                              <p className="text-gray-200 text-xs sm:text-lg">
+                                BMI: {item.bodyBMI}
+                              </p>
+                              <p className="text-gray-200 text-xs sm:text-lg">
+                                Body Lean Mass: {item.bodyLeanMass}
+                              </p>
+                              <p className="text-gray-200 text-xs sm:text-lg">
+                                Body Fat Calculation: {item.bodyFatCalc}
+                              </p>
+                              <p className="text-gray-200 text-xs sm:text-lg">
+                                Body Fat Mass: {item.bodyFatMass}
+                              </p>
+                              <p className="text-gray-200 text-xs sm:text-lg">
+                                entryId: {item.entryId}
+                              </p>
+                              <p className="text-gray-200 text-xs sm:text-lg">
+                                Weight: {item.weight}
+                              </p>
+                            </div>
 
                             <Button
-                              onClick={() => {
-                                handleDelete(item.entryId)
-                              }}
-                              className="bg-red-600 text-gray-200 rounded shadow"
+                              onClick={() => handleDelete(item.entryId)}
+                              className="bg-red-600 text-gray-200 rounded shadow mt-4"
                             >
                               Delete
                             </Button>

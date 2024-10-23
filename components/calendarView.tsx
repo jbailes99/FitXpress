@@ -317,13 +317,13 @@ const CalendarView = () => {
   const renderCurrentDay = () => {
     const currentDay = format(daysOfWeek[currentDayIndex], 'EEEE')
     return (
-      <div className="day-card p-6 bg-gray-50 rounded-lg text-center">
-        <h2 className="text-2xl text-medium-purple-500 font-bold mb-2">{currentDay}</h2>
+      <div className="day-card p-4 sm:p-6 bg-gray-50 rounded-lg text-center w-full max-w-md mx-auto">
+        <h2 className="text-xl sm:text-2xl text-medium-purple-500 font-bold mb-2">{currentDay}</h2>
 
         <div className="mt-4">
           <label className="text-sm font-medium">Select Workout Category:</label>
           <select
-            className="p-2 border border-gray-300 rounded-md w-full mt-2"
+            className="p-2 border border-gray-300 rounded-md w-full mt-2 text-base"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -348,7 +348,7 @@ const CalendarView = () => {
               onChange={handleExerciseChange}
               isClearable={false} // Disable the clear button
               placeholder="Select Exercises"
-              className="w-full"
+              className="w-full text-base"
               components={{
                 MultiValue: SelectedValue,
                 MultiValueRemove: CustomMultiValueRemove, // Use the custom remove component
@@ -361,15 +361,15 @@ const CalendarView = () => {
         <div className="mt-6 flex justify-between">
           <button
             onClick={() => navigateDay('prev')}
-            className="bg-gray-300 text-gray-700 p-2 rounded-lg hover:bg-gray-400"
+            className="bg-gray-300 text-gray-700 p-2 rounded-lg hover:bg-gray-400 text-sm sm:text-base"
           >
-            ← Previous Day
+            ← Prev
           </button>
           <button
             onClick={() => navigateDay('next')}
-            className="bg-gray-300 text-gray-700 p-2 rounded-lg hover:bg-gray-400"
+            className="bg-gray-300 text-gray-700 p-2 rounded-lg hover:bg-gray-400 text-sm sm:text-base"
           >
-            Next Day →
+            Next →
           </button>
         </div>
       </div>
@@ -380,16 +380,13 @@ const CalendarView = () => {
     return (
       <div className="mt-8 bg-secondary-300 p-4 rounded-xl">
         <h3 className="text-xl text-gray-200 font-semibold mb-4">Weekly Plan</h3>
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
           {daysOfWeek.map((day, index) => {
             const dayName = format(day, 'EEEE')
             return (
-              <div
-                key={index}
-                className="border-0 p-6 rounded-md bg-white shadow-sm h-24 sm:h-42 md:h-40 lg:h-48 xl:h-64"
-              >
+              <div key={index} className="border-0 p-4 rounded-md bg-white shadow-sm min-h-[120px]">
                 <h4 className="font-medium">{dayName}</h4>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {selectedExercises[dayName]?.length ? (
                     selectedExercises[dayName].map((exercise, i) => (
                       <span
@@ -404,7 +401,7 @@ const CalendarView = () => {
                           className="ml-2 text-red-500"
                           title="Remove exercise"
                         >
-                          &times; {/* X icon */}
+                          &times;
                         </button>
                       </span>
                     ))
@@ -432,9 +429,9 @@ const CalendarView = () => {
 
   return (
     <div className="calendar-view">
-      <div className="bg-secondary-300 rounded-lg ">
-        <div className="p-6 w-1/2 mx-auto mt-4 rounded-lg">
-          <h2 className="text-2xl font-semibold text-gray-200 mb-4">
+      <div className="bg-secondary-300 rounded-lg">
+        <div className="p-4 sm:p-6 w-full sm:w-3/4 md:w-1/2 mx-auto mt-4 rounded-lg">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-200 mb-4">
             What do you want to call this plan?
           </h2>
           <div className="flex flex-col">
@@ -442,21 +439,21 @@ const CalendarView = () => {
               type="text"
               id="planName"
               value={planName}
-              onChange={(e) => setPlanName(e.target.value)} // Add this line
+              onChange={(e) => setPlanName(e.target.value)}
               placeholder="Enter a name for your workout plan"
-              className="p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base"
             />
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="flex justify-center">{renderCurrentDay()}</div>
           {renderWeeklyOverview()}
         </div>
-        <div className="px-4 pt-3  bg-secondary-400  rounded-t-xl inline-block">
+        <div className="px-4 pt-3 bg-secondary-400 rounded-t-xl inline-block w-full">
           <button
             onClick={handleSaveWeeklyPlan}
-            className="bg-medium-purple-500 text-white p-3 rounded-lg hover:bg-medium-purple-600"
+            className="bg-medium-purple-500 text-white p-3 rounded-lg hover:bg-medium-purple-600 w-full sm:w-auto text-base"
           >
             Save Weekly Plan
           </button>
@@ -484,9 +481,9 @@ const CalendarView = () => {
         ) : (
           weeklyPlans.map((plan) => (
             <div key={plan.entryId} className="bg-gray-100 p-4 mb-4 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-2">{plan.planName || 'Unnamed Plan'}</h3>{' '}
+              <h3 className="text-xl font-semibold mb-2">{plan.planName || 'Unnamed Plan'}</h3>
               <p className="text-sm text-gray-500 mb-2">{plan.timestamp}</p>
-              <div className="grid grid-cols-7 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(
                   (day) => (
                     <div key={day} className="border p-2 rounded-md bg-white shadow-sm">
@@ -507,10 +504,10 @@ const CalendarView = () => {
                   )
                 )}
               </div>
-              <div className="mt-4 flex justify-center space-x-24">
+              <div className="mt-4 flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-4">
                 <button
                   onClick={() => handleActivatePlan(plan.entryId)}
-                  className={`px-4 py-2 rounded-lg ${
+                  className={`px-4 py-2 rounded-lg w-full sm:w-auto ${
                     plan.isActive
                       ? 'bg-green-500 text-white'
                       : 'bg-indigo-600 text-white hover:bg-indigo-700'
@@ -518,7 +515,7 @@ const CalendarView = () => {
                   disabled={plan.isActive}
                 >
                   {plan.isActive ? (
-                    <span className="flex items-center">
+                    <span className="flex items-center justify-center">
                       <StarIcon className="w-6 h-6 mr-2 text-yellow-300" />
                       Active
                     </span>
@@ -528,7 +525,7 @@ const CalendarView = () => {
                 </button>
                 <button
                   onClick={() => handleDeletePlan(plan.entryId)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 w-full sm:w-auto"
                 >
                   Delete
                 </button>

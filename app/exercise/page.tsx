@@ -11,6 +11,7 @@ import { Button } from '@/components/button'
 import CalendarView from '@/components/calendarView'
 import { Spinner } from '@material-tailwind/react'
 import { Alert } from '@material-tailwind/react'
+import { Panel } from '@/components/panel'
 
 type ExerciseEntry = {
   entryId(entryId: any): unknown
@@ -244,23 +245,19 @@ const ExerciseTracker = () => {
         return (
           <>
             <div className="text-white">
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                Exercise Type: {item.exerciseType}
-              </p>
+              <p className="text-base text-white my-1">{item.timestamp}</p>
+              <p className="text-base text-white my-1">Exercise Type: {item.exerciseType}</p>
               {item.intensity && (
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>Intensity: {item.intensity}</p>
+                <p className="text-base text-white my-1">Intensity: {item.intensity}</p>
               )}
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>Time: {item.time}</p>
+              <p className="text-base text-white my-1">Time: {item.time}</p>
               {item.distance && (
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>Distance: {item.distance}</p>
+                <p className="text-base text-white my-1">Distance: {item.distance}</p>
               )}
               {item.additionalInfo && (
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                  Additional Info: {item.additionalInfo}
-                </p>
+                <p className="text-base my-1">Additional Info: {item.additionalInfo}</p>
               )}
-              <p className="text-medium-purple-300" style={{ fontSize: '24px', margin: '5px 0' }}>
+              <p className="text-medium-purple-300 text-2xl my-1">
                 {caloriesBurned !== null ? Math.round(caloriesBurned) : 'N/A'} calories burned
               </p>
               <Button
@@ -278,19 +275,13 @@ const ExerciseTracker = () => {
         return (
           <>
             <div className="text-white">
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
-
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                Exercise Type: {item.exerciseType}
-              </p>
-
-              {item.weight && (
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>Weight: {item.weight}</p>
-              )}
-              {item.reps && <p style={{ fontSize: '16px', margin: '5px 0' }}>Reps: {item.reps}</p>}
-              {item.sets && <p style={{ fontSize: '16px', margin: '5px 0' }}>Sets: {item.sets}</p>}
+              <p className="text-base text-white my-1">{item.timestamp}</p>
+              <p className="text-base text-white my-1">Exercise Type: {item.exerciseType}</p>
+              {item.weight && <p className="text-base text-white my-1">Weight: {item.weight}</p>}
+              {item.reps && <p className="text-base text-white my-1">Reps: {item.reps}</p>}
+              {item.sets && <p className="text-base text-white my-1">Sets: {item.sets}</p>}
               {item.additionalInfo && (
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>Comments: {item.additionalInfo}</p>
+                <p className="text-base my-1">Additional Info: {item.additionalInfo}</p>
               )}
               <Button
                 onClick={() => {
@@ -307,17 +298,11 @@ const ExerciseTracker = () => {
         return (
           <>
             <div className="text-white">
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
-
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                Exercise Type: {item.exerciseType}
-              </p>
-
-              {item.amount && (
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>Reps: {item.amount}</p>
-              )}
+              <p className="text-base text-white my-1">{item.timestamp}</p>
+              <p className="text-base text-white my-1">Exercise Type: {item.exerciseType}</p>
+              {item.amount && <p className="text-base text-white my-1">Reps: {item.amount}</p>}
               {item.additionalInfo && (
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>Comments: {item.additionalInfo}</p>
+                <p className="text-base my-1">Additional Info: {item.additionalInfo}</p>
               )}
               <Button
                 onClick={() => {
@@ -334,16 +319,11 @@ const ExerciseTracker = () => {
       default:
         return (
           <>
-            <div className="text-gray-200">
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
-
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                Exercise Type: {item.exerciseType}
-              </p>
+            <div className="text-white">
+              <p className="text-base text-white my-1">{item.timestamp}</p>
+              <p className="text-base text-white my-1">Exercise Type: {item.exerciseType}</p>
               {item.additionalInfo && (
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                  Additional Info: {item.additionalInfo}
-                </p>
+                <p className="text-base my-1">Additional Info: {item.additionalInfo}</p>
               )}
               <Button
                 onClick={() => {
@@ -368,183 +348,185 @@ const ExerciseTracker = () => {
         visible: { opacity: 1, y: 0 },
       }}
     >
-      <div>
-        <div className="flex flex-col justify-center items-center mb-4 ">
-          <div className="bg-secondary-400 p-12 rounded-xl mt-6 w-3/4 min-h-[60vh]">
-            <h1 className="text-6xl font-extrabold text-white mb-4 text-center ">
-              Exercise Tracker
-            </h1>
-            <div className="flex">
-              <div className="mt-12 text-black text-center justify-center items-center flex-grow w-1/2">
-                <h1 className="text-center text-white text-xl font-bold mb-2">Log an exercise</h1>
-                {/* Workout category dropdown */}
-                <div className="flex justify-center text-center ">
-                  <div className="w-3/4">
-                    <select
-                      className="mt-1 p-2 border border-gray-300 rounded-md w-full text-center"
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                      <option value="" disabled>
-                        Select a Workout Category
-                      </option>
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-
-                    {/* Exercise type dropdown */}
-                    {selectedCategory && exerciseTypes.length > 0 && (
+      <main>
+        <div className=" bg-secondary-400 mx-4 my-4  rounded-xl  relative isolate overflow-hidden ">
+          <div className="flex flex-col justify-center items-center mb-4 ">
+            <div className="bg-secondary-400 p-12 rounded-xl mt-6 w-3/4 min-h-[60vh]">
+              <h1 className="text-6xl font-extrabold text-white mb-4 text-center ">
+                Log an exercise
+              </h1>
+              <div className="flex">
+                <div className="mt-12 text-black text-center justify-center items-center flex-grow w-1/2">
+                  <h1 className="text-center text-white text-xl font-bold mb-2">Log an exercise</h1>
+                  {/* Workout category dropdown */}
+                  <div className="flex justify-center text-center ">
+                    <div className="w-3/4">
                       <select
-                        className="mt-1 p-2 border border-gray-300 rounded-md w-full"
-                        value={selectedExerciseType}
-                        onChange={(e) => setSelectedExerciseType(e.target.value)}
+                        className="mt-1 p-2 border border-gray-300 rounded-md w-full text-center"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
                       >
                         <option value="" disabled>
-                          Select an Exercise Type
+                          Select a Workout Category
                         </option>
-                        {exerciseTypes.map((type) => (
-                          <option key={type} value={type}>
-                            {type}
+                        {categories.map((category) => (
+                          <option key={category} value={category}>
+                            {category}
                           </option>
                         ))}
                       </select>
-                    )}
 
-                    {selectedCategory === 'Cardio' && selectedExerciseType && (
-                      <>
+                      {/* Exercise type dropdown */}
+                      {selectedCategory && exerciseTypes.length > 0 && (
                         <select
-                          className="mt-3 p-2 border border-gray-300 rounded-md w-full"
-                          value={newExerciseEntry.time}
-                          onChange={(e) =>
-                            setNewExerciseEntry({
-                              ...newExerciseEntry,
-                              time: e.target.value,
-                            })
-                          }
+                          className="mt-1 p-2 border border-gray-300 rounded-md w-full"
+                          value={selectedExerciseType}
+                          onChange={(e) => setSelectedExerciseType(e.target.value)}
                         >
-                          <option value="0">Select Duration</option>
-
-                          <option value="30">30 mins</option>
-                          <option value="60">1 hour</option>
-                          <option value="90">1 hour 30 mins</option>
-                          <option value="120">2 hours</option>
-                          <option value="150">2 hours 30 mins</option>
-                          <option value="180">3 hours</option>
-                          <option value="210">3 hours 30 mins</option>
-                          <option value="240">4 hours</option>
+                          <option value="" disabled>
+                            Select an Exercise Type
+                          </option>
+                          {exerciseTypes.map((type) => (
+                            <option key={type} value={type}>
+                              {type}
+                            </option>
+                          ))}
                         </select>
-                        <div className="mt-4 bg-white rounded-md pb-4">
-                          <h1 className="justify-center text-center font-bold mb-2">
-                            {' '}
-                            Select Level of Intensity{' '}
-                          </h1>
-                          <IntensitySelector
-                            selectedIntensity={newExerciseEntry.intensity}
-                            onChange={(intensity) =>
-                              setNewExerciseEntry({ ...newExerciseEntry, intensity })
+                      )}
+
+                      {selectedCategory === 'Cardio' && selectedExerciseType && (
+                        <>
+                          <select
+                            className="mt-3 p-2 border border-gray-300 rounded-md w-full"
+                            value={newExerciseEntry.time}
+                            onChange={(e) =>
+                              setNewExerciseEntry({
+                                ...newExerciseEntry,
+                                time: e.target.value,
+                              })
+                            }
+                          >
+                            <option value="0">Select Duration</option>
+
+                            <option value="30">30 mins</option>
+                            <option value="60">1 hour</option>
+                            <option value="90">1 hour 30 mins</option>
+                            <option value="120">2 hours</option>
+                            <option value="150">2 hours 30 mins</option>
+                            <option value="180">3 hours</option>
+                            <option value="210">3 hours 30 mins</option>
+                            <option value="240">4 hours</option>
+                          </select>
+                          <div className="mt-4 bg-white rounded-md pb-4">
+                            <h1 className="justify-center text-center font-bold mb-2">
+                              {' '}
+                              Select Level of Intensity{' '}
+                            </h1>
+                            <IntensitySelector
+                              selectedIntensity={newExerciseEntry.intensity}
+                              onChange={(intensity) =>
+                                setNewExerciseEntry({ ...newExerciseEntry, intensity })
+                              }
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      {selectedCategory === 'Bodyweight Exercises' && selectedExerciseType && (
+                        <>
+                          <input
+                            type="number"
+                            placeholder="Amount"
+                            className="mt-3 p-2 border border-gray-300 rounded-md w-full"
+                            value={
+                              newExerciseEntry.amount !== undefined ? newExerciseEntry.amount : ''
+                            }
+                            onChange={(e) =>
+                              setNewExerciseEntry({
+                                ...newExerciseEntry,
+                                amount: e.target.value ? Number(e.target.value) : undefined,
+                              })
                             }
                           />
-                        </div>
-                      </>
-                    )}
+                        </>
+                      )}
 
-                    {selectedCategory === 'Bodyweight Exercises' && selectedExerciseType && (
-                      <>
-                        <input
-                          type="number"
-                          placeholder="Amount"
-                          className="mt-3 p-2 border border-gray-300 rounded-md w-full"
-                          value={
-                            newExerciseEntry.amount !== undefined ? newExerciseEntry.amount : ''
-                          }
-                          onChange={(e) =>
-                            setNewExerciseEntry({
-                              ...newExerciseEntry,
-                              amount: e.target.value ? Number(e.target.value) : undefined,
-                            })
-                          }
-                        />
-                      </>
-                    )}
+                      {selectedCategory == 'Strength training' && selectedExerciseType && (
+                        <>
+                          <input
+                            type="text"
+                            placeholder="Weight"
+                            className="mt-3 p-2 border border-gray-300 rounded-md w-full"
+                            value={newExerciseEntry.weight}
+                            onChange={(e) =>
+                              setNewExerciseEntry({
+                                ...newExerciseEntry,
+                                weight: e.target.value,
+                              })
+                            }
+                          />
+                          <input
+                            type="text"
+                            placeholder="Reps"
+                            className="mt-3 p-2 border border-gray-300 rounded-md w-full"
+                            value={newExerciseEntry.reps}
+                            onChange={(e) =>
+                              setNewExerciseEntry({
+                                ...newExerciseEntry,
+                                reps: e.target.value,
+                              })
+                            }
+                          />
+                          <input
+                            type="text"
+                            placeholder="Sets"
+                            className="mt-3 p-2 border border-gray-300 rounded-md w-full"
+                            value={newExerciseEntry.sets}
+                            onChange={(e) =>
+                              setNewExerciseEntry({
+                                ...newExerciseEntry,
+                                sets: e.target.value,
+                              })
+                            }
+                          />
+                        </>
+                      )}
 
-                    {selectedCategory == 'Strength training' && selectedExerciseType && (
-                      <>
-                        <input
-                          type="text"
-                          placeholder="Weight"
-                          className="mt-3 p-2 border border-gray-300 rounded-md w-full"
-                          value={newExerciseEntry.weight}
-                          onChange={(e) =>
-                            setNewExerciseEntry({
-                              ...newExerciseEntry,
-                              weight: e.target.value,
-                            })
-                          }
-                        />
-                        <input
-                          type="text"
-                          placeholder="Reps"
-                          className="mt-3 p-2 border border-gray-300 rounded-md w-full"
-                          value={newExerciseEntry.reps}
-                          onChange={(e) =>
-                            setNewExerciseEntry({
-                              ...newExerciseEntry,
-                              reps: e.target.value,
-                            })
-                          }
-                        />
-                        <input
-                          type="text"
-                          placeholder="Sets"
-                          className="mt-3 p-2 border border-gray-300 rounded-md w-full"
-                          value={newExerciseEntry.sets}
-                          onChange={(e) =>
-                            setNewExerciseEntry({
-                              ...newExerciseEntry,
-                              sets: e.target.value,
-                            })
-                          }
-                        />
-                      </>
-                    )}
-
-                    {selectedCategory && selectedExerciseType && (
-                      <>
-                        <input
-                          type="text"
-                          placeholder="Additional Info"
-                          className="mt-3 p-2 border border-gray-300 rounded-md w-full"
-                          value={newExerciseEntry.additionalInfo}
-                          onChange={(e) =>
-                            setNewExerciseEntry({
-                              ...newExerciseEntry,
-                              additionalInfo: e.target.value,
-                            })
-                          }
-                        />
-                        <div className="mt-4 text-center">
-                          {/* Input fields for reps and additional info */}
-                          <button
-                            className="bg-medium-purple-400 rounded-md text-white px-4 py-2 pb-rounded hover:bg-medium-purple-600 mt-2"
-                            onClick={handleExerciseSubmit}
-                          >
-                            Log Exercise
-                          </button>
-                        </div>
-                      </>
-                    )}
-                    {showSuccessMessage && (
-                      <p className="text-green-500 text-sm mt-2">Successfully logged exercise</p>
-                    )}
+                      {selectedCategory && selectedExerciseType && (
+                        <>
+                          <input
+                            type="text"
+                            placeholder="Additional Info"
+                            className="mt-3 p-2 border border-gray-300 rounded-md w-full"
+                            value={newExerciseEntry.additionalInfo}
+                            onChange={(e) =>
+                              setNewExerciseEntry({
+                                ...newExerciseEntry,
+                                additionalInfo: e.target.value,
+                              })
+                            }
+                          />
+                          <div className="mt-4 text-center">
+                            {/* Input fields for reps and additional info */}
+                            <button
+                              className="bg-medium-purple-400 rounded-md text-white px-4 py-2 pb-rounded hover:bg-medium-purple-600 mt-2"
+                              onClick={handleExerciseSubmit}
+                            >
+                              Log Exercise
+                            </button>
+                          </div>
+                        </>
+                      )}
+                      {showSuccessMessage && (
+                        <p className="text-green-500 text-sm mt-2">Successfully logged exercise</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="relative w-3/4 mt-12">
+          <div className="relative w-3/4 mx-auto mt-12">
             <div aria-hidden="true" className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300" />
             </div>
@@ -554,15 +536,14 @@ const ExerciseTracker = () => {
               </span>
             </div>
           </div>
-
           {isLoading ? (
             <div className="flex items-center mt-2 justify-center">
               <Spinner color="purple" />
             </div>
           ) : exerciseEntries.length > 0 ? (
-            <div className="flex-grow w-1/2">
+            <div className="flex-grow mx-auto w-1/2">
               <div className="mt-12 justify-center text-center">
-                <div className="results-container">
+                <div className="results-container ">
                   {exerciseEntries
                     .sort((a, b) => {
                       const dateA = new Date(a.timestamp)
@@ -570,7 +551,7 @@ const ExerciseTracker = () => {
                       return dateB.getTime() - dateA.getTime()
                     })
                     .map((item) => (
-                      <div key={item.id} className="bg-secondary-400 mt-2 p-4 rounded-md mb-4">
+                      <div key={item.id} className="bg-secondary-500 mt-2 p-4 rounded-md mb-4">
                         {renderExerciseDetails(item)}
                       </div>
                     ))}
@@ -583,7 +564,7 @@ const ExerciseTracker = () => {
             </div>
           )}
         </div>
-      </div>
+      </main>
     </motion.div>
   )
 }
