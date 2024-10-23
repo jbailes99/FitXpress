@@ -8,11 +8,13 @@ export const Button = memo(function Button({
   className,
   rounded,
   shadow,
+  color,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string
   rounded?: boolean
   shadow?: boolean
+  color?: 'primary' | 'secondary' | 'default'
 }) {
   return (
     <MaterialButton
@@ -24,6 +26,7 @@ export const Button = memo(function Button({
           'shadow-lg': shadow,
         }
       )}
+      color="purple"
       onClick={onClick}
       {...props}
     >
