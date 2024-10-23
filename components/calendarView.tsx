@@ -450,10 +450,10 @@ const CalendarView = () => {
           <div className="flex justify-center">{renderCurrentDay()}</div>
           {renderWeeklyOverview()}
         </div>
-        <div className="px-4 pt-3 bg-secondary-400 rounded-t-xl inline-block w-full">
+        <div className="sm:px-4 sm:pt-3 pt-1 px-2 bg-secondary-400 rounded-t-xl inline-block sm:w-4.5 ">
           <button
             onClick={handleSaveWeeklyPlan}
-            className="bg-medium-purple-500 text-white p-3 rounded-lg hover:bg-medium-purple-600 w-full sm:w-auto text-base"
+            className="bg-medium-purple-500 text-white sm:p-3 rounded-lg hover:bg-medium-purple-600 w-full p-1 sm:w-auto sm:text-base text-xs"
           >
             Save Weekly Plan
           </button>
