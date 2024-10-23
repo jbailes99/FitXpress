@@ -136,6 +136,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
           {/* Nickname input */}
           <div className="mb-4 w-3/4 mx-auto">
             <Input
+              crossOrigin={undefined}
               type="text"
               label="Nickname"
               onChange={(e) => setCredentials({ ...credentials, nickname: e.target.value })}
@@ -147,6 +148,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
           {/* Username input */}
           <div className="mb-4 w-3/4 mx-auto">
             <Input
+              crossOrigin={undefined}
               type="text"
               label="Username"
               onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
@@ -158,6 +160,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
           {/* Password input */}
           <div className="mb-4 w-3/4 mx-auto">
             <Input
+              crossOrigin={undefined}
               type="password"
               label="Password"
               onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
@@ -204,6 +207,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
           {/* Email input */}
           <div className="mb-4 w-3/4 mx-auto">
             <Input
+              crossOrigin={undefined}
               type="email"
               label="Email"
               onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
@@ -244,6 +248,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
           {/* Weight input */}
           <div className="mb-4 w-3/4 mx-auto">
             <Input
+              crossOrigin={undefined}
               type="text"
               label="Weight"
               onChange={(e) => setCredentials({ ...credentials, weight: e.target.value })}

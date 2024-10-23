@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 'use client'
 import React, { Fragment, useEffect, useState } from 'react'
 import { api } from '@/lib/api'
@@ -310,7 +309,7 @@ const BmiCalculator: React.FC = () => {
 
   return (
     <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
-      {isLoggedIn && !isAdmin && (
+      {isLoggedIn && !isAdmin ? (
         <Panel className="text-center mx-4 mt-4 rounded-2xl shadow-2xl  sm:hidden block">
           <p className="text-md md:text-lg lg:text-2xl text-gray-200 ">
             Welcome back, <span className="text-medium-purple-300">{userDetails.nickname}</span>
@@ -318,7 +317,9 @@ const BmiCalculator: React.FC = () => {
           {weeklyPlan && (
             <div className="mt-6 md:mt-8 p-4 md:p-6">
               <div className="flex items-center mb-4">
-                <h1 className="text-xl md:text-2xl font-bold text-gray-100">Today's Exercises</h1>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-100">
+                  Today&apos;s Exercises
+                </h1>
               </div>
               <ul className="mt-4 space-y-2">
                 {dailyExercises.length > 0 ? (
@@ -353,7 +354,7 @@ const BmiCalculator: React.FC = () => {
             </div>
           )}
         </Panel>
-      )}
+      ) : null}
       <div className=" flex flex-col justify-center items-center min-h-screen overflow-x-hidden ">
         <div className="w-full lg:grid lg:grid-cols-3 lg:px-12 px-4  lg:space-x-8 lg:space-y-0">
           <div className="col-span-2 ">
@@ -393,6 +394,7 @@ const BmiCalculator: React.FC = () => {
                               value={age}
                               autoComplete="off"
                               onChange={(e: any) => handleNumberInputChange(e.target.value, setAge)}
+                              crossOrigin={undefined}
                             />
                           </div>
                           <div className="flex-1 flex-col space-y-7">
@@ -439,6 +441,7 @@ const BmiCalculator: React.FC = () => {
                                 onChange={(e: any) =>
                                   handleNumberInputChange(e.target.value, setWeight)
                                 }
+                                crossOrigin={undefined}
                               />
                               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                                 {isLoggedIn && (
@@ -493,6 +496,7 @@ const BmiCalculator: React.FC = () => {
                                 handleFeetInputChange(e.target.value, setHeight)
                               }
                               className="placeholder-gray-400 placeholder-opacity-50 h-14"
+                              crossOrigin={undefined}
                             />
                           </div>
                         </div>
@@ -511,6 +515,7 @@ const BmiCalculator: React.FC = () => {
                               onChange={(e: any) =>
                                 handleNumberInputChange(e.target.value, setNeckMeasurement)
                               }
+                              crossOrigin={undefined}
                             />
                           </div>
 
@@ -528,6 +533,7 @@ const BmiCalculator: React.FC = () => {
                               onChange={(e: any) =>
                                 handleNumberInputChange(e.target.value, setWaistMeasurement)
                               }
+                              crossOrigin={undefined}
                             />
                           </div>
                           {gender == 'female' && (
@@ -545,6 +551,7 @@ const BmiCalculator: React.FC = () => {
                                 onChange={(e: any) =>
                                   handleNumberInputChange(e.target.value, setHipMeasurement)
                                 }
+                                crossOrigin={undefined}
                               />
                             </div>
                           )}
@@ -733,7 +740,11 @@ const BmiCalculator: React.FC = () => {
                             )}
                             {loader && (
                               <div className="flex items-center mt-2 justify-center">
-                                <Spinner className="h-8 w-8 text-medium-purple-500" />
+                                <Spinner
+                                  className="h-8 w-8 text-purple-500"
+                                  onPointerEnterCapture={undefined}
+                                  onPointerLeaveCapture={undefined}
+                                />{' '}
                               </div>
                             )}
                             {showAlert && (
@@ -788,7 +799,7 @@ const BmiCalculator: React.FC = () => {
                   <div className="mt-6 md:mt-8 p-4 md:p-6">
                     <div className="flex items-center mb-4">
                       <h1 className="text-xl md:text-2xl font-bold text-gray-100">
-                        Today's Exercises
+                        Today&apos;s Exercises
                       </h1>
                     </div>
                     <ul className="mt-4 space-y-2">
@@ -1015,7 +1026,7 @@ const BmiCalculator: React.FC = () => {
               ) : (
                 <>
                   <p className="text-gray-200  font-semibold text-2xl text-center">
-                    Don't have a weekly plan yet?
+                    Don&apos;t have a weekly plan yet?
                   </p>
                   <p className="text-gray-200 text-sm text-center">Go create or make one active.</p>
                 </>

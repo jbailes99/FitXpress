@@ -538,7 +538,11 @@ const ExerciseTracker = () => {
           </div>
           {isLoading ? (
             <div className="flex items-center mt-2 justify-center">
-              <Spinner className="h-8 w-8 text-medium-purple-500" />
+              <Spinner
+                className="h-8 w-8 text-medium-purple-500"
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+              />
             </div>
           ) : exerciseEntries.length > 0 ? (
             <div className="flex-grow mx-auto w-1/2">

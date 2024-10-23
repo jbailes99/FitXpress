@@ -8,6 +8,10 @@ export interface AuthState {
 }
 
 const getInitialState = () => {
+  if (typeof window === 'undefined') {
+    return {}
+  }
+
   try {
     const storedTokens = localStorage.getItem('auth:tokens')
 
@@ -28,15 +32,20 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     logout: () => {
-      localStorage.removeItem('auth:tokens')
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('auth:tokens')
+      }
       return {}
     },
     setAuth: (state, action: PayloadAction<AuthState>) => {
       // Store tokens in locat storage
-      try {
-        localStorage.setItem('auth:tokens', JSON.stringify(action.payload))
-      } catch (err) {
-        console.error('Error storing tokens:', err)
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('auth:tokens', JSON.stringify(action.payload))
+        } catch (err) {
+          console.error('Error storing tokens:', err)
+        }
       }
 
       return action.payload

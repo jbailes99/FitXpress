@@ -1,5 +1,6 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import { useState, useEffect } from 'react'
 import { Panel } from '@/components/panel'
 import { api } from '@/lib/api'
 
