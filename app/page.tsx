@@ -1045,57 +1045,49 @@ const BmiCalculator: React.FC = () => {
               </h1> */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {isLoggedIn ? (
-                  <Link href="/exercise">
-                    <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 cursor-pointer hover:bg-secondary-500">
-                      <div className="flex justify-center space-x-4 ">
-                        <ClockIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
-                        <h2 className="text-2xl font-bold  text-gray-100 mb-4">
-                          Track Your Exercises
-                        </h2>
+                  <Link href="/exercise" className="block h-full">
+                    <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 cursor-pointer hover:bg-secondary-500 h-full flex flex-col">
+                      <div className="flex justify-center space-x-4 mb-4">
+                        <ClockIcon className="h-10 w-10 text-medium-purple-300" />
+                        <h2 className="text-2xl font-bold text-gray-100">Track Your Exercises</h2>
                       </div>
-                      <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                      <p className="text-medium-purple-300 font-medium w-3/4 mx-auto flex-grow">
                         Monitor your workouts and log your exercises to keep track of your progress.
                       </p>
                     </div>
                   </Link>
                 ) : (
-                  <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
-                    <div className="flex justify-center space-x-4 ">
-                      <ClockIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
-                      <h2 className="text-2xl font-bold  text-gray-100 mb-4">
-                        Track Your Exercises
-                      </h2>
+                  <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 h-full flex flex-col">
+                    <div className="flex justify-center space-x-4 mb-4">
+                      <ClockIcon className="h-10 w-10 text-medium-purple-300" />
+                      <h2 className="text-2xl font-bold text-gray-100">Track Your Exercises</h2>
                     </div>
-                    <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                    <p className="text-medium-purple-300 font-medium w-3/4 mx-auto flex-grow">
                       Monitor your workouts and log your exercises to keep track of your progress.
                     </p>
                   </div>
                 )}
 
                 {isLoggedIn ? (
-                  <Link href="/results">
-                    <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 cursor-pointer hover:bg-secondary-500">
-                      <div className="flex justify-center space-x-4 ">
-                        <ChartBarIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
-                        <h2 className="text-2xl font-bold text-gray-100 mb-4">
-                          Monitor Body Metrics
-                        </h2>
+                  <Link href="/results" className="block h-full">
+                    <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 cursor-pointer hover:bg-secondary-500 h-full flex flex-col">
+                      <div className="flex justify-center space-x-4 mb-4">
+                        <ChartBarIcon className="h-10 w-10 text-medium-purple-300" />
+                        <h2 className="text-2xl font-bold text-gray-100">Monitor Body Metrics</h2>
                       </div>
-                      <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                      <p className="text-medium-purple-300 font-medium w-3/4 mx-auto flex-grow">
                         Keep track of your body metrics and weight loss journey with detailed
                         reports and analytics.
                       </p>
                     </div>
                   </Link>
                 ) : (
-                  <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
-                    <div className="flex justify-center space-x-4 ">
-                      <ChartBarIcon className="h-10 w-10  text-medium-purple-300 mb-4" />
-                      <h2 className="text-2xl font-bold text-gray-100 mb-4">
-                        Monitor Body Metrics
-                      </h2>
+                  <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 h-full flex flex-col">
+                    <div className="flex justify-center space-x-4 mb-4">
+                      <ChartBarIcon className="h-10 w-10 text-medium-purple-300" />
+                      <h2 className="text-2xl font-bold text-gray-100">Monitor Body Metrics</h2>
                     </div>
-                    <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                    <p className="text-medium-purple-300 font-medium w-3/4 mx-auto flex-grow">
                       Keep track of your body metrics and weight loss journey with detailed reports
                       and analytics.
                     </p>
@@ -1103,29 +1095,29 @@ const BmiCalculator: React.FC = () => {
                 )}
 
                 {isLoggedIn ? (
-                  <Link href="/weeklyPlanner">
-                    <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 cursor-pointer hover:bg-secondary-500">
-                      <div className="flex justify-center space-x-4 ">
-                        <CalendarIcon className="h-10 w-10 text-medium-purple-300 mb-4" />
-                        <h2 className="text-2xl font-bold text-gray-100 mb-4">
+                  <Link href="/weeklyPlanner" className="block h-full">
+                    <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 cursor-pointer hover:bg-secondary-500 h-full flex flex-col">
+                      <div className="flex justify-center space-x-4 mb-4">
+                        <CalendarIcon className="h-10 w-10 text-medium-purple-300" />
+                        <h2 className="text-2xl font-bold text-gray-100">
                           Make Weekly Workout Plans
                         </h2>
                       </div>
-                      <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                      <p className="text-medium-purple-300 font-medium w-3/4 mx-auto flex-grow">
                         Create and customize your weekly workout plans to stay organized and
                         motivated.
                       </p>
                     </div>
                   </Link>
                 ) : (
-                  <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300">
-                    <div className="flex justify-center space-x-4 ">
-                      <CalendarIcon className="h-10 w-10 text-medium-purple-300 mb-4" />
-                      <h2 className="text-2xl font-bold text-gray-100 mb-4">
+                  <div className="bg-secondary-400 p-8 rounded-xl shadow-lg transition-colors duration-300 h-full flex flex-col">
+                    <div className="flex justify-center space-x-4 mb-4">
+                      <CalendarIcon className="h-10 w-10 text-medium-purple-300" />
+                      <h2 className="text-2xl font-bold text-gray-100">
                         Make Weekly Workout Plans
                       </h2>
                     </div>
-                    <p className="text-medium-purple-300 font-medium w-3/4 mx-auto">
+                    <p className="text-medium-purple-300 font-medium w-3/4 mx-auto flex-grow">
                       Create and customize your weekly workout plans to stay organized and
                       motivated.
                     </p>
