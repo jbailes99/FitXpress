@@ -481,7 +481,11 @@ const CalendarView = () => {
       <div className="p-4">
         {isLoading ? (
           <div className="flex items-center mt-2 justify-center">
-            <Spinner color="purple" />
+            <Spinner
+              className="h-8 w-8 text-purple-500"
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+            />{' '}
           </div>
         ) : weeklyPlans.length === 0 ? (
           <p>No weekly plans available.</p>

@@ -59,14 +59,16 @@ export async function getUserDetails(accessToken) {
 
     // Modify the return statement based on the structure of your user details
     return {
-      email: response?.UserAttributes?.find(attr => attr.Name === 'email')?.Value || '',
-      nickname: response?.UserAttributes?.find(attr => attr.Name === 'nickname')?.Value || '',
-      sex: response?.UserAttributes?.find(attr => attr.Name === 'custom:sex')?.Value || '',
-      age: response?.UserAttributes?.find(attr => attr.Name === 'custom:age1')?.Value || '',
-      weight: response?.UserAttributes?.find(attr => attr.Name === 'custom:weight1')?.Value || '',
+      email: response?.UserAttributes?.find((attr) => attr.Name === 'email')?.Value || '',
+      nickname: response?.UserAttributes?.find((attr) => attr.Name === 'nickname')?.Value || '',
+      sex: response?.UserAttributes?.find((attr) => attr.Name === 'custom:sex')?.Value || '',
+      age: response?.UserAttributes?.find((attr) => attr.Name === 'custom:age1')?.Value || '',
+      weight: response?.UserAttributes?.find((attr) => attr.Name === 'custom:weight1')?.Value || '',
       username: response?.Username || '',
 
-      isAdmin: response?.UserAttributes?.find(attr => attr.Name === 'custom:isAdmin' && attr.Value === 'true')
+      isAdmin: response?.UserAttributes?.find(
+        (attr) => attr.Name === 'custom:isAdmin' && attr.Value === 'true'
+      )
         ? true
         : false,
     }
@@ -76,7 +78,10 @@ export async function getUserDetails(accessToken) {
   }
 }
 
-export async function updateUserDetails(accessToken: string, updatedUserData: { [key: string]: string }) {
+export async function updateUserDetails(
+  accessToken: string,
+  updatedUserData: { [key: string]: string }
+) {
   try {
     const params = {
       AccessToken: accessToken,
@@ -95,10 +100,16 @@ export async function updateUserDetails(accessToken: string, updatedUserData: { 
 const STORAGE_KEY = 'auth:tokens' // You can replace 'myAppTokens' with any string you like
 
 export function storeTokens(tokens) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens))
+  }
 }
 
 export function getStoredTokens() {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
   const storedTokens = localStorage.getItem(STORAGE_KEY)
   return storedTokens ? JSON.parse(storedTokens) : null
 }
@@ -119,7 +130,11 @@ export async function signIn(username, password) {
 
   if (result) {
     store.dispatch(
-      setAuth({ accessToken: result.AccessToken, refreshToken: result.RefreshToken, idToken: result.IdToken })
+      setAuth({
+        accessToken: result.AccessToken,
+        refreshToken: result.RefreshToken,
+        idToken: result.IdToken,
+      })
     )
 
     refreshUserDetails(result.AccessToken!)
@@ -134,6 +149,10 @@ export async function refreshUserDetails(accessToken: string) {
 }
 
 export function getCurrentTokens() {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
   const storedTokens = localStorage.getItem(STORAGE_KEY)
   return storedTokens ? JSON.parse(storedTokens) : null
 }
@@ -171,7 +190,11 @@ export async function signOut() {
     console.log('Sign-out response:', response)
 
     // Clear stored tokens after sign-out
-    localStorage.removeItem(STORAGE_KEY)
+
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEY)
+    }
+
     store.dispatch(logout())
     store.dispatch(clearUser())
     return response

@@ -372,7 +372,11 @@ export default function Results() {
             <span className={`text-${value < 0 ? 'green' : 'red'}-500`}>{value.toFixed(2)}%</span>
           ) : (
             <div className="flex items-center mt-2 justify-center">
-              <Spinner className="h-8 w-8 text-purple-500" />
+              <Spinner
+                className="h-8 w-8 text-purple-500"
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+              />
             </div>
           )}
         </div>
@@ -868,7 +872,11 @@ export default function Results() {
                   </div>
                 ) : (
                   <div className="flex items-center mt-2 justify-center">
-                    <Spinner className="h-8 w-8 text-purple-500" />
+                    <Spinner
+                      className="h-8 w-8 text-purple-500"
+                      onPointerEnterCapture={undefined}
+                      onPointerLeaveCapture={undefined}
+                    />
                   </div>
                 )}
               </div>

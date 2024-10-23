@@ -111,6 +111,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose }) => {
                 label="Username"
                 onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
                 value={credentials.username}
+                crossOrigin={undefined}
               />
             </div>
             <div className="mb-4 sm:w-1/2 ">
@@ -119,6 +120,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose }) => {
                 label="Password"
                 onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
                 value={credentials.password}
+                crossOrigin={undefined}
               />
             </div>
           </div>
