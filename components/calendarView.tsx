@@ -321,9 +321,11 @@ const CalendarView = () => {
         <h2 className="text-xl sm:text-2xl text-medium-purple-500 font-bold mb-2">{currentDay}</h2>
 
         <div className="mt-4">
-          <label className="text-sm font-medium">Select Workout Category:</label>
+          <label className="text-sm font-medium text-secondary-400 ">
+            Select Workout Category:
+          </label>
           <select
-            className="p-2 border border-gray-300 rounded-md w-full mt-2 text-base"
+            className="p-2 border text-secondary-400 border-gray-300 rounded-md w-full mt-2 text-base"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
@@ -338,7 +340,9 @@ const CalendarView = () => {
 
         {selectedCategory && (
           <div className="mt-4">
-            <label className="block text-sm font-medium mb-2">Select Exercise Type:</label>
+            <label className="block text-sm font-medium text-secondary-400 mb-2">
+              Select Exercise Type:
+            </label>
             <Select
               options={exerciseTypes}
               isMulti
@@ -348,7 +352,7 @@ const CalendarView = () => {
               onChange={handleExerciseChange}
               isClearable={false} // Disable the clear button
               placeholder="Select Exercises"
-              className="w-full text-base"
+              className="w-full text-base text-secondary-400"
               components={{
                 MultiValue: SelectedValue,
                 MultiValueRemove: CustomMultiValueRemove, // Use the custom remove component
@@ -378,13 +382,16 @@ const CalendarView = () => {
 
   const renderWeeklyOverview = () => {
     return (
-      <div className="mt-8 bg-secondary-300 p-4 rounded-xl">
+      <div className="mt-8 bg-secondary-300 p-4  rounded-xl">
         <h3 className="text-xl text-gray-200 font-semibold mb-4">Weekly Plan</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
+        <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
           {daysOfWeek.map((day, index) => {
             const dayName = format(day, 'EEEE')
             return (
-              <div key={index} className="border-0 p-4 rounded-md bg-white shadow-sm min-h-[120px]">
+              <div
+                key={index}
+                className="border-0 p-4 rounded-md text-secondary-400 bg-white shadow-sm min-h-[120px]"
+              >
                 <h4 className="font-medium">{dayName}</h4>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {selectedExercises[dayName]?.length ? (
@@ -441,7 +448,7 @@ const CalendarView = () => {
               value={planName}
               onChange={(e) => setPlanName(e.target.value)}
               placeholder="Enter a name for your workout plan"
-              className="p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base"
+              className="p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 text-secondary-400 focus:ring-medium-purple-500 text-base"
             />
           </div>
         </div>
@@ -453,7 +460,7 @@ const CalendarView = () => {
         <div className="sm:px-4 sm:pt-3 pt-1 px-2 bg-secondary-400 rounded-t-xl inline-block sm:w-4.5 ">
           <button
             onClick={handleSaveWeeklyPlan}
-            className="bg-medium-purple-500 text-white sm:p-3 rounded-lg hover:bg-medium-purple-600 w-full p-1 sm:w-auto sm:text-base text-xs"
+            className="bg-medium-purple-500 text-white sm:p-3 rounded-lg  hover:bg-medium-purple-600 w-full p-1 sm:w-auto sm:text-base text-xs"
           >
             Save Weekly Plan
           </button>
@@ -481,9 +488,11 @@ const CalendarView = () => {
         ) : (
           weeklyPlans.map((plan) => (
             <div key={plan.entryId} className="bg-gray-100 p-4 mb-4 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold mb-2">{plan.planName || 'Unnamed Plan'}</h3>
+              <h3 className="text-xl text-secondary-400 font-semibold mb-2">
+                {plan.planName || 'Unnamed Plan'}
+              </h3>
               <p className="text-sm text-gray-500 mb-2">{plan.timestamp}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 text-secondary-400 md:grid-cols-3 lg:grid-cols-7 gap-2">
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(
                   (day) => (
                     <div key={day} className="border p-2 rounded-md bg-white shadow-sm">
