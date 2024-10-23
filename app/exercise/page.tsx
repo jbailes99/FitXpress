@@ -538,7 +538,7 @@ const ExerciseTracker = () => {
           </div>
           {isLoading ? (
             <div className="flex items-center mt-2 justify-center">
-              <Spinner color="purple" />
+              <Spinner className="h-8 w-8 text-medium-purple-500" />
             </div>
           ) : exerciseEntries.length > 0 ? (
             <div className="flex-grow mx-auto w-1/2">

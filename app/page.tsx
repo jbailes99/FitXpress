@@ -733,7 +733,7 @@ const BmiCalculator: React.FC = () => {
                             )}
                             {loader && (
                               <div className="flex items-center mt-2 justify-center">
-                                <Spinner color="purple" />
+                                <Spinner className="h-8 w-8 text-medium-purple-500" />
                               </div>
                             )}
                             {showAlert && (
