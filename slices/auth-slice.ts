@@ -27,6 +27,10 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    logout: () => {
+      localStorage.removeItem('auth:tokens')
+      return {}
+    },
     setAuth: (state, action: PayloadAction<AuthState>) => {
       // Store tokens in locat storage
       try {
@@ -42,5 +46,5 @@ export const authSlice = createSlice({
 
 export const {
   reducer: authReducer,
-  actions: { setAuth },
+  actions: { setAuth, logout },
 } = authSlice

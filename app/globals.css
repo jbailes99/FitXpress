@@ -9,17 +9,57 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 209, 213, 219;       /* Purple foreground color */
+    --foreground-rgb: 209, 213, 219; /* Purple foreground color */
     --background-rgb: 209, 213, 219; /* Purple background start color */
   }
 }
 
 @import '~@fortawesome/fontawesome-free/css/all.min.css';
 
+.bg-background {
+  @apply bg-[#1f2937];
+}
 
 body {
-  @apply bg-gray-800;
+  @apply bg-[#1f2937];
   color: rgb(var(--foreground-rgb));
+}
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  flex-direction: column;
+  background-color: #f0f0f0;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active  {
+  transition: background-color 5000s;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #3498db; /* Customize your color */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+p {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  color: #333;
 }
 
 .intensity-selector {
@@ -45,7 +85,7 @@ body {
 
 .intensity-option.selected {
   transform: scale(1.2);
-  background-color: #ff6b6b;
+  background-color: #9657d6b3;
   color: white;
 }
 
@@ -54,9 +94,8 @@ body {
   font-size: 14px;
 }
 
-
 .outline-container {
-  border: 4px solid ; /* Increase border thickness */
+  border: 4px solid; /* Increase border thickness */
   padding: 10px; /* Add padding to maintain space between content and the border */
 }
 /* globals.css */
@@ -67,7 +106,7 @@ body {
 }
 
 .before-hover-animation::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -83,7 +122,6 @@ body {
   width: 100%; /* Make the gradient fill the width on hover */
   opacity: 1; /* Make the gradient visible on hover */
 }
-
 
 /* Add this to your CSS file or a <style> block */
 

@@ -11,8 +11,8 @@ const intensityLevels = [
 
 const IntensitySelector = ({ selectedIntensity, onChange }) => {
   return (
-    <div className='intensity-selector'>
-      {intensityLevels.map(level => (
+    <div className="intensity-selector">
+      {intensityLevels.map((level) => (
         <motion.div
           key={level.value}
           className={`intensity-option ${selectedIntensity === level.value ? 'selected' : ''}`}
@@ -21,7 +21,7 @@ const IntensitySelector = ({ selectedIntensity, onChange }) => {
           whileTap={{ scale: 0.9 }}
         >
           {level.icon}
-          <span className='label'>{level.label}</span>
+          <span className="label">{level.label}</span>
         </motion.div>
       ))}
     </div>
