@@ -488,7 +488,7 @@ const CalendarView = () => {
             />{' '}
           </div>
         ) : weeklyPlans.length === 0 ? (
-          <p>No weekly plans available.</p>
+          <p className="text-gray-200">You do not have any plans yet.</p>
         ) : (
           weeklyPlans.map((plan) => (
             <div key={plan.entryId} className="bg-gray-100 p-4 mb-4 rounded-lg shadow-md">

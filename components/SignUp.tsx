@@ -127,7 +127,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose }) => {
         size="xs"
         open={open}
         handler={handleSignUpClose}
-        className="bg-secondary-500 outline outline-medium-purple-500/70  bg-opacity-90"
+        className="bg-secondary-500 outline outline-medium-purple-500/70 bg-opacity-90 max-h-[90vh] overflow-y-auto"
       >
         <DialogHeader className="text-center text-gray-300 flex justify-center items-center">
           Sign Up
