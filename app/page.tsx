@@ -1014,7 +1014,11 @@ const BmiCalculator: React.FC = () => {
             >
               {isLoadingPlan ? (
                 <div className="flex justify-center items-center h-40">
-                  <Spinner className="h-12 w-12 text-medium-purple-500" />
+                  <Spinner
+                    className="h-12 w-12 text-medium-purple-500"
+                    onPointerEnterCapture={undefined}
+                    onPointerLeaveCapture={undefined}
+                  />
                 </div>
               ) : weeklyPlan ? (
                 <>
@@ -1061,7 +1065,7 @@ const BmiCalculator: React.FC = () => {
               ) : (
                 <div className="text-center py-8">
                   <p className="text-gray-200 font-semibold text-2xl mb-2">
-                    Don't have an active weekly plan yet?
+                    Don&apos;t have an active weekly plan yet?
                   </p>
                   <p className="text-gray-200 text-sm mb-4">
                     Go to the Weekly Planner to create or activate a plan.
