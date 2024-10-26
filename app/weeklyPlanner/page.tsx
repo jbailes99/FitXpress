@@ -17,7 +17,7 @@ const WeeklyPlanner: React.FC = () => {
             <div>
               <div className="flex flex-col justify-center items-center mb-4 "></div>
               <div className="flex flex-col justify-center items-center">
-                <div className=" rounded-xl p-4 font-bold text-center w-11/12 mb-4">
+                <div className=" rounded-xl sm:p-4 font-bold text-center sm:w-11/12 mb-4">
                   <CalendarView />
                 </div>
               </div>

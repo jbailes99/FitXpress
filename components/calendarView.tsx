@@ -390,7 +390,7 @@ const CalendarView = () => {
             return (
               <div
                 key={index}
-                className="border-0 p-4 rounded-md text-secondary-400 bg-white shadow-sm min-h-[240px]"
+                className="border-0 p-4 rounded-md text-secondary-400 bg-white shadow-sm sm:min-h-[240px]"
               >
                 <h4 className="font-medium">{dayName}</h4>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -436,8 +436,10 @@ const CalendarView = () => {
 
   return (
     <div className="calendar-view">
-      <div className="bg-secondary-400 outline outline-medium-purple-500 rounded-lg">
-        <div className="bg-medium-purple-500 text-gray-200 text-2xl p-3">Create a Weekly Plan</div>
+      <div className="bg-secondary-400 sm:outline sm:outline-medium-purple-500 rounded-lg">
+        <div className="bg-medium-purple-500 rounded-tl-md rounded-tr-md text-gray-200 text-2xl p-3">
+          Create a Weekly Plan
+        </div>
         <div className="p-4 sm:p-6 w-full sm:w-3/4 md:w-1/2 mx-auto mt-4 rounded-lg">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-200 mb-4">
             What do you want to call this plan?

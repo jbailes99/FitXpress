@@ -351,8 +351,8 @@ const ExerciseTracker = () => {
       <main>
         <div className="  mx-4 my-4  rounded-xl  relative isolate overflow-hidden ">
           <div className="flex flex-col justify-center items-center mb-4 ">
-            <div className="bg-secondary-400 outline outline-medium-purple-500 rounded-xl mt-6 w-11/12 min-h-[60vh]">
-              <div className="bg-medium-purple-500 text-gray-200 text-2xl p-3 text-center font-bold ">
+            <div className="bg-secondary-400 sm:outline sm:outline-medium-purple-500 rounded-xl mt-6 w-full sm:w-11/12 min-h-[60vh]">
+              <div className="bg-medium-purple-500 text-gray-200 rounded-tl-lg rounded-tr-lg text-2xl p-3 text-center font-bold ">
                 Log Exercises
               </div>
 
@@ -548,7 +548,7 @@ const ExerciseTracker = () => {
               />
             </div>
           ) : exerciseEntries.length > 0 ? (
-            <div className="flex-grow mx-auto w-1/2">
+            <div className="flex-grow mx-auto sm:w-1/2">
               <div className="mt-12 justify-center text-center">
                 <div className="results-container ">
                   {exerciseEntries
