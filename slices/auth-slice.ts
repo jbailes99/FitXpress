@@ -38,7 +38,7 @@ export const authSlice = createSlice({
       return {}
     },
     setAuth: (state, action: PayloadAction<AuthState>) => {
-      // Store tokens in locat storage
+      // Store tokens in local storage
 
       if (typeof window !== 'undefined') {
         try {

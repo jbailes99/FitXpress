@@ -382,15 +382,15 @@ const CalendarView = () => {
 
   const renderWeeklyOverview = () => {
     return (
-      <div className="mt-8 bg-secondary-300 p-4  rounded-xl">
-        <h3 className="text-xl text-gray-200 font-semibold mb-4">Weekly Plan</h3>
+      <div className="mt-8  p-6  rounded-xl">
+        <h3 className="text-xl text-gray-200 font-semibold mb-4">Plan Overview</h3>
         <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-2">
           {daysOfWeek.map((day, index) => {
             const dayName = format(day, 'EEEE')
             return (
               <div
                 key={index}
-                className="border-0 p-4 rounded-md text-secondary-400 bg-white shadow-sm min-h-[120px]"
+                className="border-0 p-4 rounded-md text-secondary-400 bg-white shadow-sm sm:min-h-[240px]"
               >
                 <h4 className="font-medium">{dayName}</h4>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -405,7 +405,7 @@ const CalendarView = () => {
                         {exercise}
                         <button
                           onClick={() => handleRemoveExercise(dayName, exercise)}
-                          className="ml-2 text-red-500"
+                          className="ml-2 text-lg  text-red-500"
                           title="Remove exercise"
                         >
                           &times;
@@ -436,7 +436,10 @@ const CalendarView = () => {
 
   return (
     <div className="calendar-view">
-      <div className="bg-secondary-300 rounded-lg">
+      <div className="bg-secondary-400 sm:outline sm:outline-medium-purple-500 rounded-lg">
+        <div className="bg-medium-purple-500 rounded-tl-md rounded-tr-md text-gray-200 text-2xl p-3">
+          Create a Weekly Plan
+        </div>
         <div className="p-4 sm:p-6 w-full sm:w-3/4 md:w-1/2 mx-auto mt-4 rounded-lg">
           <h2 className="text-xl sm:text-2xl font-semibold text-gray-200 mb-4">
             What do you want to call this plan?
@@ -457,7 +460,7 @@ const CalendarView = () => {
           <div className="flex justify-center">{renderCurrentDay()}</div>
           {renderWeeklyOverview()}
         </div>
-        <div className="sm:px-4 sm:pt-3 pt-1 px-2 bg-secondary-400 rounded-t-xl inline-block sm:w-4.5 ">
+        <div className="sm:px-4 sm:pt-3 py-4 px-2 bg-secondary-400 rounded-t-xl inline-block sm:w-4.5 ">
           <button
             onClick={handleSaveWeeklyPlan}
             className="bg-medium-purple-500 text-white sm:p-3 rounded-lg  hover:bg-medium-purple-600 w-full p-1 sm:w-auto sm:text-base text-xs"
@@ -472,7 +475,7 @@ const CalendarView = () => {
           <div className="w-full border-t border-gray-300" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-secondary-400 px-3 text-base font-semibold leading-6 text-medium-purple-300">
+          <span className="bg-[#1f2937] px-3 text-xl font-semibold leading-6 text-medium-purple-300">
             Your Plans
           </span>
         </div>
@@ -488,7 +491,7 @@ const CalendarView = () => {
             />{' '}
           </div>
         ) : weeklyPlans.length === 0 ? (
-          <p>No weekly plans available.</p>
+          <p className="text-gray-200">You do not have any plans yet.</p>
         ) : (
           weeklyPlans.map((plan) => (
             <div key={plan.entryId} className="bg-gray-100 p-4 mb-4 rounded-lg shadow-md">

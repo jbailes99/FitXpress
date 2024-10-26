@@ -405,24 +405,22 @@ export default function Results() {
       case 'Cardio':
         return (
           <>
-            <div className="flex">
+            <div className="flex text-gray-200">
               <div>
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>
+                <p className="text-base text-gray-200 mb-1">
                   <strong>{item.timestamp}</strong>
                 </p>
 
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                  Exercise Type: {item.exerciseType}
-                </p>
+                <p className="text-base text-gray-200 mb-1">Exercise Type: {item.exerciseType}</p>
                 {item.intensity && (
-                  <p style={{ fontSize: '16px', margin: '5px 0' }}>Intensity: {item.intensity}</p>
+                  <p className="text-base text-gray-200 mb-1">Intensity: {item.intensity}</p>
                 )}
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>Time: {item.time}</p>
+                <p className="text-base text-gray-200 mb-1">Time: {item.time}</p>
                 {item.distance && (
-                  <p style={{ fontSize: '16px', margin: '5px 0' }}>Distance: {item.distance}</p>
+                  <p className="text-base text-gray-200 mb-1">Distance: {item.distance}</p>
                 )}
                 {item.additionalInfo && (
-                  <p style={{ fontSize: '16px', margin: '5px 0' }}>
+                  <p className="text-base text-gray-200 mb-1">
                     Additional Info: {item.additionalInfo}
                   </p>
                 )}
@@ -438,36 +436,30 @@ export default function Results() {
       case 'Strength training':
         return (
           <>
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>
+            <p className="text-base text-gray-200 mb-1">
               <strong>{item.timestamp}</strong>
             </p>
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
+            <p className="text-base text-gray-200 mb-1">Exercise Type: {item.exerciseType}</p>
 
-            {item.weight && (
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>Weight: {item.weight}</p>
-            )}
-            {item.reps && <p style={{ fontSize: '16px', margin: '5px 0' }}>Reps: {item.reps}</p>}
-            {item.sets && <p style={{ fontSize: '16px', margin: '5px 0' }}>Sets: {item.sets}</p>}
+            {item.weight && <p className="text-base text-gray-200 mb-1">Weight: {item.weight}</p>}
+            {item.reps && <p className="text-base text-gray-200 mb-1">Reps: {item.reps}</p>}
+            {item.sets && <p className="text-base text-gray-200 mb-1">Sets: {item.sets}</p>}
             {item.additionalInfo && (
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>Comments: {item.additionalInfo}</p>
+              <p className="text-base text-gray-200 mb-1">Comments: {item.additionalInfo}</p>
             )}
           </>
         )
       case 'Bodyweight Exercises':
         return (
           <>
-            <div className="text-white">
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>{item.timestamp}</p>
+            <div className=" text-gray-200">
+              <p className="text-base mb-1">{item.timestamp}</p>
 
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>
-                Exercise Type: {item.exerciseType}
-              </p>
+              <p className="text-base mb-1">Exercise Type: {item.exerciseType}</p>
 
-              {item.amount && (
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>Reps: {item.amount}</p>
-              )}
+              {item.amount && <p className="text-base mb-1">Reps: {item.amount}</p>}
               {item.additionalInfo && (
-                <p style={{ fontSize: '16px', margin: '5px 0' }}>Comments: {item.additionalInfo}</p>
+                <p className="text-base mb-1">Comments: {item.additionalInfo}</p>
               )}
             </div>
           </>
@@ -475,15 +467,17 @@ export default function Results() {
       default:
         return (
           <>
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>
+            <p className="text-gray-200" style={{ fontSize: '16px', margin: '5px 0' }}>
               <strong>{item.timestamp}</strong>
             </p>
-            <p style={{ fontSize: '16px', margin: '5px 0' }}>Exercise Type: {item.exerciseType}</p>
-            <p className="text-red-200" style={{ fontSize: '16px', margin: '5px 0' }}>
+            <p className="text-gray-200" style={{ fontSize: '16px', margin: '5px 0' }}>
+              Exercise Type: {item.exerciseType}
+            </p>
+            <p className="text-red-200 " style={{ fontSize: '16px', margin: '5px 0' }}>
               <strong>No statistics provided</strong>
             </p>
             {item.additionalInfo && (
-              <p style={{ fontSize: '16px', margin: '5px 0' }}>
+              <p className="text-gray-200" style={{ fontSize: '16px', margin: '5px 0' }}>
                 Additional Info: {item.additionalInfo}
               </p>
             )}
@@ -610,7 +604,7 @@ export default function Results() {
                       <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-md">
                         <h3 className="text-xl font-semibold mb-2">Weight Lifting</h3>
                         <p className="text-lg">
-                          <span className="font-bold">
+                          <span className="font-bold text-gray-200">
                             Record weight lifting exercises to display stats!
                           </span>
                         </p>
@@ -619,7 +613,7 @@ export default function Results() {
                       exerciseStats.weightLifting.maxWeight > 0 && (
                         <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-md">
                           <h3 className="text-xl font-semibold mb-2">Weight Lifting</h3>
-                          <p className="text-lg">
+                          <p className="text-lg text-gray-200 ">
                             Max Weight:{' '}
                             <span className="font-bold">
                               {exerciseStats.weightLifting.maxWeight} kg
@@ -633,9 +627,9 @@ export default function Results() {
                     {(exerciseStats.cardio.totalDistance > 0 ||
                       exerciseStats.cardio.totalTime > 0) && (
                       <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-md">
-                        <h3 className="text-xl font-semibold mb-2">Cardio</h3>
+                        <h3 className="text-xl font-semibold mb-2 text-gray-200 ">Cardio</h3>
 
-                        <p className="text-lg">
+                        <p className="text-lg text-gray-200">
                           Total Time:{' '}
                           <span className="font-bold">
                             {exerciseStats.cardio.totalTime} minutes
@@ -844,7 +838,7 @@ export default function Results() {
                           </div>
                         ))}
                     {selectedCategory === 'exercises' && (
-                      <div className="results-container">
+                      <div className="results-container ">
                         {exerciseResults.map((item) => (
                           <div
                             key={item.id}

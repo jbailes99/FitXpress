@@ -76,6 +76,7 @@ const BmiCalculator: React.FC = () => {
   })
   const [isSignUpOpen, setSignUpOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [isLoadingPlan, setIsLoadingPlan] = useState(true)
 
   useEffect(() => {
     if (isLoggedIn && userDetails?.username) {
@@ -93,10 +94,12 @@ const BmiCalculator: React.FC = () => {
   }, [userDetails])
 
   const fetchActiveWeeklyPlan = async (username: any) => {
+    setIsLoadingPlan(true)
     const storedTokens = getCurrentTokens()
 
     if (!storedTokens || !storedTokens.accessToken) {
       console.warn('User is not logged in or access token is missing.')
+      setIsLoadingPlan(false)
       return
     }
 
@@ -106,6 +109,7 @@ const BmiCalculator: React.FC = () => {
 
       if (!getWeeklyPlanApi || !userId) {
         console.error('API endpoint or userId is not defined.')
+        setIsLoadingPlan(false)
         return
       }
 
@@ -115,13 +119,17 @@ const BmiCalculator: React.FC = () => {
       const activePlan = plans.find((plan: { isActive: any }) => plan.isActive)
 
       if (activePlan) {
-        setWeeklyPlan(activePlan) // Store the active plan in state
-        updateDailyExercises(activePlan) // Update daily exercises
+        setWeeklyPlan(activePlan)
+        updateDailyExercises(activePlan)
       } else {
         console.warn('No active plan found.')
+        setWeeklyPlan(null)
       }
     } catch (error) {
       console.error('Error fetching weekly plan:', error)
+      setWeeklyPlan(null)
+    } finally {
+      setIsLoadingPlan(false)
     }
   }
 
@@ -355,12 +363,35 @@ const BmiCalculator: React.FC = () => {
           )}
         </Panel>
       ) : null}
+
       <div className=" flex flex-col justify-center items-center min-h-screen overflow-x-hidden ">
         <div className="w-full lg:grid lg:grid-cols-3 lg:px-12 px-4  lg:space-x-8 lg:space-y-0">
+          {!isLoggedIn && !isAdmin && (
+            <Panel className="!bg-medium-purple-500 col-span-2 flex flex-col justify-center items-center text-center md:mb-6 p-4 md:p-6 lg:hidden rounded-2xl shadow-2xl mt-8 md:mt-16 w-full h-auto sm:flex">
+              <div className="leading-tight mb-3">
+                <div className="font-bold text-xl md:text-3xl text-white leading-tight">
+                  Take the first step.
+                </div>
+                <div className="text-sm md:text-base font-medium text-white/80">
+                  Sign up to start your journey!
+                </div>
+              </div>
+              <div className="text-sm md:text-base text-white font-medium mb-3">
+                Start easily tracking your progress and access personalized fitness and nutrition
+                advice.
+              </div>
+              <Button
+                onClick={openSignUpModal}
+                className="text-white font-bold bg-secondary-800 hover:bg-secondary-600 rounded-md shadow-md text-lg px-4"
+              >
+                Sign up
+              </Button>
+            </Panel>
+          )}
           <div className="col-span-2 ">
             <Card
               shadow={true}
-              className={`text-center  sm:mt-16  mt-6 outline outline-medium-purple-500  bg-secondary-400 rounded-xl ${
+              className={`text-center sm:mt-20  mt-6 outline outline-medium-purple-500  bg-secondary-400 rounded-xl ${
                 showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'
               }`}
             >
@@ -401,7 +432,7 @@ const BmiCalculator: React.FC = () => {
                             <div className="">
                               <Select
                                 color="purple"
-                                label="Select Gender"
+                                label="Select Sex"
                                 className="h-14"
                                 id="gender"
                                 value={gender || ''}
@@ -838,7 +869,7 @@ const BmiCalculator: React.FC = () => {
             )}
 
             {!isLoggedIn && !isAdmin && (
-              <Panel className="!bg-medium-purple-500 col-span-2 flex flex-col justify-center items-center text-center md:mb-6 p-4 md:p-6 rounded-2xl shadow-2xl mt-8 md:mt-16 w-full h-auto">
+              <Panel className="!bg-medium-purple-500 col-span-2 flex flex-col justify-center items-center text-center md:mb-6 p-4 md:p-6 rounded-2xl shadow-2xl mt-8 md:mt-16 w-full h-auto hidden sm:flex">
                 <div className="leading-tight mb-3">
                   <div className="font-bold text-xl md:text-3xl text-white leading-tight">
                     Take the first step.
@@ -981,7 +1012,15 @@ const BmiCalculator: React.FC = () => {
                 !weeklyPlan ? 'sm:w-[94.5%]  mx-2 pb-4  sm:mx-auto' : 'w-[94.5%] '
               }`}
             >
-              {weeklyPlan ? (
+              {isLoadingPlan ? (
+                <div className="flex justify-center items-center h-40">
+                  <Spinner
+                    className="h-12 w-12 text-medium-purple-500"
+                    onPointerEnterCapture={undefined}
+                    onPointerLeaveCapture={undefined}
+                  />
+                </div>
+              ) : weeklyPlan ? (
                 <>
                   <h1 className="bg-medium-purple-500 text-gray-100 font-semibold p-3 sm:w-1/2 w-3/4 mx-auto rounded-bl-lg rounded-br-lg text-center mb-4 border-secondary-600 border-b-[2px] border-l-[2px] border-r-[2px]">
                     My Active Weekly Plan:{' '}
@@ -1024,12 +1063,19 @@ const BmiCalculator: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <>
-                  <p className="text-gray-200  font-semibold text-2xl text-center">
-                    Don&apos;t have a weekly plan yet?
+                <div className="text-center py-8">
+                  <p className="text-gray-200 font-semibold text-2xl mb-2">
+                    Don&apos;t have an active weekly plan yet?
                   </p>
-                  <p className="text-gray-200 text-sm text-center">Go create or make one active.</p>
-                </>
+                  <p className="text-gray-200 text-sm mb-4">
+                    Go to the Weekly Planner to create or activate a plan.
+                  </p>
+                  <Link href="/weeklyPlanner">
+                    <Button color="purple" variant="gradient" size="lg">
+                      Go to Weekly Planner
+                    </Button>
+                  </Link>
+                </div>
               )}
             </Card>
           )}
