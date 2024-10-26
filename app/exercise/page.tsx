@@ -349,15 +349,18 @@ const ExerciseTracker = () => {
       }}
     >
       <main>
-        <div className=" bg-secondary-400 mx-4 my-4  rounded-xl  relative isolate overflow-hidden ">
+        <div className="  mx-4 my-4  rounded-xl  relative isolate overflow-hidden ">
           <div className="flex flex-col justify-center items-center mb-4 ">
-            <div className="bg-secondary-400 p-12 rounded-xl mt-6 w-3/4 min-h-[60vh]">
-              <h1 className="text-6xl font-extrabold text-white mb-4 text-center ">
-                Log an exercise
-              </h1>
+            <div className="bg-secondary-400 outline outline-medium-purple-500 rounded-xl mt-6 w-11/12 min-h-[60vh]">
+              <div className="bg-medium-purple-500 text-gray-200 text-2xl p-3 text-center font-bold ">
+                Log Exercises
+              </div>
+
               <div className="flex">
-                <div className="mt-12 text-black text-center justify-center items-center flex-grow w-1/2">
-                  <h1 className="text-center text-white text-xl font-bold mb-2">Log an exercise</h1>
+                <div className="mt-12 text-black text-center justify-center items-center flex-grow w-11/12">
+                  <h1 className="text-center text-white text-xl font-bold mb-2">
+                    Let&apos;s get started
+                  </h1>
                   {/* Workout category dropdown */}
                   <div className="flex justify-center text-center ">
                     <div className="w-3/4">
@@ -526,12 +529,12 @@ const ExerciseTracker = () => {
               </div>
             </div>
           </div>
-          <div className="relative w-3/4 mx-auto mt-12">
+          <div className="relative w-11/12 mx-auto mt-12">
             <div aria-hidden="true" className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-medium-purple-500 text-white rounded px-3 text-xl font-semibold leading-6 ">
+              <span className="bg-[#1f2937] text-medium-purple-300 rounded px-3 text-xl font-semibold leading-6 ">
                 Recent Logs
               </span>
             </div>

@@ -432,7 +432,7 @@ const BmiCalculator: React.FC = () => {
                             <div className="">
                               <Select
                                 color="purple"
-                                label="Select Gender"
+                                label="Select Sex"
                                 className="h-14"
                                 id="gender"
                                 value={gender || ''}
