@@ -9,7 +9,7 @@ import { redirect } from 'next/dist/server/api-utils'
 import { useIsLoggedIn, useUserDetails, useIsAdmin } from '@/hooks'
 import { Button } from '@/components/button'
 import CalendarView from '@/components/calendarView'
-import { Spinner } from '@material-tailwind/react'
+import { Spinner, Tooltip, Typography } from '@material-tailwind/react'
 import { Alert } from '@material-tailwind/react'
 import { Panel } from '@/components/panel'
 
@@ -257,9 +257,41 @@ const ExerciseTracker = () => {
               {item.additionalInfo && (
                 <p className="text-base my-1">Additional Info: {item.additionalInfo}</p>
               )}
-              <p className="text-medium-purple-300 text-2xl my-1">
-                {caloriesBurned !== null ? Math.round(caloriesBurned) : 'N/A'} calories burned
-              </p>
+              <div className="flex text-center items-center justify-center space-x-4">
+                <p className="text-medium-purple-300 text-2xl my-1">
+                  {caloriesBurned !== null ? Math.round(caloriesBurned) : 'N/A'} calories burned
+                </p>
+                <Tooltip
+                  className="bg-medium-purple-500"
+                  content={
+                    <div className="w-80">
+                      <Typography color="white" className="font-medium">
+                        How is this calculated?
+                      </Typography>
+                      <Typography variant="small" color="white" className="font-normal opacity-80">
+                        This uses the body metrics associated with your account and the intensity
+                        and type of work out to calculate an approximate amount of calories burned.
+                      </Typography>
+                    </div>
+                  }
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    className="h-5 w-5 cursor-pointer text-medium-purple-500"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                    />
+                  </svg>
+                </Tooltip>
+              </div>
+
               <Button
                 onClick={() => {
                   handleDelete(item.entryId)
@@ -512,7 +544,7 @@ const ExerciseTracker = () => {
                           <div className="mt-4 text-center">
                             {/* Input fields for reps and additional info */}
                             <button
-                              className="bg-medium-purple-400 rounded-md text-white px-4 py-2 pb-rounded hover:bg-medium-purple-600 mt-2"
+                              className="bg-medium-purple-400 rounded-md text-white px-4 py-2 mb-4 pb-rounded hover:bg-medium-purple-600 mt-2"
                               onClick={handleExerciseSubmit}
                             >
                               Log Exercise

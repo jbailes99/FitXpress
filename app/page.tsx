@@ -318,12 +318,13 @@ const BmiCalculator: React.FC = () => {
   return (
     <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
       {isLoggedIn && !isAdmin ? (
+        //Mobile welcome panel
         <Panel className="text-center mx-4 mt-4 rounded-2xl shadow-2xl  sm:hidden block">
           <p className="text-md md:text-lg lg:text-2xl text-gray-200 ">
             Welcome back, <span className="text-medium-purple-300">{userDetails.nickname}</span>
           </p>
           {weeklyPlan && (
-            <div className="mt-6 md:mt-8 p-4 md:p-6">
+            <div className="p-4 md:p-6">
               <div className="flex items-center mb-4">
                 <h1 className="text-xl md:text-2xl font-bold text-gray-100">
                   Today&apos;s Exercises
@@ -363,7 +364,6 @@ const BmiCalculator: React.FC = () => {
           )}
         </Panel>
       ) : null}
-
       <div className=" flex flex-col justify-center items-center min-h-screen overflow-x-hidden ">
         <div className="w-full lg:grid lg:grid-cols-3 lg:px-12 px-4  lg:space-x-8 lg:space-y-0">
           {!isLoggedIn && !isAdmin && (
@@ -388,10 +388,10 @@ const BmiCalculator: React.FC = () => {
               </Button>
             </Panel>
           )}
-          <div className="col-span-2 ">
+          <div className="col-span-2">
             <Card
               shadow={true}
-              className={`text-center sm:mt-20  mt-6 outline outline-medium-purple-500  bg-secondary-400 rounded-xl ${
+              className={`text-center sm:mt-16  mt-6 outline outline-medium-purple-500  bg-secondary-400 rounded-xl ${
                 showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'
               }`}
             >
@@ -827,8 +827,8 @@ const BmiCalculator: React.FC = () => {
                   <span className="text-medium-purple-300">{userDetails.nickname}</span>
                 </p>
                 {weeklyPlan && (
-                  <div className="mt-6 md:mt-8 p-4 md:p-6">
-                    <div className="flex items-center mb-4">
+                  <div className="mt-6 md:mt-4 p-4 md:p-2">
+                    <div className="flex items-center ">
                       <h1 className="text-xl md:text-2xl font-bold text-gray-100">
                         Today&apos;s Exercises
                       </h1>
@@ -903,9 +903,9 @@ const BmiCalculator: React.FC = () => {
             )}
 
             <Panel className="text-center mb-4 md:mb-6 p-4 mt-10 sm:mt-0 md:p-6 rounded-2xl shadow-2xl w-full h-auto">
-              <h1 className="mb-4 text-gray-200 font-bold text-xl sm:text-2xl">
+              {/* <h1 className="mb-4 text-gray-200 font-bold text-xl sm:text-2xl">
                 Unlock insights into your body composition.
-              </h1>
+              </h1> */}
               <div className="leading-6 text-left text-sm sm:text-base space-y-2">
                 <div className="flex-col flex text-left ">
                   <span className="text-gray-200">
@@ -1008,7 +1008,7 @@ const BmiCalculator: React.FC = () => {
         <div className="w-full flex flex-col items-center justify-center">
           {isLoggedIn && (
             <Card
-              className={`mx-4 sm:mx-10 rounded-xl mb-6 sm:mb-4 shadow-2xl mt-6 sm:mt-8 bg-secondary-400 px-6 ${
+              className={`mx-4 mt-4 sm:mx-10 rounded-xl mb-6 sm:mb-4 shadow-2xl  bg-secondary-400 px-6 ${
                 !weeklyPlan ? 'sm:w-[94.5%]  mx-2 pb-4  sm:mx-auto' : 'w-[94.5%] '
               }`}
             >
