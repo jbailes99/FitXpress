@@ -323,6 +323,7 @@ const BmiCalculator: React.FC = () => {
           <p className="text-md md:text-lg lg:text-2xl text-gray-200 ">
             Welcome back, <span className="text-medium-purple-300">{userDetails.nickname}</span>
           </p>
+          <h1 className="mt-2 text-gray-500 ">Create a weekly plan to see your daily exercises</h1>
           {weeklyPlan && (
             <div className="p-4 md:p-6">
               <div className="flex items-center mb-4">
@@ -396,14 +397,17 @@ const BmiCalculator: React.FC = () => {
               }`}
             >
               <div className="flex items-center justify-center rounded-tr-xl rounded-tl-xl h-16 bg-medium-purple-500 text-gray-200">
-                <Typography variant="h5" className="sm:text-2xl text-2xl font-bold">
+                <Typography
+                  variant="h5"
+                  className="sm:text-2xl text-3xl text-gray-200 font-semibold"
+                >
                   Body Composition Calculator
                 </Typography>
               </div>
               <div className="my-auto mt-4">
-                <Typography variant="h1" color="white" className="text-2xl mt-4 font-bold">
+                <p className="text-xl mt-4 text-gray-200 ">
                   Gain comprehensive insight into your body composition
-                </Typography>
+                </p>
               </div>
               <div className="py-12">
                 <div className="mx-12 ">
@@ -826,6 +830,10 @@ const BmiCalculator: React.FC = () => {
                   Welcome back,{' '}
                   <span className="text-medium-purple-300">{userDetails.nickname}</span>
                 </p>
+                <h2 className="mt-8 text-gray-500">
+                  Create a weekly plan to view your daily exercises
+                </h2>
+
                 {weeklyPlan && (
                   <div className="mt-6 md:mt-4 p-4 md:p-2">
                     <div className="flex items-center ">
@@ -1063,7 +1071,7 @@ const BmiCalculator: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="text-center py-8">
+                <div className="text-center py-4">
                   <p className="text-gray-200 font-semibold text-2xl mb-2">
                     Don&apos;t have an active weekly plan yet?
                   </p>
