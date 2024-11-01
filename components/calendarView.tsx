@@ -475,7 +475,7 @@ const CalendarView = () => {
           <div className="w-full border-t border-gray-300" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-[#1f2937] px-3 text-xl font-semibold leading-6 text-medium-purple-300">
+          <span className="bg-[#1f2937] px-3 text-2xl font-semibold leading-6 text-medium-purple-300">
             Your Plans
           </span>
         </div>

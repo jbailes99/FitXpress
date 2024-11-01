@@ -19,9 +19,16 @@ import { Alert } from '@material-tailwind/react'
 import { Typography } from '@material-tailwind/react'
 import Footer from '@/components/footer'
 import { Tooltip } from '@material-tailwind/react'
-import { FaQuestionCircle } from 'react-icons/fa' // Importing from react-icons/fa
 import Loading from '@/components/Loading'
 import Link from 'next/link'
+import { CiSaveDown2, CiRedo } from 'react-icons/ci'
+import {
+  Dialog as MTDialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+} from '@material-tailwind/react'
+import { TbInfoHexagon } from 'react-icons/tb'
 
 ChartJS.register(...registerables)
 interface WeeklyPlan {
@@ -75,8 +82,11 @@ const BmiCalculator: React.FC = () => {
     visible: { opacity: 1, y: 0 },
   })
   const [isSignUpOpen, setSignUpOpen] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const [isLoadingPlan, setIsLoadingPlan] = useState(true)
+
+  const [isGenderModalOpen, setGenderModalOpen] = useState(false)
 
   useEffect(() => {
     if (isLoggedIn && userDetails?.username) {
@@ -315,6 +325,22 @@ const BmiCalculator: React.FC = () => {
   }
   const currentDay = new Date().toLocaleString('en-US', { weekday: 'long' })
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true) // Open the modal
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false) // Close the modal
+  }
+
+  const openGenderModal = () => {
+    setGenderModalOpen(true) // Open the gender modal
+  }
+
+  const closeGenderModal = () => {
+    setGenderModalOpen(false) // Close the gender modal
+  }
+
   return (
     <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
       {isLoggedIn && !isAdmin ? (
@@ -323,10 +349,17 @@ const BmiCalculator: React.FC = () => {
           <p className="text-md md:text-lg lg:text-2xl text-gray-200 ">
             Welcome back, <span className="text-medium-purple-300">{userDetails.nickname}</span>
           </p>
-          <h1 className="mt-2 text-gray-500 ">Create a weekly plan to see your daily exercises</h1>
-          {weeklyPlan && (
-            <div className="p-4 md:p-6">
-              <div className="flex items-center mb-4">
+          {isLoadingPlan ? ( // New loading state check
+            <div className="flex justify-center items-center">
+              <Spinner
+                className="h-8 w-8 text-purple-500"
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+              />
+            </div>
+          ) : weeklyPlan ? ( // Check if weeklyPlan exists
+            <div className="mt-6 md:mt-4 p-4 md:p-2">
+              <div className="flex items-center ">
                 <h1 className="text-xl md:text-2xl font-bold text-gray-100">
                   Today&apos;s Exercises
                 </h1>
@@ -358,15 +391,20 @@ const BmiCalculator: React.FC = () => {
                     </li>
                   ))
                 ) : (
-                  <li className="text-gray-400 text-left">No exercises for today.</li>
+                  <li className="text-gray-400">No exercises for today.</li>
                 )}
               </ul>
             </div>
+          ) : (
+            // Fallback message if no weeklyPlan
+            <h2 className="mt-8 text-gray-500">
+              Create a weekly plan to view your daily exercises
+            </h2>
           )}
         </Panel>
       ) : null}
-      <div className=" flex flex-col justify-center items-center min-h-screen overflow-x-hidden ">
-        <div className="w-full lg:grid lg:grid-cols-3 lg:px-12 px-4  lg:space-x-8 lg:space-y-0">
+      <div className="flex flex-col justify-center items-center min-h-screen overflow-x-hidden">
+        <div className="w-full lg:grid lg:grid-cols-3  lg:px-12 px-4 lg:space-x-8 lg:space-y-0">
           {!isLoggedIn && !isAdmin && (
             <Panel className="!bg-medium-purple-500 col-span-2 flex flex-col justify-center items-center text-center md:mb-6 p-4 md:p-6 lg:hidden rounded-2xl shadow-2xl mt-8 md:mt-16 w-full h-auto sm:flex">
               <div className="leading-tight mb-3">
@@ -389,30 +427,31 @@ const BmiCalculator: React.FC = () => {
               </Button>
             </Panel>
           )}
-          <div className="col-span-2">
-            <Card
-              shadow={true}
-              className={`text-center sm:mt-16  mt-6 outline outline-medium-purple-500  bg-secondary-400 rounded-xl ${
+          <div className="col-span-2 flex-grow flex flex-col justify-center">
+            <div
+              className={`text-center flex-grow mt-12 outline outline-medium-purple-500 rounded-tl-2xl rounded-tr-2xl bg-secondary-400 rounded-xl ${
                 showResults ? 'sm:w-full max-w-full' : 'sm:w-full max-w-screen-full'
-              }`}
+              } flex flex-col justify-center items-center`}
             >
-              <div className="flex items-center justify-center rounded-tr-xl rounded-tl-xl h-16 bg-medium-purple-500 text-gray-200">
+              <div className="flex items-center justify-center  w-full rounded-tr-xl rounded-tl-xl h-16 bg-medium-purple-500 text-gray-200">
                 <Typography
                   variant="h5"
-                  className="sm:text-2xl text-3xl text-gray-200 font-semibold"
+                  className="sm:text-3xl text-md text-gray-200 font-semibold"
                 >
                   Body Composition Calculator
                 </Typography>
               </div>
-              <div className="my-auto mt-4">
-                <p className="text-xl mt-4 text-gray-200 ">
-                  Gain comprehensive insight into your body composition
-                </p>
-              </div>
-              <div className="py-12">
-                <div className="mx-12 ">
+              {!showResults && (
+                <div className="flex-grow flex items-center ">
+                  <p className="sm:text-xl text-xs  sm:mb-0 mb-6 mt-4 text-gray-200">
+                    Gain comprehensive insight into your body composition
+                  </p>
+                </div>
+              )}
+              <div className="flex-grow flex flex-col w-full ">
+                <div className=" w-full flex flex-col items-center">
                   <div
-                    className={`col-span-3 sm:col-span-3 text-center mt-6 ${
+                    className={`col-span-3 sm:col-span-3 text-center w-10/12 ${
                       showResults ? 'hidden' : 'visible'
                     }`}
                   >
@@ -448,16 +487,19 @@ const BmiCalculator: React.FC = () => {
                                 <Option value="male">Male</Option>
                                 <Option value="female">Female</Option>
                               </Select>
-                              <div className="mt-4">
+                              {/* <div className="mt-4">
                                 <span
-                                  className="underline text-xs cursor-pointer text-medium-purple-500 hover:text-medium-purple-200  "
-                                  onClick={openModal}
+                                  className="underline text-xs cursor-pointer text-medium-purple-500 hover:text-medium-purple-200"
+                                  onClick={openGenderModal}
                                 >
                                   More info
                                 </span>
 
-                                <GenderExplanationModal isOpen={isModalOpen} onClose={closeModal} />
-                              </div>
+                                <GenderExplanationModal
+                                  isOpen={isGenderModalOpen}
+                                  onClose={closeGenderModal}
+                                />
+                              </div> */}
                             </div>
                           </div>
                         </div>
@@ -482,20 +524,10 @@ const BmiCalculator: React.FC = () => {
                                 {isLoggedIn && (
                                   <Tooltip
                                     className="bg-medium-purple-500"
-                                    content={
-                                      <div className="w-80">
-                                        <Typography color="white" className="font-medium">
-                                          Weight Changes
-                                        </Typography>
-                                        <Typography
-                                          variant="small"
-                                          color="white"
-                                          className="font-normal opacity-80"
-                                        >
+                                    content="
+                                      
                                           To change your weight, go to profile and weigh in.
-                                        </Typography>
-                                      </div>
-                                    }
+                                    "
                                   >
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
@@ -600,7 +632,7 @@ const BmiCalculator: React.FC = () => {
                             size="lg"
                             variant="gradient"
                             color="purple"
-                            className="h-16"
+                            className="h-16 sm:mb-0 mb-4"
                           >
                             Calculate
                           </Button>
@@ -623,88 +655,82 @@ const BmiCalculator: React.FC = () => {
                       </div>
                     </form>
                   </div>
-
                   <div
-                    className={`text-gray-300 font-bold sm:col-span-3 col-span-3 text-2xl ${
+                    className={`text-gray-300 font-bold mt-2 sm:col-span-3 col-span-3 w-full text-2xl ${
                       showResults ? 'visible' : 'hidden'
                     }`}
                   >
                     {showResults && (
                       <>
-                        <h1> Your Results </h1>
-                        <div className="mt-4 text-black" id="result">
-                          <div className="flex items-center justify-center">
-                            <div className="bg-blue-100 shadow w-full 2xl:w-3/4 px-2 py-2 rounded-3xl sm:rounded-lg mt-2">
-                              <h3 className="text-base font-semibold leading-6 text-gray-800">
-                                Body Fat
-                              </h3>
-                              <div className="mt-2 sm:flex sm:items-start sm:justify-center">
-                                <div className="text-md text-gray-800 text-center">
-                                  {bodyFatCalc !== null ? (
-                                    <>
-                                      <p className="text-center">{bodyFatCalc.toFixed(2)}</p>
-
-                                      <div className="flex justify-center items-center text-center">
-                                        <div className="">
-                                          <GaugeChart
-                                            id="gauge-chart1"
-                                            percent={parseFloat(bodyFatCalc.toFixed(2)) / 40} // Normalize bodyBMI to fit within the range of 0 to 100
-                                            nrOfLevels={30}
-                                            arcsLength={[0.2, 0.6, 0.2]}
-                                            colors={['#F5CD19', '#5BE12C', '#EA4228']}
-                                            labels={['Low', 'Medium', 'High']}
-                                            hideText
-                                          />
+                        <h1 className="text-lg sm:text-2xl"> Your Results </h1>
+                        <div className="mt-4 text-black w-11/12 sm:w-3/4 mx-auto" id="result">
+                          <div className="flex flex-col sm:flex-row w-full mx-auto justify-center space-x-0 sm:space-x-4">
+                            <div className="flex items-center justify-center w-full 2xl:w-1/2">
+                              <div className="bg-blue-100 shadow rounded-3xl sm:rounded-lg w-full">
+                                <h3 className="text-base font-semibold leading-6 text-gray-800">
+                                  Body Fat
+                                </h3>
+                                <div className="mt-2 sm:flex sm:items-start sm:justify-center">
+                                  <div className="text-md text-gray-800 text-center">
+                                    {bodyFatCalc !== null ? (
+                                      <>
+                                        <p className="text-center">{bodyFatCalc.toFixed(2)}</p>
+                                        <div className="flex justify-center items-center text-center">
+                                          <div className="">
+                                            <GaugeChart
+                                              id="gauge-chart1"
+                                              percent={parseFloat(bodyFatCalc.toFixed(2)) / 40} // Normalize bodyBMI to fit within the range of 0 to 100
+                                              nrOfLevels={30}
+                                              arcsLength={[0.2, 0.6, 0.2]}
+                                              colors={['#F5CD19', '#5BE12C', 'red']}
+                                              labels={['Low', 'Medium', 'High']}
+                                              hideText
+                                            />
+                                          </div>
                                         </div>
-                                      </div>
-                                    </>
-                                  ) : (
-                                    ''
-                                  )}
+                                      </>
+                                    ) : (
+                                      ''
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center sm:mt-0 mt-6 justify-center w-full 2xl:w-1/2">
+                              <div className="bg-blue-100 shadow rounded-3xl sm:rounded-lg w-full">
+                                <h3 className="text-base font-semibold leading-6 text-gray-800">
+                                  BMI
+                                </h3>
+                                <div className="mt-2 sm:flex sm:items-start sm:justify-center">
+                                  <div className="text-md text-gray-800 text-center">
+                                    {bodyBMI !== null ? (
+                                      <>
+                                        <p className="text-center">{bodyBMI.toFixed(2)}</p>
+                                        <div className="flex justify-center items-center text-center">
+                                          <div className="">
+                                            <GaugeChart
+                                              id="gauge-chart1"
+                                              percent={parseFloat(bodyBMI.toFixed(2)) / 40} // Normalize bodyBMI to fit within the range of 0 to 100
+                                              nrOfLevels={30}
+                                              arcsLength={[0.2, 0.6, 0.2]}
+                                              colors={['#F5CD19', '#5BE12C', 'red']}
+                                              labels={['Low', 'Medium', 'High']}
+                                              hideText
+                                            />
+                                          </div>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      ''
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center justify-center">
-                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6 ">
-                              <h3 className="text-base font-semibold leading-6 text-gray-900">
-                                {' '}
-                                BMI{' '}
-                              </h3>
-                              <div className="mt-2 flex-row items-center justify-center">
-                                <h1 className="text-md text-gray-800">
-                                  {bodyBMI !== null ? (
-                                    <>
-                                      <p className="text-center">{bodyBMI.toFixed(2)}</p>
-                                      <div className="flex justify-center items-center text-center">
-                                        <div className="w-1/4">
-                                          <GaugeChart
-                                            id="gauge-chart1"
-                                            percent={parseFloat(bodyBMI.toFixed(2)) / 40} // Normalize bodyBMI to fit within the range of 0 to 100
-                                            nrOfLevels={30}
-                                            arcsLength={[0.2, 0.6, 0.2]}
-                                            colors={['#F5CD19', '#5BE12C', '#EA4228']}
-                                            labels={['Low', 'Medium', 'High']}
-                                            hideText
-                                          />
-                                        </div>
-                                      </div>
-                                    </>
-                                  ) : (
-                                    ''
-                                  )}
-                                </h1>
-                                <div
-                                  className="flex items-center justify-center mt-4 sm:mt-0 w-full 
 
-                        "
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center justify-center">
-                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6">
+                          <div className="flex flex-col items-center justify-center mt-6">
+                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2">
                               <h3 className="text-base font-semibold leading-6 text-gray-800">
                                 Fat Mass
                               </h3>
@@ -716,8 +742,8 @@ const BmiCalculator: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-center">
-                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6">
+                          <div className="flex flex-col items-center justify-center mt-6">
+                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2">
                               <h3 className="text-base font-semibold leading-6 text-gray-800">
                                 BMR
                               </h3>
@@ -733,8 +759,8 @@ const BmiCalculator: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-center">
-                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2 mt-6">
+                          <div className="flex flex-col items-center justify-center mt-6">
+                            <div className="bg-blue-100 shadow rounded-3xl w-full 2xl:w-3/4 sm:rounded-lg px-2 py-2">
                               <h3 className="text-base font-semibold leading-6 text-gray-800">
                                 Lean Mass
                               </h3>
@@ -749,32 +775,42 @@ const BmiCalculator: React.FC = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="flex mt-5 text-sm h-full justify-center items-center">
+
+                          <div className="flex mt-5 text-sm h-full space-x-0 sm:space-x-4 sm:space-y-0 space-y-4 justify-center pb-4 items-center flex-col sm:flex-row">
                             {isLoggedIn && (
                               <button
                                 type="submit"
                                 onClick={handleSave}
-                                className=" bg-red-600 mr-2 text-white font-semibold py-2 px-4 rounded hover:bg-red-700"
+                                className="bg-red-600 mr-2 text-white font-semibold py-2 px-4 rounded hover:bg-red-700 flex items-center justify-center"
                               >
+                                <CiSaveDown2 className="h-5 w-5 mr-2" />
                                 Save Results
                               </button>
                             )}
                             <button
                               type="submit"
                               onClick={handleGoBack}
-                              className=" bg-blue-600 ml-2 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700"
+                              className="bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 flex items-center justify-center"
                             >
+                              <CiRedo className="h-5 w-5 mr-2" />
                               Calculate Again
+                            </button>
+                            <button
+                              onClick={handleOpenModal} // Button to open the modal
+                              className="bg-green-600 ml-2 text-white font-semibold py-2 px-4 rounded hover:bg-green-700 flex items-center justify-center"
+                            >
+                              <TbInfoHexagon className="h-5 w-5 mr-2" />
+                              More Info
                             </button>
                           </div>
                           <div className="flex items-center justify-center">
                             {showSuccessMessage && (
-                              <p className="text-green-500 text-sm mt-2">
+                              <p className="text-green-500 text-sm mt-2 mb-2">
                                 Successfully saved results
                               </p>
                             )}
                             {loader && (
-                              <div className="flex items-center mt-2 justify-center">
+                              <div className="flex items-center mb-2 mt-2 justify-center">
                                 <Spinner
                                   className="h-8 w-8 text-purple-500"
                                   onPointerEnterCapture={undefined}
@@ -788,40 +824,14 @@ const BmiCalculator: React.FC = () => {
                               </Alert>
                             )}
                           </div>
-                          {/* {bodyFatCalc !== null ? <p>Your Body Fat is: {bodyFatCalc.toFixed(2)}%</p> : ''}
-              {bodyFatMass !== null ? <p>Body Fat Mass is: {Math.round(bodyFatMass)} lbs</p> : ''}
-              {bodyLeanMass !== null ? <p>Body Lean Mass is: {Math.round(bodyLeanMass)} lbs</p> : ''}
-              {bodyBMI !== null ? <p>BMI: {bodyBMI.toFixed(2)}</p> : ''} */}
                         </div>
                       </>
                     )}
                   </div>
                 </div>
               </div>
-
-              {/* <div className='mt-4 text-black' id='result'>
-          {bodyFatCalc !== null ? <p>Your Body Fat is: {bodyFatCalc.toFixed(2)}%</p> : ''}
-          {bodyFatMass !== null ? <p>Body Fat Mass is: {Math.round(bodyFatMass)} lbs</p> : ''}
-          {bodyLeanMass !== null ? <p>Body Lean Mass is: {Math.round(bodyLeanMass)} lbs</p> : ''}
-          {bodyBMI !== null ? <p>BMI: {bodyBMI.toFixed(2)}</p> : ''}
-        </div> */}
-            </Card>
+            </div>
           </div>
-
-          {/* <div className='flex flex-col items-center justify-center '>
-            {!isLoggedIn && (
-              <div className='flex flex-col items-center justify-center '>
-                {!isLoggedIn && !isAdmin && (
-                  <Panel className='col-span-2 text-center mb-4 md:mb-6 p-4 md:p-8 rounded-2xl shadow-2xl mt-16 w-full h-full'>
-                    {' '}
-                    <p className='text-sm md:text-2xl'>
-                      Welcome back, <span className='text-medium-purple-300'></span>
-                    </p>
-                  </Panel>
-                )}
-              </div>
-            )}
-          </div> */}
 
           <div className="flex flex-col items-center justify-center ">
             {isLoggedIn && !isAdmin && (
@@ -830,11 +840,16 @@ const BmiCalculator: React.FC = () => {
                   Welcome back,{' '}
                   <span className="text-medium-purple-300">{userDetails.nickname}</span>
                 </p>
-                <h2 className="mt-8 text-gray-500">
-                  Create a weekly plan to view your daily exercises
-                </h2>
 
-                {weeklyPlan && (
+                {isLoadingPlan ? ( // New loading state check
+                  <div className="flex mt-6 justify-center items-center">
+                    <Spinner
+                      className="h-8 w-8  text-purple-500"
+                      onPointerEnterCapture={undefined}
+                      onPointerLeaveCapture={undefined}
+                    />
+                  </div>
+                ) : weeklyPlan ? ( // Check if weeklyPlan exists
                   <div className="mt-6 md:mt-4 p-4 md:p-2">
                     <div className="flex items-center ">
                       <h1 className="text-xl md:text-2xl font-bold text-gray-100">
@@ -872,6 +887,11 @@ const BmiCalculator: React.FC = () => {
                       )}
                     </ul>
                   </div>
+                ) : (
+                  // Fallback message if no weeklyPlan
+                  <h2 className="mt-8 text-gray-500">
+                    Create a weekly plan to view your daily exercises
+                  </h2>
                 )}
               </Panel>
             )}
@@ -956,67 +976,10 @@ const BmiCalculator: React.FC = () => {
           </div>
         </div>
 
-        <div className={showResults ? 'visible' : 'hidden'}>
-          <div className="mx-auto max-w-7xl ">
-            <div className="mt-4 mb-4 flex items-center justify-center">
-              <h2 className="text-2xl mt-4 font-semibold tracking-tight text-gray-300 sm:text-4xl">
-                What Your Results May Mean
-              </h2>
-            </div>
-            <div className="grid grid-cols-2 grid-rows-2 gap-8 sm:gap-12">
-              <div className="col-span-1 row-span-1">
-                <div className="mt-0 sm:mt-6 text-sm ml-4 sm:ml-0 sm:text-lg text-center text-gray-300">
-                  <p className="text-medium-purple-500">
-                    <strong>BMI (Body Mass Index):</strong>
-                  </p>
-                  <p className="text-gray-200">
-                    A BMI range of 18.5 to 24.9 is considered healthy. The higher the BMI, the
-                    greater the risk of developing or experiencing health problems. A BMI of 30 or
-                    higher may indicate obesity.
-                  </p>
-                </div>
-              </div>
-              <div className="col-span-1 row-span-1">
-                <div className="mt-0 sm:mt-6  mr-4 sm:mr-0 text-sm sm:text-lg sm:ml-0 text-center text-gray-300">
-                  <p className="text-medium-purple-500">
-                    <strong>Body Fat:</strong>
-                  </p>
-                  <p className="text-gray-200">
-                    Body fat percentage is a measure of the amount of body fat compared to total
-                    body weight. Healthy body fat percentages vary by age and gender.
-                  </p>
-                </div>
-              </div>
-              <div className="col-span-1 row-span-1">
-                <div className="mt-0 sm:mt-6 ml-4 text-sm sm:text-lg sm:ml-0 text-center text-gray-300">
-                  <p className="text-medium-purple-500">
-                    <strong>Fat Mass:</strong>
-                  </p>
-                  <p className="text-gray-200">
-                    Fat mass refers to the total weight of fat in the body. Monitoring fat mass is
-                    essential for assessing overall health and fitness levels.
-                  </p>
-                </div>
-              </div>
-              <div className="col-span-1 row-span-1">
-                <div className="mt-0 sm:mt-6  mr-4 text-sm sm:text-lg sm:mr-0 text-center text-gray-300">
-                  <p className="text-medium-purple-500">
-                    <strong>Lean Mass:</strong>
-                  </p>
-                  <p className="text-gray-200">
-                    Lean mass is the weight of everything in the body except fat, including muscles,
-                    bones, organs, and more. Maintaining a healthy balance of lean mass is crucial
-                    for overall well-being.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
         <div className="w-full flex flex-col items-center justify-center">
           {isLoggedIn && (
             <Card
-              className={`mx-4 mt-4 sm:mx-10 rounded-xl mb-6 sm:mb-4 shadow-2xl  bg-secondary-400 px-6 ${
+              className={`mx-4 mt-10 sm:mx-10 rounded-xl mb-6 sm:mb-4 shadow-2xl  bg-secondary-400 px-6 ${
                 !weeklyPlan ? 'sm:w-[94.5%]  mx-2 pb-4  sm:mx-auto' : 'w-[94.5%] '
               }`}
             >
@@ -1030,7 +993,7 @@ const BmiCalculator: React.FC = () => {
                 </div>
               ) : weeklyPlan ? (
                 <>
-                  <h1 className="bg-medium-purple-500 text-gray-100 font-semibold p-3 sm:w-1/2 w-3/4 mx-auto rounded-bl-lg rounded-br-lg text-center mb-4 border-secondary-600 border-b-[2px] border-l-[2px] border-r-[2px]">
+                  <h1 className="bg-medium-purple-500 text-gray-100 font-semibold  p-3 sm:w-1/2 w-3/4 mx-auto rounded-bl-lg rounded-br-lg text-center mb-4 border-secondary-600 border-b-[2px] border-l-[2px] border-r-[2px]">
                     My Active Weekly Plan:{' '}
                     <span className="text-yellow-400">{weeklyPlan.planName || 'Unnamed Plan'}</span>
                   </h1>
@@ -1071,7 +1034,7 @@ const BmiCalculator: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="text-center py-4">
+                <div className="text-center py-2">
                   <p className="text-gray-200 font-semibold text-2xl mb-2">
                     Don&apos;t have an active weekly plan yet?
                   </p>
@@ -1182,6 +1145,94 @@ const BmiCalculator: React.FC = () => {
           </div>
         </div>
       </div>
+      <MTDialog
+        size="lg"
+        open={isModalOpen}
+        handler={handleCloseModal}
+        className="bg-secondary-500 outline outline-medium-purple-500/70 bg-opacity-90 max-h-[90vh] overflow-y-auto"
+      >
+        {/* Header */}
+        <DialogHeader className="text-center text-medium-purple-300 font-semibold text-2xl mb-4">
+          What Your Results May Mean
+        </DialogHeader>
+
+        {/* Body */}
+        <DialogBody className="overflow-y-auto flex flex-col items-center space-y-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            {/* BMI Explanation */}
+            <div>
+              <p className="text-medium-purple-300 font-bold">BMI (Body Mass Index):</p>
+              <p className="text-gray-200">
+                A BMI range of 18.5 to 24.9 is considered healthy. A BMI of 30 or higher may
+                indicate obesity, which could raise health risks.
+              </p>
+            </div>
+
+            {/* Body Fat Explanation */}
+            <div>
+              <p className="text-medium-purple-300 font-bold">Body Fat:</p>
+              <p className="text-gray-200">
+                Body fat percentage is the amount of body fat compared to total body weight. Healthy
+                ranges vary by age and gender.
+              </p>
+            </div>
+
+            {/* Fat Mass Explanation */}
+            <div>
+              <p className="text-medium-purple-300 font-bold">Fat Mass:</p>
+              <p className="text-gray-200">
+                Fat mass represents the total weight of fat in the body. Monitoring it is key to
+                assessing health and fitness.
+              </p>
+            </div>
+
+            {/* Lean Mass Explanation */}
+            <div>
+              <p className="text-medium-purple-300 font-bold">Lean Mass:</p>
+              <p className="text-gray-200">
+                Lean mass includes everything in the body except fat, such as muscles, bones, and
+                organs, vital for overall health.
+              </p>
+            </div>
+          </div>
+
+          {/* New Section for Calculations Explanation */}
+          <div className="w-full border-t border-medium-purple-500/40 pt-6">
+            <h3 className="text-medium-purple-300 font-semibold text-lg text-center mb-4">
+              How Calculations Are Made
+            </h3>
+            <ul className="list-disc list-inside space-y-2 text-gray-200 ">
+              <li>
+                <strong>BMR Calculation:</strong> Based on sex, weight, height, and age using a
+                specific formula for males and females.
+              </li>
+              <li>
+                <strong>Body Fat Percentage:</strong> Calculated with waist, neck, height, and
+                additional measurements using distinct formulas for men and women.
+              </li>
+              <li>
+                <strong>Body Fat Mass:</strong> Derived from body fat percentage and total weight.
+              </li>
+              <li>
+                <strong>Lean Mass:</strong> Calculated as total weight minus body fat mass.
+              </li>
+              <li>
+                <strong>BMI:</strong> Computed with the formula weight (lb) / [height (in)]² x 703.
+              </li>
+            </ul>
+          </div>
+        </DialogBody>
+
+        {/* Footer */}
+        <DialogFooter className="flex justify-center mt-6">
+          <button
+            onClick={handleCloseModal}
+            className="bg-medium-purple-500 hover:bg-medium-purple-600 text-white py-2 px-4 rounded-lg"
+          >
+            Close
+          </button>
+        </DialogFooter>
+      </MTDialog>
     </motion.div>
   )
 }
