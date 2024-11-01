@@ -1087,7 +1087,7 @@ export default function Results() {
                             </div>
                           ))}
                       {selectedCategory === 'exercises' && (
-                        <div className="results-container ">
+                        <div className="sm:w-1/2 w-full">
                           {exerciseResults.length === 0 ? ( // Check if there are no exercise results
                             <div className="text-gray-200 text-center p-4">
                               <p className="text-gray-200">
