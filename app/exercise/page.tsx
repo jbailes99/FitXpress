@@ -362,8 +362,10 @@ const ExerciseTracker = () => {
                   </p>
                 )}
                 <p className="text-gray-300 text-base sm:text-lg flex items-center space-x-4">
-                  <span className="font-bold">Estimated Calories Burned:</span>
-                  <div className="flex space-x-2 items-center">
+                  <span className="font-bold sm:text-center text-start  ">
+                    Estimated Calories Burned:
+                  </span>
+                  <div className="flex sm:space-x-2 space-x-2  items-center ">
                     <Tooltip
                       className="bg-medium-purple-500"
                       content="Calories burned are estimated based on user weight, exercise type, intensity, and duration."
@@ -375,7 +377,7 @@ const ExerciseTracker = () => {
                         </div>
                       </div>
                     </Tooltip>
-                    <span>
+                    <span className="text-start">
                       {caloriesBurned !== null ? Math.round(caloriesBurned) : 'N/A'} calories
                     </span>
                   </div>
@@ -561,13 +563,13 @@ const ExerciseTracker = () => {
               </div>
 
               <div className="flex">
-                <div className="mt-12 text-black text-center justify-center items-center flex-grow w-11/12">
+                <div className="sm:mt-12 mt-2 text-black text-center justify-center items-center flex-grow w-11/12">
                   <h1 className="text-center text-white text-3xl font-bold mb-4">
                     Let&apos;s get started
                   </h1>
                   {/* Workout category dropdown */}
                   <div className="flex justify-center text-center ">
-                    <div className="w-1/2">
+                    <div className="sm:w-1/2 w-11/12">
                       <select
                         className="mt-1 p-2 border border-gray-300 rounded-md w-full text-center"
                         value={selectedCategory}
@@ -765,7 +767,7 @@ const ExerciseTracker = () => {
               />
             </div>
           ) : exerciseEntries.length > 0 ? (
-            <div className="flex-grow mx-auto sm:w-1/2">
+            <div className="flex-grow mx-auto sm:w-1/2 w-11/12">
               <div className="mt-12 justify-center text-center">
                 <div className="results-container ">
                   {exerciseEntries
