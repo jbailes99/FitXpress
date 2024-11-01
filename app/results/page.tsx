@@ -1,12 +1,25 @@
 'use client'
 import React, { Fragment, useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { api } from '@/lib/api'
 import { getCurrentTokens, getUserDetails } from '@/utils/authService'
 import { Spinner } from '@material-tailwind/react'
 import { Alert } from '@material-tailwind/react'
 import { Button } from '@/components/button'
-
+import { FaUser, FaChartLine, FaWeight } from 'react-icons/fa'
+import {
+  GiMuscleUp,
+  GiBodySwapping,
+  GiBurningPassion,
+  GiRunningNinja,
+  GiWeightLiftingUp,
+  GiBodyBalance,
+} from 'react-icons/gi'
+import { BsSpeedometer2 } from 'react-icons/bs'
+import { FaCalculator } from 'react-icons/fa'
+import { IoBody, IoFitness } from 'react-icons/io5'
+import { FaTshirt } from 'react-icons/fa'
+import { Tooltip } from '@material-tailwind/react'
 import { Line } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -15,18 +28,37 @@ import {
   LineElement,
   PointElement,
   Title,
-  Tooltip,
+  Tooltip as ChartTooltip,
   Legend,
   ChartOptions,
 } from 'chart.js'
+import { TbInfoTriangle } from 'react-icons/tb'
+import { useRouter } from 'next/navigation'
 
 // Register required Chart.js components including PointElement
-ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend)
+ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, ChartTooltip, Legend)
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
+const AlertMessage = ({ message, color, show }) => (
+  <AnimatePresence>
+    {show && (
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -50 }}
+        transition={{ duration: 0.3 }}
+        className="transform -translate-x-1/2 z-50"
+      >
+        <Alert color={color} className="bg-opacity-75 w-1/2 mx-auto mt-2 mb-2">
+          {message}
+        </Alert>
+      </motion.div>
+    )}
+  </AnimatePresence>
+)
 export default function Results() {
   const [selectedCategory, setSelectedCategory] = useState('bodyMetrics')
   const [loading, setLoading] = useState(true)
@@ -42,8 +74,12 @@ export default function Results() {
     cardio: { totalDistance: 0, totalTime: 0 },
   })
   const [loader, setLoader] = useState(false)
-  const [showAlert, setShowAlert] = useState(false)
-  const [alertMessage, setAlertMessage] = useState('')
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false)
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false)
+  const [mostDoneExercise, setMostDoneExercise] = useState<{ type: string; count: number }>({
+    type: '',
+    count: 0,
+  })
 
   interface ExerciseResultItem {
     id: number
@@ -86,6 +122,7 @@ export default function Results() {
 
   const exerciseDeleteEndpoint =
     'https://d4wil5bz64.execute-api.us-east-1.amazonaws.com/default/deleteExerciseLog'
+
   const handleDeleteLogs = async (entryId) => {
     setLoader(true)
     try {
@@ -96,8 +133,15 @@ export default function Results() {
       console.log('Deleting item with entryId:', entryId)
       const response = await api.post(exerciseDeleteEndpoint, { entryId, userId })
       console.log('Response from lambda:', response.data)
-      alert('Exercise log deleted.')
-      fetchExerciseLogs()
+
+      setShowDeleteAlert(true)
+
+      // Fetch the updated exercise logs after deletion
+      await fetchExerciseLogs()
+
+      setTimeout(() => {
+        setShowDeleteAlert(false)
+      }, 2000)
     } catch (error) {
       console.error('Error deleting item:', error)
     }
@@ -114,7 +158,12 @@ export default function Results() {
       console.log('Deleting item with entryId:', entryId)
       const response = await api.post(deleteEndpoint, { entryId, userId })
       console.log('Response from lambda:', response.data)
-      alert('Calculation entry deleted.')
+
+      setShowSuccessAlert(true)
+
+      setTimeout(() => {
+        setShowSuccessAlert(false)
+      }, 2000)
       fetchResults()
     } catch (error) {
       console.error('Error deleting item:', error)
@@ -369,7 +418,9 @@ export default function Results() {
         <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-lg">
           <h1 className="text-xl font-semibold mb-2">{title}:</h1>
           {!loading ? (
-            <span className={`text-${value < 0 ? 'green' : 'red'}-500`}>{value.toFixed(2)}%</span>
+            <span className={`text-${value === 0 ? 'gray' : value < 0 ? 'green' : 'red'}-500`}>
+              {value.toFixed(2)}%
+            </span>
           ) : (
             <div className="flex items-center mt-2 justify-center">
               <Spinner
@@ -405,29 +456,70 @@ export default function Results() {
       case 'Cardio':
         return (
           <>
-            <div className="flex text-gray-200">
-              <div>
-                <p className="text-base text-gray-200 mb-1">
-                  <strong>{item.timestamp}</strong>
+            <div className="text-white">
+              <div className="flex items-center space-x-3 justify-center mb-4">
+                <GiRunningNinja className="text-gray-200 h-6 w-6" />
+                <h2 className="text-gray-300 text-base sm:text-lg">
+                  <span className="font-semibold text-white">
+                    {item.exerciseCategory.charAt(0).toUpperCase() + item.exerciseCategory.slice(1)}
+                  </span>{' '}
+                  at <span className="font-semibold text-white">{item.timestamp}</span>
+                </h2>
+              </div>
+              <div className="space-y-3 w-3/4 mx-auto sm:space-y-2 border-t border-gray-700 pt-4">
+                <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                  <div>
+                    <span className="font-bold">Exercise:</span>{' '}
+                    {item.exerciseType.charAt(0).toUpperCase() + item.exerciseType.slice(1)}
+                  </div>
                 </p>
-
-                <p className="text-base text-gray-200 mb-1">Exercise Type: {item.exerciseType}</p>
-                {item.intensity && (
-                  <p className="text-base text-gray-200 mb-1">Intensity: {item.intensity}</p>
-                )}
-                <p className="text-base text-gray-200 mb-1">Time: {item.time}</p>
                 {item.distance && (
-                  <p className="text-base text-gray-200 mb-1">Distance: {item.distance}</p>
-                )}
-                {item.additionalInfo && (
-                  <p className="text-base text-gray-200 mb-1">
-                    Additional Info: {item.additionalInfo}
+                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                    <div>
+                      <span className="font-bold">Distance:</span> {item.distance}
+                    </div>
                   </p>
                 )}
-              </div>
-              <div className="justify-center items-center flex ml-36 px-4 text">
-                <p className="font-bold text-xl text-medium-purple-300" style={{ margin: '5px 0' }}>
-                  {caloriesBurned} calories burned
+                {item.time && (
+                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                    <div>
+                      <span className="font-bold">Time:</span> {item.time}
+                    </div>
+                  </p>
+                )}
+                {item.intensity && (
+                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                    <div>
+                      <span className="font-bold">Intensity:</span>{' '}
+                      {item.intensity.charAt(0).toUpperCase() + item.intensity.slice(1)}
+                    </div>
+                  </p>
+                )}
+                {item.additionalInfo && (
+                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                    <div>
+                      <span className="font-bold">Additional Info:</span> {item.additionalInfo}
+                    </div>
+                  </p>
+                )}
+                <p className="text-gray-300 text-base sm:text-lg flex items-center space-x-4">
+                  <span className="font-bold">Estimated Calories Burned:</span>
+                  <div className="flex space-x-2 items-center">
+                    <Tooltip
+                      className="bg-medium-purple-500"
+                      content="Calories burned are estimated based on user weight, exercise type, intensity, and duration."
+                      position="right"
+                    >
+                      <div className="text-gray-300 text-base sm:text-lg flex items-center">
+                        <div>
+                          <TbInfoTriangle className="text-medium-purple-300" />
+                        </div>
+                      </div>
+                    </Tooltip>
+                    <span>
+                      {caloriesBurned !== null ? Math.round(caloriesBurned) : 'N/A'} calories
+                    </span>
+                  </div>
                 </p>
               </div>
             </div>
@@ -436,30 +528,82 @@ export default function Results() {
       case 'Strength training':
         return (
           <>
-            <p className="text-base text-gray-200 mb-1">
-              <strong>{item.timestamp}</strong>
-            </p>
-            <p className="text-base text-gray-200 mb-1">Exercise Type: {item.exerciseType}</p>
-
-            {item.weight && <p className="text-base text-gray-200 mb-1">Weight: {item.weight}</p>}
-            {item.reps && <p className="text-base text-gray-200 mb-1">Reps: {item.reps}</p>}
-            {item.sets && <p className="text-base text-gray-200 mb-1">Sets: {item.sets}</p>}
-            {item.additionalInfo && (
-              <p className="text-base text-gray-200 mb-1">Comments: {item.additionalInfo}</p>
-            )}
+            <div className="text-white">
+              <div className="flex items-center space-x-3 justify-center mb-4">
+                <GiWeightLiftingUp className="text-gray-200 h-6 w-6" />
+                <h2 className="text-gray-300 text-base sm:text-lg">
+                  <span className="font-semibold text-white">{item.exerciseCategory}</span> at{' '}
+                  <span className="font-semibold text-white">{item.timestamp}</span>
+                </h2>
+              </div>
+              <div className="space-y-3 w-3/4  mx-auto sm:space-y-2 border-t border-gray-700 pt-4">
+                <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                  <div>
+                    <span className="font-bold">Exercise:</span>{' '}
+                    {item.exerciseType.charAt(0).toUpperCase() + item.exerciseType.slice(1)}
+                  </div>
+                </p>
+                {item.weight && (
+                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                    <div>
+                      <span className="font-bold">Weight:</span> {item.weight}
+                    </div>
+                  </p>
+                )}
+                {item.reps && (
+                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                    <div>
+                      <span className="font-bold">Reps:</span> {item.reps}
+                    </div>
+                  </p>
+                )}
+                {item.sets && (
+                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                    <div>
+                      <span className="font-bold">Sets:</span> {item.sets}
+                    </div>
+                  </p>
+                )}
+                {item.additionalInfo && (
+                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                    <div>
+                      <span className="font-bold">Additional Info:</span> {item.additionalInfo}
+                    </div>
+                  </p>
+                )}
+              </div>
+            </div>
           </>
         )
       case 'Bodyweight Exercises':
         return (
           <>
-            <div className=" text-gray-200">
-              <p className="text-base mb-1">{item.timestamp}</p>
-
-              <p className="text-base mb-1">Exercise Type: {item.exerciseType}</p>
-
-              {item.amount && <p className="text-base mb-1">Reps: {item.amount}</p>}
+            <div className="flex items-center space-x-3 justify-center mb-4">
+              <GiBodyBalance className="text-gray-200 h-6 w-6" />
+              <h2 className="text-gray-300 text-base sm:text-lg">
+                <span className="font-semibold text-white">{item.exerciseCategory}</span> at{' '}
+                <span className="font-semibold text-white">{item.timestamp}</span>
+              </h2>
+            </div>
+            <div className="space-y-3 w-3/4  mx-auto sm:space-y-2 border-t border-gray-700 pt-4">
+              <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                <div>
+                  <span className="font-bold">Exercise:</span> {item.exerciseType}
+                </div>
+              </p>
+              {item.amount && (
+                <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                  <div>
+                    <span className="font-bold">Reps:</span> {item.amount}
+                  </div>
+                </p>
+              )}
               {item.additionalInfo && (
-                <p className="text-base mb-1">Comments: {item.additionalInfo}</p>
+                <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                  <div>
+                    <span className="font-bold">Additional Info:</span> {item.additionalInfo}
+                  </div>
+                </p>
               )}
             </div>
           </>
@@ -467,20 +611,32 @@ export default function Results() {
       default:
         return (
           <>
-            <p className="text-gray-200" style={{ fontSize: '16px', margin: '5px 0' }}>
-              <strong>{item.timestamp}</strong>
-            </p>
-            <p className="text-gray-200" style={{ fontSize: '16px', margin: '5px 0' }}>
-              Exercise Type: {item.exerciseType}
-            </p>
-            <p className="text-red-200 " style={{ fontSize: '16px', margin: '5px 0' }}>
-              <strong>No statistics provided</strong>
-            </p>
-            {item.additionalInfo && (
-              <p className="text-gray-200" style={{ fontSize: '16px', margin: '5px 0' }}>
-                Additional Info: {item.additionalInfo}
-              </p>
-            )}
+            <div className="text-white">
+              <div className="flex items-center space-x-3 justify-center mb-4">
+                <IoFitness className="text-gray-200 h-6 w-6" />
+                <h2 className="text-gray-300 text-base sm:text-lg">
+                  <span className="font-semibold text-white">
+                    {item.exerciseCategory.charAt(0).toUpperCase() + item.exerciseCategory.slice(1)}
+                  </span>{' '}
+                  at <span className="font-semibold text-white">{item.timestamp}</span>
+                </h2>
+              </div>
+              <div className="space-y-3 w-3/4 mx-auto sm:space-y-2 border-t border-gray-700 pt-4">
+                <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                  <div>
+                    <span className="font-bold">Exercise:</span>{' '}
+                    {item.exerciseType.charAt(0).toUpperCase() + item.exerciseType.slice(1)}
+                  </div>
+                </p>
+                {item.additionalInfo && (
+                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                    <div>
+                      <span className="font-bold">Additional Info:</span> {item.additionalInfo}
+                    </div>
+                  </p>
+                )}
+              </div>
+            </div>
           </>
         )
     }
@@ -532,11 +688,37 @@ export default function Results() {
     return rgbColor
   }
 
+  // Function to calculate the most done exercise
+  const calculateMostDoneExercise = (entries: ExerciseResultItem[]) => {
+    const exerciseCount: { [key: string]: number } = {}
+
+    entries.forEach((entry) => {
+      if (entry.exerciseType) {
+        exerciseCount[entry.exerciseType] = (exerciseCount[entry.exerciseType] || 0) + 1
+      }
+    })
+
+    const mostDone = Object.entries(exerciseCount).reduce(
+      (prev, current) => (current[1] > prev.count ? { type: current[0], count: current[1] } : prev),
+      { type: '', count: 0 }
+    )
+
+    return mostDone
+  }
+
+  // Update the most done exercise whenever exerciseResults change
+  useEffect(() => {
+    const mostDone = calculateMostDoneExercise(exerciseResults)
+    setMostDoneExercise(mostDone)
+  }, [exerciseResults])
+
+  const router = useRouter()
+
   return (
     <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
       <>
         <main>
-          <div className=" bg-secondary-400 mx-4 my-4  rounded-xl  relative isolate overflow-hidden ">
+          <div className=" bg-secondary-400 pb-10 mx-4 my-4 flex-col rounded-xl  relative isolate overflow-hidden ">
             {/* Secondary navigation */}
             <div className="flex justify-center rounded-t-none ">
               <div className="flex bg-[#1f2937] w-1/16 px-4 justify-center space-x-12 pb-2 rounded-b-xl ">
@@ -558,7 +740,7 @@ export default function Results() {
                 </button>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row justify-center text-center sm:ml-6">
+            <div className="flex flex-col sm:flex-row justify-center text-center ">
               {/* <div className='flex space-x-24 items-center mt-4'> */}
               <div className=" rounded-2xl sm:w-1/2 w-full  mr-4 p-12 sm:mb-4 ">
                 <h3 className="font-bold text-gray-200">Statistics</h3>
@@ -599,6 +781,24 @@ export default function Results() {
 
                 {selectedCategory === 'exercises' && (
                   <div className="flex-row space-y-4">
+                    {/* Most Done Exercise Section */}
+                    <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-md">
+                      <h3 className="text-xl font-semibold mb-2">Favorite Exercise</h3>
+                      {mostDoneExercise.count > 0 ? (
+                        <p className="text-lg text-gray-200">
+                          <span className="font-bold text-medium-purple-500">
+                            {mostDoneExercise.type.charAt(0).toUpperCase() +
+                              mostDoneExercise.type.slice(1)}
+                          </span>{' '}
+                          has been done the most at a total of {mostDoneExercise.count} times.
+                        </p>
+                      ) : (
+                        <p className="text-lg">
+                          <span className="font-bold text-gray-200">Keep recording exercises!</span>
+                        </p>
+                      )}
+                    </div>
+
                     {/* Weight Lifting Section */}
                     {!exerciseStats.weightLifting.maxWeight ? (
                       <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-md">
@@ -615,7 +815,7 @@ export default function Results() {
                           <h3 className="text-xl font-semibold mb-2">Weight Lifting</h3>
                           <p className="text-lg text-gray-200 ">
                             Max Weight:{' '}
-                            <span className="font-bold">
+                            <span className="font-bold text-medium-purple-500">
                               {exerciseStats.weightLifting.maxWeight} kg
                             </span>
                           </p>
@@ -624,18 +824,27 @@ export default function Results() {
                     )}
 
                     {/* Cardio Section */}
-                    {(exerciseStats.cardio.totalDistance > 0 ||
-                      exerciseStats.cardio.totalTime > 0) && (
+                    {!exerciseStats.cardio.totalTime ? (
                       <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-md">
-                        <h3 className="text-xl font-semibold mb-2 text-gray-200 ">Cardio</h3>
-
-                        <p className="text-lg text-gray-200">
-                          Total Time:{' '}
-                          <span className="font-bold">
-                            {exerciseStats.cardio.totalTime} minutes
+                        <h3 className="text-xl font-semibold mb-2">Cardio</h3>
+                        <p className="text-lg">
+                          <span className="font-bold text-gray-200">
+                            Record cardio exercises to display stats!
                           </span>
                         </p>
                       </div>
+                    ) : (
+                      exerciseStats.cardio.totalTime > 0 && (
+                        <div className="p-4 bg-secondary-600 text-gray-200 rounded-lg shadow-md">
+                          <h3 className="text-xl font-semibold mb-2">Cardio</h3>
+                          <p className="text-lg text-gray-200 ">
+                            Total Time:{' '}
+                            <span className="font-bold text-medium-purple-500">
+                              {exerciseStats.cardio.totalTime} minutes
+                            </span>
+                          </p>
+                        </div>
+                      )
                     )}
                   </div>
                 )}
@@ -659,7 +868,7 @@ export default function Results() {
                       </div>
                       <div className="hidden sm:block">
                         <button
-                          className="rounded-xl sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
+                          className="rounded-xl mt-4 text-white sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
                           style={{ backgroundColor: getColorForDataset('bmi') }}
                           onMouseOver={(e) =>
                             (e.currentTarget.style.backgroundColor = darkenColor(
@@ -674,7 +883,7 @@ export default function Results() {
                           BMI
                         </button>
                         <button
-                          className="rounded-xl sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
+                          className="rounded-xl text-white sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
                           style={{ backgroundColor: getColorForDataset('fatMass') }}
                           onMouseOver={(e) =>
                             (e.currentTarget.style.backgroundColor = darkenColor(
@@ -689,7 +898,7 @@ export default function Results() {
                           Fat Mass
                         </button>
                         <button
-                          className="rounded-xl sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
+                          className="rounded-xl text-white sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
                           style={{ backgroundColor: getColorForDataset('leanMass') }}
                           onMouseOver={(e) =>
                             (e.currentTarget.style.backgroundColor = darkenColor(
@@ -704,7 +913,7 @@ export default function Results() {
                           Lean Mass
                         </button>
                         <button
-                          className="rounded-xl sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
+                          className="rounded-xl text-white sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
                           style={{ backgroundColor: getColorForDataset('bodyFatPercentage') }}
                           onMouseOver={(e) =>
                             (e.currentTarget.style.backgroundColor = darkenColor(
@@ -720,7 +929,7 @@ export default function Results() {
                           Body Fat Percentage
                         </button>
                         <button
-                          className="rounded-xl sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
+                          className="rounded-xl text-white sm:p-2 p-2 sm:px-4 mr-2 sm:text-lg text-xs transition-colors duration-200"
                           style={{ backgroundColor: getColorForDataset('bodyWeight') }}
                           onMouseOver={(e) =>
                             (e.currentTarget.style.backgroundColor = darkenColor(
@@ -745,7 +954,7 @@ export default function Results() {
                   <>
                     <div className="mt-4 space-x-6 pb-2">
                       <button
-                        className="rounded-xl p-2 px-4 mr-2 transition-colors duration-200"
+                        className="rounded-xl sm:text-lg text-xs text-white p-2 px-4 mr-2 transition-colors duration-200"
                         style={{ backgroundColor: getColorForDataset('weightLifting') }}
                         onMouseOver={(e) =>
                           (e.currentTarget.style.backgroundColor = darkenColor(
@@ -781,98 +990,167 @@ export default function Results() {
                 )}
               </div>
             </div>
-          </div>
-
-          <div className="bg-secondary-400 rounded-xl m-4 space-y-16 py-16 xl:space-y-20">
-            <div>
-              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <h2 className="mx-auto text-center mb-2 max-w-2xl  text-base font-semibold leading-6 text-gray-300 lg:mx-0 lg:max-w-none">
-                  Recent activity
-                </h2>
-                {!loading ? (
-                  <div className="results-container">
-                    {selectedCategory === 'bodyMetrics' &&
-                      results
-                        .sort(
-                          (a: ResultItem, b: ResultItem) =>
-                            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-                        )
-                        .map((item, index) => (
-                          <div
-                            key={index}
-                            className="bg-secondary-100  text-white rounded-lg shadow-md sm:p-5 p-2 mb-5"
-                          >
-                            <div className="space-y-2 sm:space-y-1">
-                              <p className="text-gray-200 text-xs sm:text-sm font-bold">
-                                {item.timestamp}
-                              </p>
-                              <h2 className="text-gray-200 text-xs sm:text-base font-bold mb-2">
-                                {item.userId}
-                              </h2>
-                              <p className="text-gray-200 text-xs sm:text-lg">
-                                BMI: {item.bodyBMI}
-                              </p>
-                              <p className="text-gray-200 text-xs sm:text-lg">
-                                Body Lean Mass: {item.bodyLeanMass}
-                              </p>
-                              <p className="text-gray-200 text-xs sm:text-lg">
-                                Body Fat Calculation: {item.bodyFatCalc}
-                              </p>
-                              <p className="text-gray-200 text-xs sm:text-lg">
-                                Body Fat Mass: {item.bodyFatMass}
-                              </p>
-                              <p className="text-gray-200 text-xs sm:text-lg">
-                                entryId: {item.entryId}
-                              </p>
-                              <p className="text-gray-200 text-xs sm:text-lg">
-                                Weight: {item.weight}
-                              </p>
-                            </div>
-
-                            <Button
-                              onClick={() => handleDelete(item.entryId)}
-                              className="bg-red-600 text-gray-200 rounded shadow mt-4"
+            <div className="rounded-xl m-4 space-y-16 py-6 xl:space-y-20">
+              <div>
+                <div className="mx-auto ">
+                  <div className="relative mt-2 mb-12 w-11/12 mx-auto">
+                    <div aria-hidden="true" className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t-2 border-gray-200" />
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="bg-secondary-400 px-3 text-2xl font-semibold leading-6 text-medium-purple-300">
+                        All Activity
+                      </span>
+                    </div>
+                  </div>
+                  <AlertMessage
+                    message="Successfully deleted result"
+                    color="red"
+                    show={showSuccessAlert}
+                  />
+                  <AlertMessage
+                    message="Successfully deleted log"
+                    color="red"
+                    show={showDeleteAlert}
+                  />
+                  {!loading ? (
+                    <div className="sm:w-1/2 w-full mx-auto">
+                      {selectedCategory === 'bodyMetrics' &&
+                        results
+                          .sort(
+                            (a: ResultItem, b: ResultItem) =>
+                              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+                          )
+                          .map((item, index) => (
+                            <div
+                              key={index}
+                              className="bg-secondary-600 outline outline-medium-purple-300 text-gray-200 rounded-bl-md rounded-tr-md shadow-md sm:py-4 p-2 mb-5"
                             >
-                              Delete
-                            </Button>
-                          </div>
-                        ))}
-                    {selectedCategory === 'exercises' && (
-                      <div className="results-container ">
-                        {exerciseResults.map((item) => (
-                          <div
-                            key={item.id}
-                            className="bg-secondary-100 text-white"
-                            style={{
-                              borderRadius: '8px',
-                              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                              padding: '20px',
-                              marginBottom: '20px',
-                            }}
-                          >
-                            {renderExerciseDetails(item)}
+                              <div className="w-3/4 mx-auto">
+                                <div className="flex items-center space-x-3 justify-center mb-4">
+                                  <FaUser className="text-gray-200" />
+                                  <h2 className="text-gray-300 text-base sm:text-lg">
+                                    <span className="font-semibold text-white">{item.userId}</span>{' '}
+                                    at{' '}
+                                    <span className="font-semibold text-white">
+                                      {item.timestamp}
+                                    </span>
+                                  </h2>
+                                </div>
+                                <div className="space-y-3 sm:space-y-2 border-t border-gray-700 pt-4">
+                                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                                    <BsSpeedometer2 className="mr-2 text-gray-200" />
+                                    <div>
+                                      <span className="font-bold">BMI:</span>{' '}
+                                      {Math.round(item.bodyBMI)}
+                                    </div>
+                                  </p>
+                                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                                    <GiBodySwapping className="mr-2 text-gray-200" />
+                                    <div>
+                                      <span className="font-bold">Body Lean Mass:</span>{' '}
+                                      {Math.round(item.bodyLeanMass)}
+                                    </div>
+                                  </p>
+                                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                                    <GiBodySwapping className="mr-2 text-gray-200" />
+                                    <div>
+                                      <span className="font-bold">Body Fat Mass: </span>{' '}
+                                      {Math.round(item.bodyFatMass)}
+                                    </div>
+                                  </p>
+                                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                                    <GiBurningPassion className="mr-2 text-gray-200" />
+                                    <div>
+                                      <span className="font-bold">Body Fat Calculation: </span>{' '}
+                                      {Math.round(item.bodyFatCalc)}
+                                    </div>
+                                  </p>
+                                  <p className="text-gray-300 text-base sm:text-lg flex items-center">
+                                    <FaWeight className="mr-2 text-gray-200" />
+                                    <div>
+                                      <span className="font-bold">Weight:</span>{' '}
+                                      {Math.round(item.weight)}
+                                    </div>
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="flex justify-center">
+                                <Button
+                                  onClick={() => handleDelete(item.entryId)}
+                                  className="bg-red-600 text-gray-200 rounded shadow mt-4"
+                                >
+                                  Delete
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                      {selectedCategory === 'exercises' && (
+                        <div className="results-container ">
+                          {exerciseResults.length === 0 ? ( // Check if there are no exercise results
+                            <div className="text-gray-200 text-center p-4">
+                              <p className="text-gray-200">
+                                Go to Exercise Hub to record an exercise.
+                              </p>
+                              <Button
+                                onClick={() => {
+                                  // Navigate to Exercise Hub
+                                  router.push('/exercise') // Updated to link to /exercises
+                                }}
+                                className="mt-2 bg-medium-purple-500 text-white rounded px-4 py-2"
+                              >
+                                Go to Exercise Hub
+                              </Button>
+                            </div>
+                          ) : (
+                            exerciseResults.map((item) => (
+                              <div
+                                key={item.id}
+                                className="bg-secondary-600 outline outline-medium-purple-300 text-gray-200 rounded-bl-md rounded-tr-md shadow-md sm:py-4 p-2 mb-5"
+                              >
+                                <div className="w-3/4 mx-auto">{renderExerciseDetails(item)}</div>
+                                <div className="flex justify-center">
+                                  <Button
+                                    onClick={() => {
+                                      handleDeleteLogs(item.entryId)
+                                    }}
+                                    className="bg-red-600 text-gray-200 rounded shadow mt-4"
+                                  >
+                                    Delete
+                                  </Button>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
+                      {selectedCategory === 'bodyMetrics' &&
+                        results.length === 0 && ( // Check if there are no calculation results
+                          <div className="text-gray-200 text-center p-4">
+                            <p className="text-gray-200">No calculation results to display.</p>
                             <Button
                               onClick={() => {
-                                handleDeleteLogs(item.entryId)
+                                // Navigate to Metrics Recording Page
+                                router.push('/') // Update this path as necessary
                               }}
-                              className="bg-red-600 text-gray-200 rounded shadow"
+                              className="mt-2 bg-medium-purple-500 text-white rounded px-4 py-2"
                             >
-                              Delete
+                              Go make a calculation
                             </Button>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-center mt-2 justify-center">
-                    <Spinner
-                      className="h-8 w-8 text-purple-500"
-                      onPointerEnterCapture={undefined}
-                      onPointerLeaveCapture={undefined}
-                    />
-                  </div>
-                )}
+                        )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center mt-2 justify-center">
+                      <Spinner
+                        className="h-8 w-8 text-purple-500"
+                        onPointerEnterCapture={undefined}
+                        onPointerLeaveCapture={undefined}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
