@@ -456,7 +456,7 @@ export default function Results() {
       case 'Cardio':
         return (
           <>
-            <div className="text-white">
+            <div className="text-white mx-auto w-full">
               <div className="flex items-center space-x-3 justify-center mb-4">
                 <GiRunningNinja className="text-gray-200 h-6 w-6" />
                 <h2 className="text-gray-300 text-base sm:text-lg">
@@ -1087,7 +1087,7 @@ export default function Results() {
                             </div>
                           ))}
                       {selectedCategory === 'exercises' && (
-                        <div className="sm:w-1/2 w-full">
+                        <div className="sm:w-full w-full mx-auto">
                           {exerciseResults.length === 0 ? ( // Check if there are no exercise results
                             <div className="text-gray-200 text-center p-4">
                               <p className="text-gray-200">
