@@ -188,7 +188,7 @@ const ProfilePage: React.FC = () => {
             Profile
           </div>
 
-          <div className="mt-8 flex flex-col bg-secondary-600 outline outline-medium-purple-500 sm:w-1/4 w-11/12 p-4 mx-auto rounded-md items-center space-y-4 text-gray-200">
+          <div className="mt-8 flex flex-col bg-secondary-500 outline outline-medium-purple-500 sm:w-1/2 w-11/12 p-4 mx-auto rounded-md items-center space-y-4 text-gray-200">
             <h2 className="text-xl font-semibold text-center">
               <FaWeight className="inline-block mr-2" /> Weigh In
             </h2>
@@ -243,12 +243,24 @@ const ProfilePage: React.FC = () => {
             </AnimatePresence>
           </div>
 
+          {/* <div className="relative w-11/12 mx-auto mt-12">
+            <div aria-hidden="true" className="absolute inset-0 flex items-center">
+              <h1 className="mx-auto text-medium-purple-300 bg-secondary-400 p-4 text-lg">
+                User Settings
+              </h1>
+            </div>
+          </div> */}
           <div className="relative w-11/12 mx-auto mt-12">
             <div aria-hidden="true" className="absolute inset-0 flex items-center">
-              <h1 className="mx-auto bg-secondary-400 p-4 text-lg">User Settings</h1>
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-secondary-400 text-medium-purple-300 rounded px-3 text-xl font-semibold leading-6 ">
+                User Settings
+              </span>
             </div>
           </div>
-          <div className="outline rounded sm:w-3/4 w-2/3 mb-4 p-4 mx-auto ">
+          <div className="rounded sm:w-3/4 w-2/3 mb-4 p-4 mx-auto ">
             <form className="p-4 mt-4 ">
               {loading ? (
                 <div className="flex justify-center">
