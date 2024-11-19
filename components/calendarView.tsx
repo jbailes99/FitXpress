@@ -169,10 +169,10 @@ const CalendarView = () => {
             params: { category: selectedCategory },
           })
 
-          // Transform the string array to the required format
+          // Transform the string array to the required format with uppercase first letter
           const exerciseTypes = response.data.types.map((type) => ({
             value: type,
-            label: type,
+            label: type.charAt(0).toUpperCase() + type.slice(1), // Ensure first letter is uppercase
           }))
 
           setExerciseTypes(exerciseTypes)
@@ -402,7 +402,7 @@ const CalendarView = () => {
                           exercise
                         )} text-gray-700`}
                       >
-                        {exercise}
+                        {exercise.charAt(0).toUpperCase() + exercise.slice(1)}{' '}
                         <button
                           onClick={() => handleRemoveExercise(dayName, exercise)}
                           className="ml-2 text-lg  text-red-500"
@@ -512,7 +512,7 @@ const CalendarView = () => {
                               exercise
                             )} text-gray-700`}
                           >
-                            {exercise}
+                            {exercise.charAt(0).toUpperCase() + exercise.slice(1)}{' '}
                           </span>
                         )) || <span className="text-sm text-gray-500">No exercises</span>}
                       </div>
