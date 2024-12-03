@@ -190,6 +190,17 @@ const ProfilePage: React.FC = () => {
 
           <div className="mt-8 flex flex-col bg-secondary-500 outline outline-medium-purple-500 sm:w-1/2 w-11/12 p-4 mx-auto rounded-md items-center space-y-4 text-gray-200">
             <h2 className="text-xl font-semibold text-center">
+              {' '}
+              <div className="relative w-11/12 mx-auto mt-12">
+                <div aria-hidden="true" className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-[#1f2937] text-medium-purple-300 rounded px-3 text-2xl font-semibold leading-6 ">
+                    Recent Logs
+                  </span>
+                </div>
+              </div>
               <FaWeight className="inline-block mr-2" /> Weigh In
             </h2>
             <p className="text-gray-200">Current Weight: {userData?.weight}</p>
@@ -351,7 +362,9 @@ const ProfilePage: React.FC = () => {
                 <p>
                   {accessToken ? (
                     <>
-                      To view your profile, please <a href="/login">log in</a>.
+                      <div className="text-white">
+                        To view your profile, please <a href="/login">log in</a>.
+                      </div>
                     </>
                   ) : (
                     <>
