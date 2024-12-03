@@ -34,9 +34,9 @@ body {
 }
 
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active  {
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
   transition: background-color 5000s;
   -webkit-text-fill-color: #ffffff !important;
 }
@@ -148,4 +148,8 @@ p {
 .react-date-picker__calendar-day--selected {
   background-color: #3b82f6; /* Tailwind's bg-blue-500 */
   color: white;
+}
+
+.text-shadow {
+  text-shadow: 2px 2px 4px rgba(42, 10, 38, 0.5); /* Adjust values and color for your effect */
 }

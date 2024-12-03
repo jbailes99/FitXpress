@@ -444,7 +444,7 @@ const BmiCalculator: React.FC = () => {
               <div className="flex flex-grow items-center "></div>
               {!showResults && (
                 <div className="flex items-center ">
-                  <p className="sm:text-xl text-sm  sm:mb-10 mb-6 mt-4 text-gray-200">
+                  <p className="sm:text-2xl text-shadow text-sm  sm:mb-10 mb-6 mt-4 text-bold text-medium-purple-200">
                     Gain comprehensive insight into your body composition
                   </p>
                 </div>
