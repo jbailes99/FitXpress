@@ -151,5 +151,5 @@ p {
 }
 
 .text-shadow {
-  text-shadow: 2px 2px 4px rgba(42, 10, 38, 0.5); /* Adjust values and color for your effect */
+  text-shadow: 1px 1px 2px #ffffff80; /* Adjust values and color for your effect */
 }
