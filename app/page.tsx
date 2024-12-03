@@ -386,7 +386,7 @@ const BmiCalculator: React.FC = () => {
                         />
                       </svg>
                       <span className="text-xs md:text-sm text-gray-200 font-semibold">
-                        {exercise}
+                        {exercise.charAt(0).toUpperCase() + exercise.slice(1)}{' '}
                       </span>
                     </li>
                   ))
@@ -441,9 +441,10 @@ const BmiCalculator: React.FC = () => {
                   Body Composition Calculator
                 </Typography>
               </div>
+              <div className="flex flex-grow items-center "></div>
               {!showResults && (
-                <div className="flex-grow flex items-center ">
-                  <p className="sm:text-xl text-xs  sm:mb-0 mb-6 mt-4 text-gray-200">
+                <div className="flex items-center ">
+                  <p className="sm:text-xl text-sm  sm:mb-10 mb-6 mt-4 text-gray-200">
                     Gain comprehensive insight into your body composition
                   </p>
                 </div>
@@ -878,7 +879,7 @@ const BmiCalculator: React.FC = () => {
                               />
                             </svg>
                             <span className="text-xs md:text-sm text-gray-200 font-semibold">
-                              {exercise}
+                              {exercise.charAt(0).toUpperCase() + exercise.slice(1)}{' '}
                             </span>
                           </li>
                         ))
@@ -1021,7 +1022,7 @@ const BmiCalculator: React.FC = () => {
                                   exercise
                                 )} text-gray-700`}
                               >
-                                {exercise}
+                                {exercise.charAt(0).toUpperCase() + exercise.slice(1)}{' '}
                               </span>
                             )) || <span className="text-sm text-gray-500">No exercises</span>}
                           </div>
