@@ -436,17 +436,19 @@ const BmiCalculator: React.FC = () => {
               <div className="flex items-center justify-center  w-full rounded-tr-xl rounded-tl-xl h-16 bg-medium-purple-500 text-gray-200">
                 <Typography
                   variant="h5"
-                  className="sm:text-3xl text-md text-gray-200 font-semibold"
+                  className="sm:text-2xl text-md font-sans text-gray-200 font-semibold"
                 >
                   Body Composition Calculator
                 </Typography>
               </div>
               <div className="flex flex-grow items-center "></div>
               {!showResults && (
-                <div className="flex items-center ">
-                  <p className="sm:text-2xl text-shadow text-sm  sm:mb-10 mb-6 mt-4 text-bold text-medium-purple-300">
-                    Gain comprehensive insight into your body composition
-                  </p>
+                <div className="relative mt-2 mb-12 w-11/12 mx-auto">
+                  <div className="relative flex justify-center">
+                    <span className="bg-secondary-400 px-3 text-2xl font-semibold leading-6 text-gray-200">
+                      Gain comprehensive insight into your body composition
+                    </span>
+                  </div>
                 </div>
               )}
               <div className="flex-grow flex flex-col w-full ">
