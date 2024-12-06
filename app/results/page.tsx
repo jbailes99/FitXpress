@@ -50,9 +50,12 @@ const AlertMessage = ({ message, color, show }) => (
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}
         transition={{ duration: 0.3 }}
-        className="transform -translate-x-1/2 z-50"
+        className="transform mx-auto -translate-x-1/2 z-50"
       >
-        <Alert color={color} className="bg-opacity-75 w-1/2 mx-auto mt-2 mb-2">
+        <Alert
+          color={color}
+          className="bg-opacity-75 w-1/2 text-center  mx-auto mt-2 mb-2 flex justify-center"
+        >
           {message}
         </Alert>
       </motion.div>
