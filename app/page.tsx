@@ -926,7 +926,7 @@ const BmiCalculator: React.FC = () => {
 
             {isAdmin && (
               <Panel className="col-span-2 text-center mb-4 md:mb-6 p-4 md:p-6 rounded-2xl shadow-2xl mt-8 md:mt-16 w-full h-auto">
-                <p className="text-xs md:text-lg">
+                <p className="text-xs md:text-lg text-gray-200">
                   Administrator:{' '}
                   <span className="text-medium-purple-300">{userDetails.nickname}</span>
                 </p>

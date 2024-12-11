@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { addDays, format, startOfWeek } from 'date-fns'
+import { addDays, format, set, startOfWeek } from 'date-fns'
 import { api } from '@/lib/api' // Import your API utility function
 import { StarIcon } from '@heroicons/react/24/solid'
 import { components } from 'react-select'
@@ -7,6 +7,8 @@ import { Spinner } from '@material-tailwind/react'
 import Select from 'react-select'
 import { getCurrentTokens, getUserDetails } from '@/utils/authService'
 import { useIsLoggedIn, useUserDetails, useIsAdmin } from '@/hooks'
+import { motion } from 'framer-motion'
+import { Alert } from '@material-tailwind/react'
 
 interface WeeklyPlan {
   planName: string
@@ -31,7 +33,9 @@ const CalendarView = () => {
   const makeWeeklyPlanActiveApi = process.env.NEXT_PUBLIC_MAKE_PLAN_ACTIVE
   const [isLoading, setIsLoading] = useState(false)
   const [planName, setPlanName] = useState('')
-
+  const [isDeleting, setIsDeleting] = useState(false) // New state for deleting status
+  const [deleteMessage, setDeleteMessage] = useState('') // New state for delete message
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false) // State to control alert visibility
   const [activePlan, setActivePlan] = useState<string | null>(null)
   const [weeklyPlans, setWeeklyPlans] = useState<WeeklyPlan[]>([])
   const userDetails = useUserDetails()
@@ -41,6 +45,8 @@ const CalendarView = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [categories, setCategories] = useState<string[]>([])
   const [exerciseTypes, setExerciseTypes] = useState<{ value: string; label: string }[]>([])
+  const [isSaving, setIsSaving] = useState(false) // New state for saving status
+  const [successMessage, setSuccessMessage] = useState('') // New state for success message
 
   const daysOfWeek = Array.from({ length: 7 }).map((_, index) => addDays(weekStart, index))
 
@@ -61,6 +67,9 @@ const CalendarView = () => {
       alert('error')
       return
     }
+
+    setIsDeleting(true)
+    setDeleteMessage('')
     try {
       const storedTokens = getCurrentTokens()
       const userDetails = await getUserDetails(storedTokens.accessToken)
@@ -69,10 +78,17 @@ const CalendarView = () => {
       console.log('Deleting item with entryId:', entryId)
       const response = await api.post(deleteWeeklyPlanApi, { entryId, userId })
       console.log('Response from lambda:', response.data)
-      alert('Log entry deleted.')
+      setDeleteMessage('Log entry deleted successfully')
+      setShowDeleteAlert(true)
+      setTimeout(() => {
+        setShowDeleteAlert(false)
+      }, 3000) // Hide alert after 3 seconds
       fetchWeeklyPlans()
     } catch (error) {
       console.error('Error deleting item:', error)
+      alert('an error ocured while deleting')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -258,6 +274,9 @@ const CalendarView = () => {
 
   // Function to handle saving the weekly plan to the backend
   const handleSaveWeeklyPlan = async () => {
+    setIsSaving(true) // Set loading state to true
+    setSuccessMessage('') // Reset success message
+
     const storedTokens = getCurrentTokens()
     const userDetails = await getUserDetails(storedTokens.accessToken)
     const userId = userDetails.username
@@ -290,6 +309,12 @@ const CalendarView = () => {
       if (response.ok) {
         await fetchWeeklyPlans()
 
+        setSuccessMessage('Weekly plan saved successfully')
+
+        setTimeout(() => {
+          setSuccessMessage('') // Set success message
+        }, 3000)
+
         // reset
         setSelectedExercises({
           Monday: [],
@@ -311,6 +336,8 @@ const CalendarView = () => {
     } catch (error) {
       console.error('Error saving weekly plan:', error)
       alert('An error occurred while saving the plan.')
+    } finally {
+      setIsSaving(false) // Reset loading state
     }
   }
 
@@ -463,10 +490,22 @@ const CalendarView = () => {
         <div className="sm:px-4 sm:pt-3 py-4 px-2 bg-secondary-400 rounded-t-xl inline-block sm:w-4.5 ">
           <button
             onClick={handleSaveWeeklyPlan}
-            className="bg-medium-purple-500 text-white sm:p-3 rounded-lg  hover:bg-medium-purple-600 w-full p-1 sm:w-auto sm:text-base text-xs"
+            className="bg-medium-purple-500 text-white sm:p-3 rounded-lg hover:bg-medium-purple-600 w-full p-1 sm:w-auto sm:text-base text-xs"
+            disabled={isSaving} // Disable button while saving
           >
-            Save Weekly Plan
+            {isSaving ? (
+              <Spinner
+                className="h-8 w-8 text-purple-500"
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+              />
+            ) : (
+              'Save Weekly Plan'
+            )}
           </button>
+          {successMessage && (
+            <p className="text-green-500 mt-2">{successMessage}</p> // Show success message
+          )}
         </div>
       </div>
 
@@ -480,6 +519,19 @@ const CalendarView = () => {
           </span>
         </div>
       </div>
+      {showDeleteAlert && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }} // Start slightly smaller
+          animate={{ opacity: 1, scale: 1 }} // Animate to full size
+          exit={{ opacity: 0, scale: 0.9 }} // Fade out and shrink
+          transition={{ duration: 0.5 }} // Duration for smoother transition
+          className="mx-auto w-1/2 transform -translate-x-1/2 z-50"
+        >
+          <Alert color="red" className="text-center bg-opacity-75">
+            {deleteMessage}
+          </Alert>
+        </motion.div>
+      )}
 
       <div className="p-4">
         {isLoading ? (
