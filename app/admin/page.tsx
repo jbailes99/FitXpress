@@ -3,6 +3,7 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { Panel } from '@/components/panel'
 import { api } from '@/lib/api'
+import { Spinner } from '@material-tailwind/react'
 
 interface Exercise {
   exerciseType: string
@@ -13,6 +14,7 @@ const AdminPanel = () => {
   const [exerciseType, setExerciseType] = useState('')
   const [exerciseCategory, setExerciseCategory] = useState('')
   const [exerciseList, setExerciseList] = useState<Exercise[]>([])
+  const [loading, setLoading] = useState(true)
 
   const apiEndpoint =
     'https://rh9j7m9y9j.execute-api.us-east-1.amazonaws.com/default/saveExerciseType'
@@ -43,6 +45,7 @@ const AdminPanel = () => {
   const fetchEndpoint =
     'https://bgcthf8l4l.execute-api.us-east-1.amazonaws.com/default/getAllExerciseTypes'
   const fetchExerciseList = async () => {
+    setLoading(true)
     try {
       const response = await api.get(fetchEndpoint)
       const exercises = Array.isArray(response.data.exercises) ? response.data.exercises : []
@@ -50,6 +53,8 @@ const AdminPanel = () => {
     } catch (error) {
       console.error('Error fetching exercise list:', error)
       setExerciseList([])
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -110,7 +115,13 @@ const AdminPanel = () => {
         </div>
         <div>
           <h2 className="text-2xl text-white font-semibold mb-4">Current List of Exercises</h2>
-          {Object.keys(groupedExercises).length > 0 ? (
+          {loading ? (
+            <Spinner
+              className="h-8 w-8 text-purple-500"
+              onPointerEnterCapture={undefined}
+              onPointerLeaveCapture={undefined}
+            />
+          ) : Object.keys(groupedExercises).length > 0 ? (
             Object.keys(groupedExercises).map((category, index) => (
               <div key={index} className="mb-6">
                 <h3 className="text-xl font-semibold mb-2 text-medium-purple-500">{category}</h3>
@@ -126,7 +137,7 @@ const AdminPanel = () => {
               </div>
             ))
           ) : (
-            <p>No exercises available</p>
+            <p className="text-gray-200">No exercises available</p>
           )}
         </div>
       </Panel>

@@ -292,9 +292,9 @@ const ProfilePage: React.FC = () => {
                       <input
                         type="text"
                         name="nickname"
-                        value={formValues.nickname}
+                        placeholder={formValues.nickname}
                         onChange={handleChange}
-                        className="mt-1 p-2 border rounded-md w-full text-center"
+                        className="mt-1 p-2 border rounded-md text-gray-700  w-full text-center"
                       />
 
                       <label className="block mt-4 text-sm font-medium text-gray-200 text-center">
@@ -315,9 +315,9 @@ const ProfilePage: React.FC = () => {
                       <input
                         type="text"
                         name="age"
-                        value={formValues.age}
+                        placeholder={formValues.age}
                         onChange={handleChange}
-                        className="mt-1 p-2 border rounded-md w-full text-center"
+                        className="mt-1 p-2 border rounded-md w-full text-gray-700 text-center"
                       />
 
                       <label className="block mt-4 text-sm font-medium text-gray-200 text-center">
@@ -327,13 +327,17 @@ const ProfilePage: React.FC = () => {
                         name="sex"
                         value={formValues.sex}
                         onChange={handleChange}
-                        className="mt-1 p-2 border rounded-md w-full text-center"
+                        className="mt-1 p-2 border rounded-md  w-full text-center"
                       >
                         <option value="" disabled>
                           Select sex
                         </option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
+                        <option className="text-gray-700 " value="male">
+                          Male
+                        </option>
+                        <option className="text-gray-700 " value="female">
+                          Female
+                        </option>
                       </select>
                     </div>
 
